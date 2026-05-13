@@ -30,13 +30,13 @@ export async function POST(req: Request) {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-
+    
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { imageData } = await req.json()
-
+    
     if (!imageData) {
       return Response.json({ error: 'No image provided' }, { status: 400 })
     }
@@ -97,7 +97,7 @@ Provide detailed analysis and style tips specific to this person's coloring.`
       .from('color_analyses')
       .insert({
         user_id: user.id,
-        photo_url: imageData,
+        photo_url: imageData, // Store the base64 for now, could upload to storage
         season: output.season,
         sub_season: output.sub_season,
         skin_undertone: output.skin_undertone,

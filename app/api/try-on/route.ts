@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     }
 
     if (!FASHN_API_KEY) {
-      return Response.json({
+      return Response.json({ 
         error: 'FASHN API key not configured. Please add FASHN_API_KEY to environment variables.',
         needsApiKey: true
       }, { status: 500 })
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
     if (!runResponse.ok) {
       const errorData = await runResponse.json().catch(() => ({}))
       console.error('FASHN API error:', errorData)
-      return Response.json({
+      return Response.json({ 
         error: 'Failed to start try-on job',
-        details: errorData
+        details: errorData 
       }, { status: 500 })
     }
 
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     // Step 2: Poll for completion
     let resultData = null
     const maxAttempts = 60 // ~2 minutes with 2 second intervals
-
+    
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       await new Promise(resolve => setTimeout(resolve, 2000))
 
@@ -84,31 +84,34 @@ export async function POST(req: Request) {
         resultData = statusData
         break
       } else if (statusData.status === 'failed') {
-        return Response.json({
+        return Response.json({ 
           error: 'Try-on generation failed',
-          details: statusData.error
+          details: statusData.error 
         }, { status: 500 })
       }
+      // Continue polling if still processing
     }
 
     if (!resultData || !resultData.output || resultData.output.length === 0) {
       return Response.json({ error: 'Try-on timed out or returned no results' }, { status: 500 })
     }
 
+    // Get the result image (base64 or URL)
     const resultImage = resultData.output[0]
 
+    // Save to history if we have a clothing item ID
     if (clothingItemId) {
       await supabase
         .from('try_on_history')
         .insert({
           user_id: user.id,
           clothing_item_id: clothingItemId,
-          original_photo_url: modelImage.substring(0, 500),
+          original_photo_url: modelImage.substring(0, 500), // Truncate for storage
           result_photo_url: resultImage.substring(0, 500),
         })
     }
 
-    return Response.json({
+    return Response.json({ 
       success: true,
       resultImage,
       predictionId
@@ -119,6 +122,7 @@ export async function POST(req: Request) {
   }
 }
 
+// GET endpoint to check status of a pending job
 export async function GET(req: Request) {
   const url = new URL(req.url)
   const predictionId = url.searchParams.get('id')

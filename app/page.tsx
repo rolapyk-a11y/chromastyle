@@ -18,7 +18,7 @@ export default function LandingPage() {
               Chroma<span className="text-primary">Style</span>
             </span>
           </Link>
-
+          
           <nav className="flex items-center gap-4">
             <Button variant="ghost" asChild>
               <Link href="/auth/login">Sign in</Link>
@@ -39,19 +39,19 @@ export default function LandingPage() {
               <Sparkles className="w-4 h-4 text-primary" />
               <span>AI-Powered Color Analysis</span>
             </div>
-
+            
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-balance">
               Discover the Colors That Make You{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
                 Look Your Best
               </span>
             </h1>
-
+            
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
-              Take a photo and let AI analyze your unique coloring. Get personalized clothing recommendations
+              Take a photo and let AI analyze your unique coloring. Get personalized clothing recommendations 
               from H&M, Zara, and more - all matched to your seasonal color palette.
             </p>
-
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="text-lg px-8">
                 <Link href="/auth/sign-up">
@@ -97,7 +97,7 @@ export default function LandingPage() {
               Our AI analyzes your unique features to find your perfect color palette in minutes
             </p>
           </div>
-
+          
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
@@ -148,7 +148,7 @@ export default function LandingPage() {
                 See How Clothes Look on You Before You Buy
               </h2>
               <p className="text-lg text-muted-foreground">
-                Our AI-powered virtual try-on lets you see exactly how clothing items will look on your body.
+                Our AI-powered virtual try-on lets you see exactly how clothing items will look on your body. 
                 No more guessing - shop with confidence knowing what works for you.
               </p>
               <ul className="space-y-3">
@@ -172,7 +172,7 @@ export default function LandingPage() {
                 </Link>
               </Button>
             </div>
-
+            
             <div className="relative">
               <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 via-accent/20 to-primary/10 flex items-center justify-center">
                 <div className="text-center space-y-4">
