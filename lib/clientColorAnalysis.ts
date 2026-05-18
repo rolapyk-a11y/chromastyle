@@ -214,7 +214,7 @@ async function sampleColorsFromImage(imageEl: HTMLImageElement): Promise<Sampled
 // Uses ITA + Lab b* (warm/cool axis) + L* (lightness) + chroma.
 // ITA is a validated dermatology metric that's more stable than raw b* alone.
 
-function classifySeason(colors: SampledColors): {
+function classifySeason(colors: SampledColors, knownUndertone?: 'warm' | 'cool'): {
   subSeason: SubSeason
   season: Season
   undertone: SkinUndertone
@@ -245,23 +245,25 @@ function classifySeason(colors: SampledColors): {
   const hairIsWarm = hairB > 12
   const hairIsDark = hairL < 38
 
-  // Undertone determination using b* + a*:
-  // Warm skin: b* > 14 (yellow-orange component), a* often > 8
-  // Neutral: b* 9-14
-  // Cool skin: b* < 9, skin looks pink/rosy
+  // Undertone: use the vein-colour answer if provided — it's more reliable
+  // than camera pixel data for the warm/cool axis.
   let undertone: SkinUndertone
-  if (skinB > 14) {
-    undertone = 'warm'
+  let isWarm: boolean
+  if (knownUndertone) {
+    isWarm = knownUndertone === 'warm'
+    undertone = knownUndertone
+  } else if (skinB > 14) {
+    isWarm = true; undertone = 'warm'
   } else if (skinB < 9) {
-    undertone = 'cool'
+    isWarm = false; undertone = 'cool'
   } else {
-    undertone = hairIsWarm ? 'neutral' : 'neutral'
+    isWarm = hairIsWarm; undertone = 'neutral'
   }
 
   let subSeason: SubSeason
   let season: Season
 
-  if (skinB > 14) {
+  if (isWarm) {
     // ── WARM FAMILY (Spring/Autumn) ──────────────────────────────────────────
     if (skinL > 62) {
       // Light + warm → Light Spring
@@ -282,7 +284,7 @@ function classifySeason(colors: SampledColors): {
       // Medium warm, earthy → True Autumn
       subSeason = 'true-autumn'; season = 'autumn'
     }
-  } else if (skinB < 9) {
+  } else if (!isWarm) {
     // ── COOL FAMILY (Summer/Winter) ──────────────────────────────────────────
     if (skinL > 65) {
       // Very light + cool → Light Summer
@@ -569,7 +571,8 @@ export class FaceNotDetectedError extends Error {
 }
 
 export async function analyzeColorsInBrowser(
-  imageData: string
+  imageData: string,
+  knownUndertone?: 'warm' | 'cool'
 ): Promise<Omit<ColorAnalysis, 'id' | 'user_id' | 'created_at'>> {
   const img = new Image()
   await new Promise<void>((resolve, reject) => {
@@ -584,7 +587,7 @@ export async function analyzeColorsInBrowser(
     throw new FaceNotDetectedError()
   }
 
-  const { subSeason, season, undertone, skinLab, hairLab } = classifySeason(colors)
+  const { subSeason, season, undertone, skinLab, hairLab } = classifySeason(colors, knownUndertone)
   const palette = SEASON_PALETTES[subSeason]
 
   const skinDesc = `Lab L=${Math.round(skinLab[0])}, b=${Math.round(skinLab[2])} — ${undertone} undertone`
