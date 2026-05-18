@@ -54,8 +54,8 @@ export default function LandingPage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="text-lg px-8">
-                <Link href="/auth/sign-up">
-                  Analyze My Colors
+                <Link href="/analyze">
+                  Analyse My Colours — Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5b21b6"/>
+      <stop offset="100%" stop-color="#be185d"/>
+    </linearGradient>
+    <radialGradient id="springGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </radialGradient>
+    <radialGradient id="summerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#bfdbfe"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </radialGradient>
+    <radialGradient id="autumnGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </radialGradient>
+    <radialGradient id="winterGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e0e7ff"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </radialGradient>
+  </defs>
+
+  <!-- iOS applies its own corner radius, so use a full square -->
+  <rect width="180" height="180" fill="url(#bg)"/>
+  <rect width="180" height="180" fill="black" opacity="0.1"/>
+
+  <!-- Season dots — diamond layout -->
+  <circle cx="90" cy="44"  r="20" fill="url(#springGlow)" opacity="0.93"/>
+  <circle cx="136" cy="90" r="20" fill="url(#summerGlow)" opacity="0.93"/>
+  <circle cx="90" cy="136" r="20" fill="url(#autumnGlow)" opacity="0.93"/>
+  <circle cx="44"  cy="90" r="20" fill="url(#winterGlow)" opacity="0.93"/>
+
+  <!-- Central sparkle -->
+  <path
+    d="M90 72 L94 86 L108 90 L94 94 L90 108 L86 94 L72 90 L86 86 Z"
+    fill="white"
+    opacity="0.95"
+  />
+</svg>

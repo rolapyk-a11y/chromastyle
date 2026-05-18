@@ -18,9 +18,10 @@ interface AnalysisResultsProps {
   analysis: ColorAnalysis
   onReset: () => void
   onContinue: () => void
+  onEssenceQuiz?: () => void
 }
 
-export function AnalysisResults({ analysis, onReset, onContinue }: AnalysisResultsProps) {
+export function AnalysisResults({ analysis, onReset, onContinue, onEssenceQuiz }: AnalysisResultsProps) {
   const seasonInfo = SEASON_INFO[analysis.season]
   const subSeasonInfo = SUB_SEASON_INFO[analysis.sub_season]
   const details = analysis.analysis_details
@@ -187,14 +188,31 @@ export function AnalysisResults({ analysis, onReset, onContinue }: AnalysisResul
         </Card>
       )}
 
+      {/* Essence Quiz CTA */}
+      {onEssenceQuiz && (
+        <Card className="border-accent/30 bg-accent/5 text-center">
+          <CardContent className="p-6">
+            <Sparkles className="w-8 h-8 text-accent mx-auto mb-3" />
+            <h3 className="font-semibold text-lg mb-1">Discover your Style Essence</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              6 quick questions to find your personal style archetype — Dramatic, Natural, Romantic and more.
+            </p>
+            <Button variant="secondary" size="lg" onClick={onEssenceQuiz}>
+              Take the Style Quiz
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
         <Button variant="outline" size="lg" onClick={onReset}>
           <RotateCcw className="mr-2 h-5 w-5" />
-          Analyze Again
+          Analyse Again
         </Button>
         <Button size="lg" onClick={onContinue}>
-          Shop Your Colors
+          Shop Your Colours
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </div>

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Main background gradient: deep violet → warm pink -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5b21b6"/>
+      <stop offset="100%" stop-color="#be185d"/>
+    </linearGradient>
+    <!-- Inner glow gradient for the season circles -->
+    <radialGradient id="springGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </radialGradient>
+    <radialGradient id="summerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#bfdbfe"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </radialGradient>
+    <radialGradient id="autumnGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </radialGradient>
+    <radialGradient id="winterGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e0e7ff"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Subtle inner vignette -->
+  <rect width="512" height="512" rx="96" fill="black" opacity="0.12"/>
+
+  <!-- Four season colour dots arranged in a diamond -->
+  <!-- Spring (top) — warm golden -->
+  <circle cx="256" cy="140" r="52" fill="url(#springGlow)" opacity="0.92"/>
+  <!-- Summer (right) — cool blue -->
+  <circle cx="372" cy="256" r="52" fill="url(#summerGlow)" opacity="0.92"/>
+  <!-- Autumn (bottom) — warm rust -->
+  <circle cx="256" cy="372" r="52" fill="url(#autumnGlow)" opacity="0.92"/>
+  <!-- Winter (left) — cool indigo -->
+  <circle cx="140" cy="256" r="52" fill="url(#winterGlow)" opacity="0.92"/>
+
+  <!-- Central white sparkle (4-pointed star) -->
+  <path
+    d="M256 206 L266 246 L306 256 L266 266 L256 306 L246 266 L206 256 L246 246 Z"
+    fill="white"
+    opacity="0.95"
+  />
+
+  <!-- Subtle connector lines between dots -->
+  <line x1="256" y1="192" x2="320" y2="256" stroke="white" stroke-width="1.5" opacity="0.2"/>
+  <line x1="320" y1="256" x2="256" y2="320" stroke="white" stroke-width="1.5" opacity="0.2"/>
+  <line x1="256" y1="320" x2="192" y2="256" stroke="white" stroke-width="1.5" opacity="0.2"/>
+  <line x1="192" y1="256" x2="256" y2="192" stroke="white" stroke-width="1.5" opacity="0.2"/>
+</svg>

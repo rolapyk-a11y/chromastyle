@@ -37,7 +37,7 @@ export default async function DashboardPage() {
         </div>
         {!latestAnalysis && (
           <Button asChild size="lg">
-            <Link href="/dashboard/analyze">
+            <Link href="/analyze">
               <Camera className="mr-2 h-5 w-5" />
               Start Color Analysis
             </Link>
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
                   </div>
                 </div>
                 <Button variant="outline" asChild>
-                  <Link href="/dashboard/analyze">
+                  <Link href="/analyze">
                     New Analysis
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
             </Card>
 
             <Card className="border-border/50 hover:bg-secondary/50 transition-colors">
-              <Link href="/dashboard/analyze">
+              <Link href="/analyze">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
                     <Camera className="w-6 h-6" />
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
                 Take a quick photo and our AI will analyze your unique coloring to find your perfect seasonal palette.
               </p>
               <Button asChild size="lg" className="mt-4">
-                <Link href="/dashboard/analyze">
+                <Link href="/analyze">
                   <Camera className="mr-2 h-5 w-5" />
                   Start Analysis
                 </Link>

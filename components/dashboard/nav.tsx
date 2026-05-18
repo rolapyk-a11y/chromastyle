@@ -31,7 +31,7 @@ interface DashboardNavProps {
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: Sparkles },
-  { href: '/dashboard/analyze', label: 'Analyze', icon: Camera },
+  { href: '/analyze', label: 'Analyze', icon: Camera },
   { href: '/dashboard/wardrobe', label: 'Wardrobe', icon: Shirt },
   { href: '/dashboard/saved', label: 'Saved', icon: Heart },
   { href: '/dashboard/trends', label: 'Trends', icon: TrendingUp },
