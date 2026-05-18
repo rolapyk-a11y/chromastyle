@@ -459,147 +459,354 @@ const SEASON_PALETTES: Record<SubSeason, {
     ],
   },
   'light-summer': {
-    best: ['#A4C1F3','#BDA7DD','#C8B4D0','#99CCEE','#B0C8E8','#D4C8E8','#C4D8F0','#E8C8D8','#C8D8E8','#D0C8E0','#B8D0E8','#DDD4EC'],
-    avoid: ['#FF8C00','#DAA520','#8B6914','#D2691E','#A52A2A','#8B4513'],
-    eyeEnhancing: ['#A4C1F3','#B8D4F0','#9BB8E8','#C0D4F4'],
-    skinAnalysis: 'Light, delicate skin with cool pink undertones — porcelain and ethereal.',
-    eyeAnalysis: 'Light, soft eyes — pale blue, grey, or light green. Most enhanced by soft powder blues and cool lavenders.',
-    hairAnalysis: 'Light to medium cool-toned hair — ash blonde, light brown, or grey.',
-    recommendation: 'Your palette is soft and cool. Powder blue, lavender, and misty rose are your best friends.',
+    // Cool + Light + muted. The coolest and lightest of the Summers.
+    // Characteristic colours: powder blue, soft lavender, blush rose, misty blue,
+    // pearl grey, dusty pink, icy lilac, soft periwinkle, cool mint, light mauve.
+    best: [
+      '#BDD7EE', // Powder Blue — the Light Summer signature, almost a neutral
+      '#C5B8D9', // Soft Lavender — delicate cool purple-blue
+      '#E0AABB', // Rose Pink — cool pink, not warm coral
+      '#AEBAD8', // Soft Periwinkle — blue-violet, very wearable
+      '#C0D5E8', // Misty Blue — hazy, ethereal blue
+      '#D4C4E0', // Icy Lilac — pale cool purple
+      '#D5D8DC', // Pearl Grey — the Light Summer neutral (replaces black)
+      '#D4A8B4', // Dusty Pink — muted cool pink
+      '#AECCC0', // Cool Sage — greyed green, cool-toned not warm
+      '#C8B4CC', // Soft Mauve — pale cool purple-pink
+      '#D8E4F0', // Ice Blue — almost white, very light blue
+      '#F0D8E0', // Blush — the palest cool pink, near-neutral
+    ],
+    avoid: [
+      '#D2691E', // Warm copper — too orange and warm
+      '#DAA520', // Goldenrod — too warm and yellow
+      '#8B4513', // Saddle brown — too warm and earthy
+      '#FF8C00', // Dark orange — clashes with cool undertones
+      '#808000', // Olive — too warm and yellow-green
+      '#A0522D', // Sienna — too warm and rich
+    ],
+    eyeEnhancing: ['#BDD7EE', '#AEBAD8', '#C5B8D9', '#D4A8B4'],
+    skinAnalysis: 'Light, delicate skin with cool blue-pink undertones — porcelain and ethereal. The fairest of all seasons.',
+    eyeAnalysis: 'Soft, light eyes — pale blue, grey, or faded green. They shimmer most against powder blue, icy lilac, and soft periwinkle.',
+    hairAnalysis: 'Light cool-toned hair — ash blonde, platinum, cool light brown, or naturally greying hair.',
+    recommendation: 'Your palette is cool, light, and quietly beautiful. Powder blue is almost a neutral for you. Build outfits from misty blue, icy lilac, and soft lavender — then let pearl grey anchor them.',
     styleTips: [
-      'Soft powder blue is almost a neutral for you',
-      'Layering cool tones creates an effortlessly chic look',
-      'Silver and white gold only — avoid yellow gold',
-      'Dove grey replaces black beautifully',
-      'Avoid warm orange and golden tones entirely',
+      'Powder blue is your version of a neutral — wear it head to toe',
+      'Pearl grey replaces black perfectly — softer and more flattering',
+      'Replace white with the palest icy blue or blush — pure white can overpower',
+      'Monochromatic cool tones from the same colour family look effortlessly elegant',
+      'Silver and white gold jewellery only — yellow gold will look jarring',
     ],
   },
   'true-summer': {
-    best: ['#CED6E0','#A6B8D2','#6F96A2','#92ADAF','#D6C7D9','#BDAECF','#E4C4CA','#8BA8C0','#9BB4CC','#C4B8D4','#7898B4','#B4C8D8'],
-    avoid: ['#FF8C00','#DAA520','#D2691E','#8B4513','#A52A2A','#FF4500'],
-    eyeEnhancing: ['#6F96A2','#7898B4','#8BA8C0','#92ADAF'],
-    skinAnalysis: 'Medium cool skin with rose or blue-pink undertones — refined and elegant.',
-    eyeAnalysis: 'Soft, cool eyes — grey-blue, grey-green, or cool grey. Enhanced by ocean slate and cool teal tones.',
-    hairAnalysis: 'Medium to dark cool-toned hair — ash brown, medium grey, or cool dark blonde.',
-    recommendation: 'Your palette is cool and muted with quiet sophistication. Ocean slate, bluebell haze, and soft lavender are yours.',
+    // Cool + medium depth + muted chroma. The classic Summer.
+    // Characteristic colours: dusty rose, bluebell, slate blue, soft teal, muted mauve,
+    // medium rose, muted navy, dusty lavender, cool heather, soft burgundy.
+    best: [
+      '#C88898', // Dusty Rose — the True Summer signature, cool and muted
+      '#6A7EAF', // Bluebell — muted blue-violet, quintessential Summer
+      '#5A8A90', // Soft Teal — cool muted teal, very sophisticated
+      '#9A7898', // Muted Mauve — cool greyed purple-pink
+      '#7080A0', // Slate Blue — cool medium blue, the best Summer neutral
+      '#C07090', // Medium Rose — deeper than Light Summer's pink
+      '#8890C0', // Periwinkle — blue-violet, very wearable
+      '#907888', // Soft Burgundy — muted cool wine
+      '#485870', // Muted Navy — the True Summer navy (replaces black)
+      '#9088B8', // Dusty Lavender — muted purple
+      '#8AA898', // Cool Sage — greyed green, not warm
+      '#9898A8', // Heather Grey — cool blue-grey neutral
+    ],
+    avoid: [
+      '#D2691E', // Warm copper/tan — too warm
+      '#DAA520', // Golden yellow — too warm
+      '#FF8C00', // Orange — clashes severely
+      '#8B4513', // Warm brown — wrong family
+      '#A52A2A', // Warm red-brown — too warm
+      '#FF6347', // Tomato — too warm and vivid
+    ],
+    eyeEnhancing: ['#5A8A90', '#7080A0', '#6A7EAF', '#8890C0'],
+    skinAnalysis: 'Medium cool skin with rose or blue-pink undertones — refined, elegant, and quietly beautiful.',
+    eyeAnalysis: 'Soft, cool eyes — grey-blue, blue-grey, or cool hazel. Come alive against slate blue, bluebell, and soft teal.',
+    hairAnalysis: 'Medium cool-toned hair — ash brown, cool medium brown, or dark ash blonde. Often has no warm highlights.',
+    recommendation: 'Your palette is cool and muted — the most quietly sophisticated of all seasons. Dusty rose, bluebell, and slate blue are your signature. Avoid anything warm or earthy.',
     styleTips: [
-      'Monochromatic cool tones create a polished look',
-      'Navy is your power neutral — it replaces black beautifully',
-      'Silver jewellery only',
-      'Muted rose and dusty blue are your signature tones',
-      'Avoid warm browns and camel — they clash with your undertones',
+      'Muted navy is your best neutral — it does what black does for Winter',
+      'Dusty rose is your power colour — near your face it looks luminous',
+      'Monochromatic outfits in cool muted tones are very chic on you',
+      'Avoid bright, vivid colours — always reach for the greyed, muted version',
+      'Silver jewellery only — white gold or platinum',
     ],
   },
   'soft-summer': {
-    best: ['#7598C4','#78ABC6','#998CBD','#C4A0A8','#A8B8C8','#B8A8C8','#C0B0C0','#8C9CB8','#A4AABC','#B4B0C4','#98A8BC','#C8BCC8'],
-    avoid: ['#FF6600','#FFD700','#FF4500','#DC143C','#8B0000','#006400'],
-    eyeEnhancing: ['#7598C4','#8DAAD0','#6A8AB8','#7890BC'],
-    skinAnalysis: 'Neutral-cool skin with a soft, greyed quality — bridging Summer and Autumn.',
-    eyeAnalysis: 'Soft, muted eyes — grey-green, grey-blue, or muted hazel. Enhanced by dusty blues and muted lavenders.',
-    hairAnalysis: 'Medium cool-to-neutral hair — often ashy or muted brown.',
-    recommendation: 'Your palette is muted and sophisticated. Dusty blue, soft mauve, and grey-purple. Avoid pure black and bright vivid tones.',
+    // Cool-neutral + muted. Bridges Summer and Autumn — slightly warmer than True Summer
+    // but always greyed and soft. Characteristic colours: dusty blue, muted rose,
+    // greyed lavender, warm grey, soft sage, taupe, muted periwinkle, smoky mauve.
+    best: [
+      '#7898B8', // Dusty Blue — the Soft Summer signature, greyed blue
+      '#9888B0', // Muted Lavender — greyed purple, not vivid
+      '#A898A8', // Greyed Mauve — cool-neutral purple-grey
+      '#88A090', // Soft Sage — greyed green, slightly warm
+      '#A8A0B4', // Warm Grey Lavender — neutral bridging tone
+      '#C0A0A8', // Dusty Pink — muted warm-cool pink
+      '#B08898', // Muted Rose — deeper dusty pink
+      '#8890A8', // Greyed Blue — neutral grey-blue
+      '#9090B8', // Dusty Periwinkle — greyed blue-violet
+      '#A8A098', // Warm Taupe — neutral bridging colour
+      '#A0A888', // Soft Khaki — muted warm-cool green
+      '#907888', // Muted Plum — deep greyed purple
+    ],
+    avoid: [
+      '#FF6600', // Vivid orange — too vivid and warm
+      '#FFD700', // Gold — too warm and bright
+      '#FF0000', // Pure red — too vivid
+      '#00FF00', // Pure green — too vivid
+      '#FF69B4', // Hot pink — too vivid and bright
+      '#FF8C00', // Dark orange — too warm
+    ],
+    eyeEnhancing: ['#7898B8', '#9090B8', '#9888B0', '#88A090'],
+    skinAnalysis: 'Cool-neutral skin with a soft, greyed quality — bridging Summer and Autumn. Colours look best when they echo the greyed, misty quality of your colouring.',
+    eyeAnalysis: 'Soft, muted eyes — grey-green, grey-blue, or muted hazel. Shine most against dusty blue, muted periwinkle, and greyed lavender.',
+    hairAnalysis: 'Medium cool-to-neutral hair — ashy or muted brown, often with no obvious warm or cool highlights.',
+    recommendation: 'Your palette is greyed and sophisticated — deliberately muted. Dusty blue, warm grey, and soft sage are your foundation. Bright or vivid colours in any temperature will overpower you.',
     styleTips: [
-      'Greyed-out tones are your superpower — dusty blue, muted mauve, sage grey',
-      'Avoid bright, saturated colours — always choose the muted version',
-      'Charcoal grey is better than true black',
-      'Tone-on-tone looks in greyed tones are very chic on you',
-      'Brushed silver or matte metal jewellery suits you',
+      'Deliberately greyed colours are your superpower — dusty blue, muted mauve, smoky sage',
+      'Always choose the muted version of a colour, never the vivid one',
+      'Warm taupe and greyed mauve make excellent everyday neutrals',
+      'Charcoal grey is much better than true black',
+      'Brushed silver or oxidised metal jewellery — not bright polished gold or silver',
     ],
   },
   'soft-autumn': {
-    best: ['#9CAF88','#BDBFA0','#D9927A','#D9A6A6','#B8A99A','#D1B7A3','#C48793','#D2B48C','#D99058','#C8A888','#B8987A','#D4B898'],
-    avoid: ['#9400D3','#4B0082','#0000FF','#4169E1','#B0E0E6','#00FFFF'],
-    eyeEnhancing: ['#D9927A','#C8A070','#B89068','#C4987A'],
-    skinAnalysis: 'Warm-neutral skin with soft, muted golden undertones — gentle rather than vivid.',
-    eyeAnalysis: 'Soft warm eyes — hazel, soft brown, or muted green. Glow most against terracotta and muted peach.',
-    hairAnalysis: 'Medium warm hair — mousy brown, warm ash, or soft golden brown.',
-    recommendation: 'Your palette is the most wearable of all seasons — soft, warm, and earthy. Muted terracotta, soft olive, and warm taupe are your foundation.',
+    // Warm-neutral + muted. The most gentle of all Autumns — soft and earthy.
+    // Characteristic colours: sage green, terracotta (muted), warm taupe, muted peach,
+    // warm camel, muted gold, warm mushroom, dusty coral, warm greige, oyster.
+    best: [
+      '#9CAF88', // Sage Green — the Soft Autumn signature, warm-greyed green
+      '#BDBFA0', // Warm Grey-Green — muted olive-grey, excellent neutral
+      '#D9927A', // Soft Terracotta — muted warm coral, not vivid orange
+      '#D2B48C', // Tan/Camel — the warm neutral backbone
+      '#B8A99A', // Warm Taupe — greyed warm neutral
+      '#D1B7A3', // Warm Beige — light warm neutral
+      '#D99058', // Warm Camel-Amber — deeper warm neutral
+      '#C8A888', // Warm Sand — light warm neutral
+      '#B8987A', // Warm Brown — medium earthy neutral
+      '#D9A6A6', // Dusty Blush — muted warm pink-rose
+      '#C48793', // Dusty Mauve — muted warm pink
+      '#D4B898', // Wheat — pale warm neutral (replaces white)
+    ],
+    avoid: [
+      '#0000FF', // Pure blue — too cool and vivid
+      '#4169E1', // Royal blue — too cool
+      '#9400D3', // Vivid purple — too cool and vivid
+      '#4B0082', // Indigo — too cool and dark
+      '#00FFFF', // Cyan — too cool and vivid
+      '#B0E0E6', // Powder blue — too cool
+    ],
+    eyeEnhancing: ['#D9927A', '#C8A888', '#9CAF88', '#D2B48C'],
+    skinAnalysis: 'Warm-neutral skin with soft, muted golden undertones — gentle and approachable rather than vivid or rich.',
+    eyeAnalysis: 'Soft warm eyes — hazel, soft warm brown, or muted green-grey. Glow most against muted terracotta, sage, and warm tan.',
+    hairAnalysis: 'Medium warm-neutral hair — mousy brown, warm ash brown, or soft dirty blonde. Not vividly warm or obviously cool.',
+    recommendation: 'Your palette is the most wearable of all seasons — soft, warm, and quietly earthy. Sage green, terracotta, and warm taupe are your everyday foundation. Stay muted always.',
     styleTips: [
-      'Soft olive and sage green are perfect everyday colours',
-      'Replace black with warm chocolate or dark brown',
-      'Replace white with warm cream or oyster',
-      'Hammered gold or matte bronze jewellery suits you',
-      'Natural fabrics — linen, cotton — in your earthy palette are ideal',
+      'Sage green is your signature — wear it near your face for an instant glow',
+      'Replace black with warm chocolate brown or dark camel',
+      'Replace white with warm cream, oyster, or wheat — pure white looks harsh',
+      'Muted terracotta and dusty rose are your warm-toned accent colours',
+      'Hammered gold, matte bronze, or aged copper jewellery suit you perfectly',
     ],
   },
   'true-autumn': {
-    best: ['#CC5500','#B7410E','#DAA520','#708238','#800020','#6B3A2A','#D4A017','#8B4513','#CD853F','#A0522D','#556B2F','#8B6914'],
-    avoid: ['#FF69B4','#00BFFF','#E0E0E0','#D3D3D3','#C0C0C0','#F0F8FF'],
-    eyeEnhancing: ['#CC5500','#B87333','#A05000','#8B6914'],
-    skinAnalysis: 'Rich warm skin with golden-amber or olive undertones — the purest expression of Autumn warmth.',
-    eyeAnalysis: 'Warm, rich eyes — deep hazel, amber, warm dark brown, or olive green. They ignite against burnt orange and forest green.',
-    hairAnalysis: 'Rich warm hair — auburn, warm chestnut, copper, or warm dark brown.',
-    recommendation: 'You are the quintessential Autumn. Burnt orange, rust, and mustard are your signature colours.',
+    // Warm + rich + medium-deep. The purest expression of Autumn.
+    // Characteristic colours: burnt orange, rust, mustard, olive green, warm burgundy,
+    // chocolate brown, amber, sienna, forest green, dark gold.
+    best: [
+      '#CC5500', // Burnt Orange — the True Autumn signature colour
+      '#B7410E', // Rust — deep warm red-orange, very Autumn
+      '#DAA520', // Mustard/Goldenrod — warm golden yellow
+      '#708238', // Olive Green — the essential Autumn green
+      '#800020', // Burgundy — warm dark red, richer than Winter's red
+      '#6B3A2A', // Warm Dark Brown — deep earthy neutral
+      '#D4A017', // Warm Gold — medium golden neutral
+      '#8B4513', // Saddle Brown — classic warm brown
+      '#CD853F', // Peru — golden warm tan
+      '#A0522D', // Sienna — rich warm brown-orange
+      '#556B2F', // Dark Olive — deeper olive, great neutral
+      '#8B6914', // Dark Gold — deep warm golden neutral
+    ],
+    avoid: [
+      '#FF69B4', // Hot pink — too cool and vivid
+      '#00BFFF', // Deep sky blue — too cool and bright
+      '#E0E0E0', // Light grey — too cool and lifeless
+      '#D3D3D3', // Silver grey — too cool
+      '#C0C0C0', // Silver — too cool and metallic
+      '#F0F8FF', // Alice blue — too cool and pale
+    ],
+    eyeEnhancing: ['#CC5500', '#708238', '#D4A017', '#CD853F'],
+    skinAnalysis: 'Rich warm skin with golden-amber or olive undertones — the purest expression of Autumn warmth and earthiness.',
+    eyeAnalysis: 'Warm, rich eyes — deep hazel, amber, warm dark brown, or olive green. Ignite against burnt orange, olive, and warm gold.',
+    hairAnalysis: 'Rich warm hair — auburn, warm chestnut, copper, or warm dark brown. Often has red or golden highlights in the light.',
+    recommendation: 'You are the quintessential Autumn. Burnt orange, rust, and mustard are your signature. Every earthy, warm colour works on you — nothing cool or grey.',
     styleTips: [
-      'Burnt orange is your signature colour',
-      'Olive green is a perfect everyday neutral',
-      'Dark chocolate brown replaces black',
-      'Bronze, brass, and copper jewellery are your metals',
-      'Tweed, corduroy, and suede in earthy tones are perfect',
+      'Burnt orange is your single best colour — own it',
+      'Olive green is your perfect everyday neutral alongside chocolate brown',
+      'Dark chocolate brown replaces black — richer and more flattering',
+      'Bronze, brass, and copper are your metals — silver looks cold on you',
+      'Textured fabrics — tweed, corduroy, suede — in earthy tones are your ideal',
     ],
   },
   'dark-autumn': {
-    best: ['#924819','#954344','#4A1B1F','#404C24','#675100','#005F6B','#8A3324','#800000','#556B2F','#8B4513','#5C4033','#704214'],
-    avoid: ['#FFB6C1','#E6E6FA','#B0E0E6','#87CEEB','#F0F8FF','#FFFACD'],
-    eyeEnhancing: ['#924819','#8B4513','#A0522D','#704214'],
-    skinAnalysis: 'Deep warm skin with rich amber, olive, or bronze undertones — powerful and dramatic.',
-    eyeAnalysis: 'Deep, rich eyes — dark brown, deep amber, or very dark hazel. Command attention.',
-    hairAnalysis: 'Very dark warm hair — deep chocolate, dark auburn, or near-black with warm undertones.',
-    recommendation: 'Your palette is dramatic and moody-luxe. Deep burgundy, army green, and dark chocolate are your anchors.',
+    // Warm + deep + rich. The darkest of the Autumn family.
+    // Characteristic colours: deep burgundy, dark forest green, dark olive, dark chocolate,
+    // dark teal (warm-leaning), plum (warm), dark rust, mahogany.
+    best: [
+      '#924819', // Dark Rust — deep warm rust
+      '#8A3324', // Deep Rust — very rich warm red-brown
+      '#800000', // Maroon — deep warm dark red
+      '#4A1B1F', // Very Dark Burgundy — almost black-red
+      '#404C24', // Dark Olive — deep earthy green
+      '#556B2F', // Dark Olive Green — forest-floor green
+      '#675100', // Dark Gold-Brown — deep golden neutral
+      '#005F6B', // Dark Teal — the one cool-leaning colour that works
+      '#8B4513', // Saddle Brown — warm medium brown
+      '#5C4033', // Dark Warm Brown — deep earthy brown
+      '#704214', // Dark Caramel — deep warm neutral
+      '#954344', // Deep Rose-Brown — warm muted deep rose
+    ],
+    avoid: [
+      '#FFB6C1', // Light pink — too light and cool
+      '#E6E6FA', // Lavender — too cool and pastel
+      '#B0E0E6', // Powder blue — too cool and light
+      '#87CEEB', // Sky blue — too cool and bright
+      '#F0F8FF', // Alice blue — too cool and pale
+      '#FFFACD', // Lemon chiffon — too light and cool-yellow
+    ],
+    eyeEnhancing: ['#924819', '#8B4513', '#404C24', '#005F6B'],
+    skinAnalysis: 'Deep warm skin with rich amber, olive, or bronze undertones — the most powerful and dramatic of all warm seasons.',
+    eyeAnalysis: 'Deep, rich eyes — very dark brown, deep amber, or dark hazel with almost no light in them. They carry tremendous depth.',
+    hairAnalysis: 'Very dark warm hair — deep chocolate, very dark auburn, or near-black hair with warm (not cool) undertones.',
+    recommendation: 'Your palette is dramatic, moody, and luxurious. Deep burgundy, dark olive, and dark chocolate are your anchors. Go deep and stay warm.',
     styleTips: [
-      'Deep burgundy and wine tones are your power colours',
-      'Army green and dark olive make you look authoritative',
-      'Very dark chocolate brown works where others use black',
-      'Velvet and suede in dark rich tones are excellent',
-      'Antiqued bronze and oxidised gold jewellery',
+      'Deep burgundy and wine are your statement colours — nothing else commands a room like these on you',
+      'Dark olive and army green make you look powerful and grounded',
+      'Very dark chocolate brown is your black — use it everywhere',
+      'Velvet, suede, and leather in deep earthy tones are your fabrics',
+      'Antiqued bronze and oxidised gold only — never silver',
     ],
   },
   'dark-winter': {
-    best: ['#0D0F1A','#003153','#015871','#00491E','#7D1B4D','#5F2566','#7A1F3D','#64242E','#1D2327','#191970','#003366','#2C0040'],
-    avoid: ['#DAA520','#FF8C00','#D2691E','#8B4513','#C8A000','#A0522D'],
-    eyeEnhancing: ['#003153','#015871','#191970','#003366'],
-    skinAnalysis: 'Deep cool-neutral skin — the darkest and most intense of all seasons.',
-    eyeAnalysis: 'Very dark, deep eyes with high contrast. Most enhanced by Prussian blue and deep teal.',
-    hairAnalysis: 'Very dark to black hair — jet black, very dark brown, or dark with cool undertones.',
-    recommendation: 'Deep navy, jewel tones, and true black are your foundation. Avoid warm earthy tones entirely.',
+    // Cool + deep + high contrast. The darkest of the Winter family.
+    // Characteristic colours: very deep navy, jet black, deep plum, dark forest green,
+    // Prussian blue, dark teal, deep burgundy (cool), midnight blue.
+    best: [
+      '#0D0F1A', // Near Black Blue — deepest Winter neutral
+      '#003153', // Prussian Blue — the signature Dark Winter blue
+      '#015871', // Dark Teal — deep cool teal
+      '#00491E', // Dark Forest Green — deep cool green
+      '#7D1B4D', // Dark Magenta-Plum — deep cool plum
+      '#5F2566', // Dark Purple — deep cool purple
+      '#7A1F3D', // Dark Wine — cool dark red-wine
+      '#64242E', // Dark Burgundy — the darkest cool red
+      '#1D2327', // Very Dark Grey-Blue — near-black neutral
+      '#191970', // Midnight Blue — deep jewel navy
+      '#003366', // Dark Navy — classic dark neutral
+      '#2C0040', // Very Dark Purple — almost black with purple depth
+    ],
+    avoid: [
+      '#DAA520', // Goldenrod — too warm
+      '#FF8C00', // Dark orange — too warm
+      '#D2691E', // Warm copper — too warm
+      '#8B4513', // Saddle brown — too warm and earthy
+      '#C8A000', // Warm gold — too warm
+      '#A0522D', // Sienna — too warm and earthy
+    ],
+    eyeEnhancing: ['#003153', '#015871', '#191970', '#003366'],
+    skinAnalysis: 'Deep cool skin — the darkest and most intense of all seasons. Rich depth with cool or neutral undertones.',
+    eyeAnalysis: 'Very dark, deep eyes with significant contrast against the whites. Most enhanced by Prussian blue and deep teal, which bring out depth and intensity.',
+    hairAnalysis: 'Very dark to black hair — jet black, very dark brown, or very dark cool-toned brown. No warm redness.',
+    recommendation: 'Deep navy, jewel tones, and true black are your foundation. You carry depth and intensity. Stay deep and cool — warm earthy tones flatten you completely.',
     styleTips: [
-      'Head-to-toe deep navy with a jewel-tone accent is very powerful',
-      'Deep teal and sapphire blue are transformative for you',
-      'True black is perfect on you',
-      'Silver jewellery only — white gold or platinum',
-      'High-contrast combinations work beautifully',
+      'Head-to-toe deep navy with a jewel-tone accent is one of your most powerful looks',
+      'Deep teal and sapphire blue bring out the intensity of your eyes',
+      'True black is perfect on you — one of the few seasons who can wear it this well',
+      'Silver, white gold, and platinum only — never yellow gold',
+      'High-contrast combinations of deep navy and jewel tones are very striking on you',
     ],
   },
   'true-winter': {
-    best: ['#000000','#FFFFFF','#003087','#003366','#CC0000','#9B111E','#FF00FF','#E91E8C','#800080','#4B0082','#A9A9A9','#C0C0C0'],
-    avoid: ['#DAA520','#D2691E','#8B4513','#F5DEB3','#DEB887','#BC8F5F'],
-    eyeEnhancing: ['#003087','#003366','#006400','#800080'],
-    skinAnalysis: 'Clear cool skin with high contrast — either porcelain-fair or very deep, with blue-pink undertones.',
-    eyeAnalysis: 'Clear, vivid eyes with high contrast against the whites. Most dramatic with cobalt blue and ruby red.',
-    hairAnalysis: 'Dark cool hair — jet black, very dark brown, or dark cool brown.',
-    recommendation: 'You are the most dramatic season. Pure black and white, cobalt blue, and true red are your colours.',
+    // Cool + clear + high contrast. The classic Winter.
+    // Characteristic colours: true black, pure white, cobalt blue, royal blue, true red,
+    // emerald green, hot pink, vivid purple, icy colours, silver grey.
+    best: [
+      '#000000', // True Black — the Winter neutral
+      '#FFFFFF', // Pure White — crisp and powerful
+      '#003087', // Dark Cobalt Blue — the signature Winter blue
+      '#003366', // Dark Navy — the Winter power neutral
+      '#CC0000', // True Red — vivid, clear cool red
+      '#9B111E', // Ruby Red — deep clear cool red
+      '#E91E8C', // Hot Pink — vivid cool pink
+      '#800080', // Purple — true vivid purple
+      '#4B0082', // Indigo — deep blue-violet
+      '#006400', // Dark Green — clear cool green (emerald family)
+      '#A9A9A9', // Dark Grey — cool neutral
+      '#C0C0C0', // Silver — the Winter metal colour
+    ],
+    avoid: [
+      '#DAA520', // Goldenrod — too warm
+      '#D2691E', // Warm copper — too warm
+      '#8B4513', // Saddle brown — too warm and earthy
+      '#F5DEB3', // Wheat — too warm and muted
+      '#DEB887', // Burlywood — too warm and earthy
+      '#BC8F5F', // Rosy brown — too warm
+    ],
+    eyeEnhancing: ['#003087', '#003366', '#006400', '#800080'],
+    skinAnalysis: 'Clear cool skin with the highest contrast of all seasons — either porcelain-fair with pink undertones, or very deep with cool-neutral undertones. Both share the same vivid, clear quality.',
+    eyeAnalysis: 'Clear, vivid eyes with strong contrast against the whites. Most dramatic with cobalt blue and ruby red — both colours amplify the eye\'s natural intensity.',
+    hairAnalysis: 'Dark cool hair — jet black, very dark cool brown. The contrast between hair and skin is a defining feature.',
+    recommendation: 'You are the most dramatic season. Pure black and white, cobalt blue, and true red are your colours. You are built for high contrast and vivid clarity — never muted, never warm.',
     styleTips: [
-      'Black and white is your signature — you make it look editorial',
-      'Cobalt and royal blue are transformative on you',
-      'True red and ruby red are your power colours',
-      'Avoid earth tones — they dull your natural high contrast',
-      'Silver jewellery always — polished and bright',
+      'Black and white together is your editorial signature — no other season wears it like you',
+      'Cobalt and royal blue are your most transformative colours',
+      'True red and ruby red are power colours — wear them when you want to command a room',
+      'Avoid earth tones and muted colours — they visually erase your natural high contrast',
+      'Polished silver jewellery always — bright and reflective, not brushed or oxidised',
     ],
   },
   'clear-winter': {
-    best: ['#DA4A94','#BE74C9','#DA4E5F','#FF0000','#FFFAFA','#191970','#0000CD','#00CED1','#00FF00','#9400D3','#FF1493','#7B68EE'],
-    avoid: ['#D2B48C','#BC8F5F','#F5DEB3','#DEB887','#8B7355','#A0522D'],
-    eyeEnhancing: ['#DA4A94','#BE74C9','#9400D3','#7B68EE'],
-    skinAnalysis: 'Cool skin with bright, vivid quality — the clearest of all Winters. High contrast and luminous.',
-    eyeAnalysis: 'Vivid, clear eyes with high contrast. Most enhanced by magenta and electric blue.',
-    hairAnalysis: 'Dark cool hair with a vivid, clear quality.',
-    recommendation: 'You bridge Winter and Spring. Magenta, hot pink, and electric blue are your signature.',
+    // Cool + clear + vivid. Bridges Winter and Spring — the colours are bright
+    // and saturated, not muted. Characteristic colours: hot pink, magenta, vivid
+    // purple, electric blue, vivid green, clear red, bright turquoise, icy tones.
+    best: [
+      '#DA4A94', // Hot Pink — the Clear Winter signature
+      '#BE74C9', // Vivid Lavender — clear bright purple-pink
+      '#DA4E5F', // Vivid Rose-Red — clear cool red-pink
+      '#FF0000', // True Red — vivid and clear
+      '#FFFAFA', // Snow White — the clearest near-white
+      '#191970', // Midnight Blue — deep vivid blue anchor
+      '#0000CD', // Medium Blue — vivid electric blue
+      '#00CED1', // Dark Turquoise — vivid clear teal
+      '#00C853', // Vivid Green — clear bright green
+      '#9400D3', // Dark Violet — vivid deep purple
+      '#FF1493', // Deep Pink — vivid magenta-pink
+      '#7B68EE', // Medium Slate Blue — clear vivid blue-purple
+    ],
+    avoid: [
+      '#D2B48C', // Tan — too warm and muted
+      '#BC8F5F', // Rosy brown — too warm
+      '#F5DEB3', // Wheat — too warm and earthy
+      '#DEB887', // Burlywood — too warm and muted
+      '#8B7355', // Warm brown — too warm
+      '#A0522D', // Sienna — too warm and earthy
+    ],
+    eyeEnhancing: ['#DA4A94', '#BE74C9', '#9400D3', '#0000CD'],
+    skinAnalysis: 'Cool skin with a vivid, bright quality — the clearest of all Winters. High contrast with a luminous, almost electric quality to the complexion.',
+    eyeAnalysis: 'Vivid, clear eyes — often very blue, very green, or very dark with high contrast. Most enhanced by magenta and electric blue, which echo the eye\'s vivid quality.',
+    hairAnalysis: 'Dark cool hair — jet black or very dark cool brown, with a clear, vivid quality rather than a warm or muted one.',
+    recommendation: 'You bridge Winter and Spring — you carry Winter\'s cool clarity with Spring\'s brightness. Magenta, hot pink, and electric blue are your signature. You are the most vivid of all seasons.',
     styleTips: [
-      'Magenta and hot pink are your signature — wear them boldly',
-      'Vivid emerald and electric blue look stunning on you',
-      'High-contrast colour blocking is your superpower',
-      'Shiny, polished silver jewellery',
-      'Animal prints in black and white are made for your colouring',
+      'Magenta and hot pink are your signature — wear them boldly near your face',
+      'Vivid emerald and electric blue are equally powerful on you',
+      'High-contrast colour blocking — hot pink with midnight blue — is your superpower',
+      'Avoid any muted or earthy tone — they make you look washed out',
+      'Polished, shiny silver jewellery only — as vivid and reflective as you are',
     ],
   },
 }

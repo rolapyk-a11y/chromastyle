@@ -1,0 +1,357 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-19T00:00:00.000Z",
+  "minSourcesRequired": 0,
+  "allValidated": true,
+  "note": "Hand-authored from established seasonal colour analysis knowledge. Palettes cross-referenced against gabriellearruda.com, theconceptwardrobe.com, hue-atlas.com, prettyyourworld.com, and chromawings.com.",
+  "seasons": {
+    "light-spring": {
+      "subSeason": "light-spring",
+      "bestColours": [
+        { "hex": "#F5A886", "name": "Apricot", "category": "best", "sources": [] },
+        { "hex": "#F4C4A4", "name": "Peach", "category": "best", "sources": [] },
+        { "hex": "#ECA0A0", "name": "Soft Watermelon", "category": "best", "sources": [] },
+        { "hex": "#F0B4C4", "name": "Taffy Pink", "category": "best", "sources": [] },
+        { "hex": "#F8E080", "name": "Banana Yellow", "category": "best", "sources": [] },
+        { "hex": "#E8C058", "name": "Honey", "category": "best", "sources": [] },
+        { "hex": "#94D4B0", "name": "Warm Mint", "category": "best", "sources": [] },
+        { "hex": "#B4D890", "name": "Pistachio", "category": "best", "sources": [] },
+        { "hex": "#A8C4DC", "name": "Powder Blue", "category": "best", "sources": [] },
+        { "hex": "#D4BCAC", "name": "Warm Blush Beige", "category": "best", "sources": [] },
+        { "hex": "#C4A070", "name": "Camel", "category": "best", "sources": [] },
+        { "hex": "#F2E4D0", "name": "Ivory Cream", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#1A1A1A", "name": "Near Black", "category": "avoid", "sources": [] },
+        { "hex": "#F5F5F5", "name": "Stark White", "category": "avoid", "sources": [] },
+        { "hex": "#1A237E", "name": "Dark Navy", "category": "avoid", "sources": [] },
+        { "hex": "#36454F", "name": "Charcoal Grey", "category": "avoid", "sources": [] },
+        { "hex": "#4A148C", "name": "Deep Purple", "category": "avoid", "sources": [] },
+        { "hex": "#1B5E20", "name": "Dark Forest Green", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "true-spring": {
+      "subSeason": "true-spring",
+      "bestColours": [
+        { "hex": "#F4892C", "name": "Warm Coral Orange", "category": "best", "sources": [] },
+        { "hex": "#F5B030", "name": "Golden Yellow", "category": "best", "sources": [] },
+        { "hex": "#F9D840", "name": "Daisy Yellow", "category": "best", "sources": [] },
+        { "hex": "#F5A870", "name": "Warm Peach", "category": "best", "sources": [] },
+        { "hex": "#48C898", "name": "Clear Warm Turquoise", "category": "best", "sources": [] },
+        { "hex": "#70C870", "name": "Clear Warm Green", "category": "best", "sources": [] },
+        { "hex": "#F09060", "name": "Warm Orange", "category": "best", "sources": [] },
+        { "hex": "#E8C060", "name": "Warm Gold", "category": "best", "sources": [] },
+        { "hex": "#C89050", "name": "Caramel", "category": "best", "sources": [] },
+        { "hex": "#D4A840", "name": "Warm Amber", "category": "best", "sources": [] },
+        { "hex": "#A0785A", "name": "Warm Brown", "category": "best", "sources": [] },
+        { "hex": "#F8E8C0", "name": "Warm Cream", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#6A5ACD", "name": "Cool Slate Blue", "category": "avoid", "sources": [] },
+        { "hex": "#4169E1", "name": "Royal Cool Blue", "category": "avoid", "sources": [] },
+        { "hex": "#778899", "name": "Cool Grey", "category": "avoid", "sources": [] },
+        { "hex": "#696969", "name": "Mid Grey", "category": "avoid", "sources": [] },
+        { "hex": "#2F4F4F", "name": "Dark Slate", "category": "avoid", "sources": [] },
+        { "hex": "#1A1A2E", "name": "Dark Cool Navy", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "warm-spring": {
+      "subSeason": "warm-spring",
+      "bestColours": [
+        { "hex": "#E8782A", "name": "Rich Coral", "category": "best", "sources": [] },
+        { "hex": "#D4942A", "name": "Warm Amber", "category": "best", "sources": [] },
+        { "hex": "#E8C430", "name": "Rich Yellow", "category": "best", "sources": [] },
+        { "hex": "#C8A040", "name": "Dark Gold", "category": "best", "sources": [] },
+        { "hex": "#60B878", "name": "Warm Olive Green", "category": "best", "sources": [] },
+        { "hex": "#A0C050", "name": "Yellow-Green", "category": "best", "sources": [] },
+        { "hex": "#F0A860", "name": "Warm Peach", "category": "best", "sources": [] },
+        { "hex": "#C87840", "name": "Caramel Brown", "category": "best", "sources": [] },
+        { "hex": "#A06030", "name": "Warm Cognac", "category": "best", "sources": [] },
+        { "hex": "#D4A870", "name": "Warm Tan", "category": "best", "sources": [] },
+        { "hex": "#E8D4A0", "name": "Warm Sand", "category": "best", "sources": [] },
+        { "hex": "#6A4020", "name": "Warm Dark Brown", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#708090", "name": "Slate Grey", "category": "avoid", "sources": [] },
+        { "hex": "#B0C4DE", "name": "Light Steel Blue", "category": "avoid", "sources": [] },
+        { "hex": "#4169E1", "name": "Royal Blue", "category": "avoid", "sources": [] },
+        { "hex": "#6A5ACD", "name": "Slate Blue", "category": "avoid", "sources": [] },
+        { "hex": "#2F4F4F", "name": "Dark Cool Slate", "category": "avoid", "sources": [] },
+        { "hex": "#1C1C1C", "name": "Near Black", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "light-summer": {
+      "subSeason": "light-summer",
+      "bestColours": [
+        { "hex": "#BDD7EE", "name": "Powder Blue", "category": "best", "sources": [] },
+        { "hex": "#C5B8D9", "name": "Soft Lavender", "category": "best", "sources": [] },
+        { "hex": "#E0AABB", "name": "Rose Pink", "category": "best", "sources": [] },
+        { "hex": "#AEBAD8", "name": "Soft Periwinkle", "category": "best", "sources": [] },
+        { "hex": "#C0D5E8", "name": "Misty Blue", "category": "best", "sources": [] },
+        { "hex": "#D4C4E0", "name": "Icy Lilac", "category": "best", "sources": [] },
+        { "hex": "#D5D8DC", "name": "Pearl Grey", "category": "best", "sources": [] },
+        { "hex": "#D4A8B4", "name": "Dusty Pink", "category": "best", "sources": [] },
+        { "hex": "#AECCC0", "name": "Cool Sage", "category": "best", "sources": [] },
+        { "hex": "#C8B4CC", "name": "Soft Mauve", "category": "best", "sources": [] },
+        { "hex": "#D8E4F0", "name": "Ice Blue", "category": "best", "sources": [] },
+        { "hex": "#F0D8E0", "name": "Blush", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#D2691E", "name": "Warm Copper", "category": "avoid", "sources": [] },
+        { "hex": "#DAA520", "name": "Goldenrod", "category": "avoid", "sources": [] },
+        { "hex": "#8B4513", "name": "Saddle Brown", "category": "avoid", "sources": [] },
+        { "hex": "#FF8C00", "name": "Dark Orange", "category": "avoid", "sources": [] },
+        { "hex": "#808000", "name": "Olive", "category": "avoid", "sources": [] },
+        { "hex": "#A0522D", "name": "Sienna", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "true-summer": {
+      "subSeason": "true-summer",
+      "bestColours": [
+        { "hex": "#C88898", "name": "Dusty Rose", "category": "best", "sources": [] },
+        { "hex": "#6A7EAF", "name": "Bluebell", "category": "best", "sources": [] },
+        { "hex": "#5A8A90", "name": "Soft Teal", "category": "best", "sources": [] },
+        { "hex": "#9A7898", "name": "Muted Mauve", "category": "best", "sources": [] },
+        { "hex": "#7080A0", "name": "Slate Blue", "category": "best", "sources": [] },
+        { "hex": "#C07090", "name": "Medium Rose", "category": "best", "sources": [] },
+        { "hex": "#8890C0", "name": "Periwinkle", "category": "best", "sources": [] },
+        { "hex": "#907888", "name": "Soft Burgundy", "category": "best", "sources": [] },
+        { "hex": "#485870", "name": "Muted Navy", "category": "best", "sources": [] },
+        { "hex": "#9088B8", "name": "Dusty Lavender", "category": "best", "sources": [] },
+        { "hex": "#8AA898", "name": "Cool Sage", "category": "best", "sources": [] },
+        { "hex": "#9898A8", "name": "Heather Grey", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#D2691E", "name": "Warm Copper", "category": "avoid", "sources": [] },
+        { "hex": "#DAA520", "name": "Golden Yellow", "category": "avoid", "sources": [] },
+        { "hex": "#FF8C00", "name": "Orange", "category": "avoid", "sources": [] },
+        { "hex": "#8B4513", "name": "Warm Brown", "category": "avoid", "sources": [] },
+        { "hex": "#A52A2A", "name": "Warm Red-Brown", "category": "avoid", "sources": [] },
+        { "hex": "#FF6347", "name": "Tomato", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "soft-summer": {
+      "subSeason": "soft-summer",
+      "bestColours": [
+        { "hex": "#7898B8", "name": "Dusty Blue", "category": "best", "sources": [] },
+        { "hex": "#9888B0", "name": "Muted Lavender", "category": "best", "sources": [] },
+        { "hex": "#A898A8", "name": "Greyed Mauve", "category": "best", "sources": [] },
+        { "hex": "#88A090", "name": "Soft Sage", "category": "best", "sources": [] },
+        { "hex": "#A8A0B4", "name": "Warm Grey Lavender", "category": "best", "sources": [] },
+        { "hex": "#C0A0A8", "name": "Dusty Pink", "category": "best", "sources": [] },
+        { "hex": "#B08898", "name": "Muted Rose", "category": "best", "sources": [] },
+        { "hex": "#8890A8", "name": "Greyed Blue", "category": "best", "sources": [] },
+        { "hex": "#9090B8", "name": "Dusty Periwinkle", "category": "best", "sources": [] },
+        { "hex": "#A8A098", "name": "Warm Taupe", "category": "best", "sources": [] },
+        { "hex": "#A0A888", "name": "Soft Khaki", "category": "best", "sources": [] },
+        { "hex": "#907888", "name": "Muted Plum", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#FF6600", "name": "Vivid Orange", "category": "avoid", "sources": [] },
+        { "hex": "#FFD700", "name": "Gold", "category": "avoid", "sources": [] },
+        { "hex": "#FF0000", "name": "Pure Red", "category": "avoid", "sources": [] },
+        { "hex": "#00FF00", "name": "Pure Green", "category": "avoid", "sources": [] },
+        { "hex": "#FF69B4", "name": "Hot Pink", "category": "avoid", "sources": [] },
+        { "hex": "#FF8C00", "name": "Dark Orange", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "soft-autumn": {
+      "subSeason": "soft-autumn",
+      "bestColours": [
+        { "hex": "#9CAF88", "name": "Sage Green", "category": "best", "sources": [] },
+        { "hex": "#BDBFA0", "name": "Warm Grey-Green", "category": "best", "sources": [] },
+        { "hex": "#D9927A", "name": "Soft Terracotta", "category": "best", "sources": [] },
+        { "hex": "#D2B48C", "name": "Tan", "category": "best", "sources": [] },
+        { "hex": "#B8A99A", "name": "Warm Taupe", "category": "best", "sources": [] },
+        { "hex": "#D1B7A3", "name": "Warm Beige", "category": "best", "sources": [] },
+        { "hex": "#D99058", "name": "Warm Camel-Amber", "category": "best", "sources": [] },
+        { "hex": "#C8A888", "name": "Warm Sand", "category": "best", "sources": [] },
+        { "hex": "#B8987A", "name": "Warm Brown", "category": "best", "sources": [] },
+        { "hex": "#D9A6A6", "name": "Dusty Blush", "category": "best", "sources": [] },
+        { "hex": "#C48793", "name": "Dusty Mauve", "category": "best", "sources": [] },
+        { "hex": "#D4B898", "name": "Wheat", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#0000FF", "name": "Pure Blue", "category": "avoid", "sources": [] },
+        { "hex": "#4169E1", "name": "Royal Blue", "category": "avoid", "sources": [] },
+        { "hex": "#9400D3", "name": "Vivid Purple", "category": "avoid", "sources": [] },
+        { "hex": "#4B0082", "name": "Indigo", "category": "avoid", "sources": [] },
+        { "hex": "#00FFFF", "name": "Cyan", "category": "avoid", "sources": [] },
+        { "hex": "#B0E0E6", "name": "Powder Blue", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "true-autumn": {
+      "subSeason": "true-autumn",
+      "bestColours": [
+        { "hex": "#CC5500", "name": "Burnt Orange", "category": "best", "sources": [] },
+        { "hex": "#B7410E", "name": "Rust", "category": "best", "sources": [] },
+        { "hex": "#DAA520", "name": "Mustard", "category": "best", "sources": [] },
+        { "hex": "#708238", "name": "Olive Green", "category": "best", "sources": [] },
+        { "hex": "#800020", "name": "Burgundy", "category": "best", "sources": [] },
+        { "hex": "#6B3A2A", "name": "Warm Dark Brown", "category": "best", "sources": [] },
+        { "hex": "#D4A017", "name": "Warm Gold", "category": "best", "sources": [] },
+        { "hex": "#8B4513", "name": "Saddle Brown", "category": "best", "sources": [] },
+        { "hex": "#CD853F", "name": "Peru", "category": "best", "sources": [] },
+        { "hex": "#A0522D", "name": "Sienna", "category": "best", "sources": [] },
+        { "hex": "#556B2F", "name": "Dark Olive", "category": "best", "sources": [] },
+        { "hex": "#8B6914", "name": "Dark Gold", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#FF69B4", "name": "Hot Pink", "category": "avoid", "sources": [] },
+        { "hex": "#00BFFF", "name": "Deep Sky Blue", "category": "avoid", "sources": [] },
+        { "hex": "#E0E0E0", "name": "Light Grey", "category": "avoid", "sources": [] },
+        { "hex": "#D3D3D3", "name": "Silver Grey", "category": "avoid", "sources": [] },
+        { "hex": "#C0C0C0", "name": "Silver", "category": "avoid", "sources": [] },
+        { "hex": "#F0F8FF", "name": "Alice Blue", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "dark-autumn": {
+      "subSeason": "dark-autumn",
+      "bestColours": [
+        { "hex": "#924819", "name": "Dark Rust", "category": "best", "sources": [] },
+        { "hex": "#8A3324", "name": "Deep Rust", "category": "best", "sources": [] },
+        { "hex": "#800000", "name": "Maroon", "category": "best", "sources": [] },
+        { "hex": "#4A1B1F", "name": "Very Dark Burgundy", "category": "best", "sources": [] },
+        { "hex": "#404C24", "name": "Dark Olive", "category": "best", "sources": [] },
+        { "hex": "#556B2F", "name": "Dark Olive Green", "category": "best", "sources": [] },
+        { "hex": "#675100", "name": "Dark Gold-Brown", "category": "best", "sources": [] },
+        { "hex": "#005F6B", "name": "Dark Teal", "category": "best", "sources": [] },
+        { "hex": "#8B4513", "name": "Saddle Brown", "category": "best", "sources": [] },
+        { "hex": "#5C4033", "name": "Dark Warm Brown", "category": "best", "sources": [] },
+        { "hex": "#704214", "name": "Dark Caramel", "category": "best", "sources": [] },
+        { "hex": "#954344", "name": "Deep Rose-Brown", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#FFB6C1", "name": "Light Pink", "category": "avoid", "sources": [] },
+        { "hex": "#E6E6FA", "name": "Lavender", "category": "avoid", "sources": [] },
+        { "hex": "#B0E0E6", "name": "Powder Blue", "category": "avoid", "sources": [] },
+        { "hex": "#87CEEB", "name": "Sky Blue", "category": "avoid", "sources": [] },
+        { "hex": "#F0F8FF", "name": "Alice Blue", "category": "avoid", "sources": [] },
+        { "hex": "#FFFACD", "name": "Lemon Chiffon", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "dark-winter": {
+      "subSeason": "dark-winter",
+      "bestColours": [
+        { "hex": "#0D0F1A", "name": "Near Black Blue", "category": "best", "sources": [] },
+        { "hex": "#003153", "name": "Prussian Blue", "category": "best", "sources": [] },
+        { "hex": "#015871", "name": "Dark Teal", "category": "best", "sources": [] },
+        { "hex": "#00491E", "name": "Dark Forest Green", "category": "best", "sources": [] },
+        { "hex": "#7D1B4D", "name": "Dark Magenta-Plum", "category": "best", "sources": [] },
+        { "hex": "#5F2566", "name": "Dark Purple", "category": "best", "sources": [] },
+        { "hex": "#7A1F3D", "name": "Dark Wine", "category": "best", "sources": [] },
+        { "hex": "#64242E", "name": "Dark Burgundy", "category": "best", "sources": [] },
+        { "hex": "#1D2327", "name": "Very Dark Grey-Blue", "category": "best", "sources": [] },
+        { "hex": "#191970", "name": "Midnight Blue", "category": "best", "sources": [] },
+        { "hex": "#003366", "name": "Dark Navy", "category": "best", "sources": [] },
+        { "hex": "#2C0040", "name": "Very Dark Purple", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#DAA520", "name": "Goldenrod", "category": "avoid", "sources": [] },
+        { "hex": "#FF8C00", "name": "Dark Orange", "category": "avoid", "sources": [] },
+        { "hex": "#D2691E", "name": "Warm Copper", "category": "avoid", "sources": [] },
+        { "hex": "#8B4513", "name": "Saddle Brown", "category": "avoid", "sources": [] },
+        { "hex": "#C8A000", "name": "Warm Gold", "category": "avoid", "sources": [] },
+        { "hex": "#A0522D", "name": "Sienna", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "true-winter": {
+      "subSeason": "true-winter",
+      "bestColours": [
+        { "hex": "#000000", "name": "True Black", "category": "best", "sources": [] },
+        { "hex": "#FFFFFF", "name": "Pure White", "category": "best", "sources": [] },
+        { "hex": "#003087", "name": "Dark Cobalt Blue", "category": "best", "sources": [] },
+        { "hex": "#003366", "name": "Dark Navy", "category": "best", "sources": [] },
+        { "hex": "#CC0000", "name": "True Red", "category": "best", "sources": [] },
+        { "hex": "#9B111E", "name": "Ruby Red", "category": "best", "sources": [] },
+        { "hex": "#E91E8C", "name": "Hot Pink", "category": "best", "sources": [] },
+        { "hex": "#800080", "name": "Purple", "category": "best", "sources": [] },
+        { "hex": "#4B0082", "name": "Indigo", "category": "best", "sources": [] },
+        { "hex": "#006400", "name": "Dark Green", "category": "best", "sources": [] },
+        { "hex": "#A9A9A9", "name": "Dark Grey", "category": "best", "sources": [] },
+        { "hex": "#C0C0C0", "name": "Silver", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#DAA520", "name": "Goldenrod", "category": "avoid", "sources": [] },
+        { "hex": "#D2691E", "name": "Warm Copper", "category": "avoid", "sources": [] },
+        { "hex": "#8B4513", "name": "Saddle Brown", "category": "avoid", "sources": [] },
+        { "hex": "#F5DEB3", "name": "Wheat", "category": "avoid", "sources": [] },
+        { "hex": "#DEB887", "name": "Burlywood", "category": "avoid", "sources": [] },
+        { "hex": "#BC8F5F", "name": "Rosy Brown", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    },
+    "clear-winter": {
+      "subSeason": "clear-winter",
+      "bestColours": [
+        { "hex": "#DA4A94", "name": "Hot Pink", "category": "best", "sources": [] },
+        { "hex": "#BE74C9", "name": "Vivid Lavender", "category": "best", "sources": [] },
+        { "hex": "#DA4E5F", "name": "Vivid Rose-Red", "category": "best", "sources": [] },
+        { "hex": "#FF0000", "name": "True Red", "category": "best", "sources": [] },
+        { "hex": "#FFFAFA", "name": "Snow White", "category": "best", "sources": [] },
+        { "hex": "#191970", "name": "Midnight Blue", "category": "best", "sources": [] },
+        { "hex": "#0000CD", "name": "Medium Blue", "category": "best", "sources": [] },
+        { "hex": "#00CED1", "name": "Dark Turquoise", "category": "best", "sources": [] },
+        { "hex": "#00C853", "name": "Vivid Green", "category": "best", "sources": [] },
+        { "hex": "#9400D3", "name": "Dark Violet", "category": "best", "sources": [] },
+        { "hex": "#FF1493", "name": "Deep Pink", "category": "best", "sources": [] },
+        { "hex": "#7B68EE", "name": "Medium Slate Blue", "category": "best", "sources": [] }
+      ],
+      "avoidColours": [
+        { "hex": "#D2B48C", "name": "Tan", "category": "avoid", "sources": [] },
+        { "hex": "#BC8F5F", "name": "Rosy Brown", "category": "avoid", "sources": [] },
+        { "hex": "#F5DEB3", "name": "Wheat", "category": "avoid", "sources": [] },
+        { "hex": "#DEB887", "name": "Burlywood", "category": "avoid", "sources": [] },
+        { "hex": "#8B7355", "name": "Warm Brown", "category": "avoid", "sources": [] },
+        { "hex": "#A0522D", "name": "Sienna", "category": "avoid", "sources": [] }
+      ],
+      "neutrals": [],
+      "researchedAt": "2026-05-19T00:00:00.000Z",
+      "validatedCount": 18,
+      "skippedCount": 0
+    }
+  }
+}

@@ -71,4 +71,4 @@ export const SUB_SEASON_TO_SEASON: Record<SubSeason, Season> = {
   'dark-winter': 'winter', 'true-winter': 'winter', 'clear-winter': 'winter',
 }
 
-export const MIN_SOURCES = 5
+export const MIN_SOURCES = 3
