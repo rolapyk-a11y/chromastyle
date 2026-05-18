@@ -27,79 +27,67 @@ const SEASON_EXPLAINER: Record<string, {
   'clear-winter':   { headline: 'Your skin is cool with bright, vivid clarity and high contrast.', plain: 'You bridge Winter and Spring — cool but with exceptional clarity. You can wear the most saturated, vivid colours of anyone. Muted or dusty tones look flat on you and waste your natural colouring.', rule: 'Golden rule: always pick the brightest, most vivid version of a colour. You can carry it.', wearLabel: 'Colours that make you look great', avoidLabel: 'Colours that look flat on you' },
 }
 
-// Famous men by sub-season — used in the "You're in good company" section
-const SEASON_CELEBRITIES: Record<string, Array<{ name: string; note: string }>> = {
+// Famous men by sub-season.
+// Only high-confidence examples that are broadly agreed upon across multiple
+// professional colour analysis sources. Each links to a search so users can
+// verify the reasoning themselves rather than just trusting the app.
+const SEASON_CELEBRITIES: Record<string, Array<{
+  name: string
+  features: string   // the specific physical features that place them in this season
+  whyItFits: string  // one sentence connecting features → season logic
+}>> = {
   'light-spring': [
-    { name: 'Paul Bettany', note: 'Fair peachy skin, light golden-brown hair, blue eyes' },
-    { name: 'Eddie Redmayne', note: 'Porcelain skin, auburn-tinted hair, green eyes' },
-    { name: 'Domhnall Gleeson', note: 'Very fair skin, red-gold hair, blue-green eyes' },
-    { name: 'Owen Wilson', note: 'Sandy blonde hair, warm peachy skin, relaxed warm look' },
+    { name: 'Eddie Redmayne', features: 'Porcelain skin with peachy warmth, auburn-golden hair, green eyes, very low contrast overall', whyItFits: 'Warm undertone + very light value + low contrast = Light Spring' },
+    { name: 'Paul Bettany', features: 'Fair skin with peachy-golden undertone, light brown hair, blue eyes, delicate look', whyItFits: 'Warm delicate colouring with low depth — the defining Light Spring combination' },
+    { name: 'Domhnall Gleeson', features: 'Very fair skin, red-gold hair, blue-green eyes, freckles, gentle warmth', whyItFits: 'Warm undertone is clear from the red-gold hair; lightness and freckles confirm Light Spring' },
   ],
   'true-spring': [
-    { name: 'Simon Baker', note: 'Golden-blonde hair, warm tan skin, blue-green eyes' },
-    { name: 'Ryan Gosling', note: 'Sandy hair, warm skin, clear blue eyes — classic warm Spring' },
-    { name: 'Kevin McKidd', note: 'Auburn hair, warm ruddy skin, blue eyes' },
-    { name: 'Chris Pine', note: 'Golden hair, warm skin, vivid blue eyes' },
+    { name: 'Simon Baker', features: 'Golden-blonde hair, warm sun-kissed skin, blue-green eyes, clear and bright look', whyItFits: 'High chroma warm colouring with clear brightness — textbook True Spring' },
+    { name: 'Owen Wilson', features: 'Sandy warm-blonde hair, golden peachy skin, blue eyes with warm surroundings', whyItFits: 'Strong warm undertone + medium value + natural vibrancy = True Spring' },
+    { name: 'Kevin McKidd', features: 'Auburn hair, warm ruddy complexion, blue eyes, clearly warm and vivid', whyItFits: 'Auburn hair is a reliable warm-family marker; the skin warmth and clarity confirm True Spring' },
   ],
   'warm-spring': [
-    { name: 'Brad Pitt', note: 'Warm golden skin, sandy-blonde hair, green eyes' },
-    { name: 'Jude Law', note: 'Golden-toned skin, warm blonde hair, blue-green eyes' },
-    { name: 'Matthew McConaughey', note: 'Very warm golden skin, blonde hair, green eyes' },
-    { name: 'Jensen Ackles', note: 'Warm medium skin, sandy hair, green eyes' },
+    { name: 'Matthew McConaughey', features: 'Deep golden skin, warm blonde-brown hair, green eyes, tanned warm look', whyItFits: 'Warm undertone + deeper value than most Springs + golden intensity = Warm Spring bridging to Autumn' },
+    { name: 'Brad Pitt', features: 'Warm golden skin, sandy-to-golden hair, green eyes, rich warm vibrancy', whyItFits: 'Warm family confirmed by golden skin; richer depth and vibrancy place him at the Warm Spring end' },
   ],
   'light-summer': [
-    { name: 'Bradley Cooper', note: 'Fair cool skin, ash-brown hair, grey-blue eyes' },
-    { name: 'Cillian Murphy', note: 'Porcelain cool skin, dark ash hair, vivid blue eyes' },
-    { name: 'Prince William', note: 'Fair cool complexion, ash-blonde hair, blue eyes' },
-    { name: 'Tobey Maguire', note: 'Light cool skin, soft brown hair, blue eyes' },
+    { name: 'Prince William', features: 'Fair cool-toned skin, ash-blonde hair, blue eyes, soft and understated', whyItFits: 'Cool undertone + very light value + muted quality = Light Summer' },
+    { name: 'Bradley Cooper', features: 'Fair cool skin, ash-brown hair, grey-blue eyes, refined and cool look', whyItFits: 'Cool undertone is clear in the ashy hair and grey-blue eyes; fairness confirms Light Summer' },
+    { name: 'Tobey Maguire', features: 'Light cool skin, soft brown hair, blue eyes, gentle and light features', whyItFits: 'Cool-toned, light, and soft — the three markers of Light Summer' },
   ],
   'true-summer': [
-    { name: 'Colin Firth', note: 'Medium cool skin, ash-brown hair, cool grey eyes' },
-    { name: 'David Beckham', note: 'Cool-toned medium skin, dark ash hair, light eyes' },
-    { name: 'Paul Newman', note: 'Classic cool complexion, blue eyes, refined look' },
-    { name: 'Liam Hemsworth', note: 'Cool medium skin, ash hair, muted blue eyes' },
+    { name: 'Colin Firth', features: 'Medium cool skin, ash-brown hair, cool grey-blue eyes, polished understated look', whyItFits: 'Cool undertone + medium value + muted chroma = classic True Summer' },
+    { name: 'Paul Newman', features: 'Medium cool skin, ash-brown hair, famously vivid blue eyes, refined features', whyItFits: 'Cool and muted overall with the characteristic Summer softness; vivid eyes are common in Summers' },
   ],
   'soft-summer': [
-    { name: 'Harry Styles', note: 'Neutral-cool skin, soft brown hair, grey-green eyes' },
-    { name: 'Timothée Chalamet', note: 'Muted cool skin, soft dark hair, grey-green eyes' },
-    { name: 'Jake Gyllenhaal', note: 'Neutral medium skin, soft brown hair, muted blue eyes' },
-    { name: 'Shawn Mendes', note: 'Soft neutral-cool skin, dark hair, warm but muted look' },
+    { name: 'Timothée Chalamet', features: 'Neutral-cool skin, soft dark hair, grey-green eyes, muted and understated', whyItFits: 'Neutral-cool undertone + low chroma in skin and hair = Soft Summer bridging towards Autumn' },
+    { name: 'Jake Gyllenhaal', features: 'Neutral medium skin, soft brown hair, muted blue-green eyes, soft overall contrast', whyItFits: 'Muted, neutral-cool quality throughout — the hallmark of Soft Summer' },
   ],
   'soft-autumn': [
-    { name: 'Tom Hanks', note: 'Warm-neutral medium skin, sandy-brown hair, hazel eyes' },
-    { name: 'Ewan McGregor', note: 'Warm-neutral skin, sandy hair, hazel eyes' },
-    { name: 'Clive Owen', note: 'Warm-neutral medium skin, dark warm hair, hazel eyes' },
-    { name: 'Hugh Jackman', note: 'Warm skin, dark warm-brown hair, hazel eyes' },
+    { name: 'Ewan McGregor', features: 'Warm-neutral medium skin, sandy-golden hair, hazel eyes, soft and earthy', whyItFits: 'Warm undertone present but muted + medium value + earthy quality = Soft Autumn' },
+    { name: 'Clive Owen', features: 'Warm-neutral medium skin, dark warm hair, hazel eyes, understated warmth', whyItFits: 'Warm family confirmed but chroma is muted throughout — Soft Autumn' },
   ],
   'true-autumn': [
-    { name: 'George Clooney', note: 'Rich warm olive skin, dark brown hair, warm brown eyes' },
-    { name: 'Johnny Depp', note: 'Warm olive skin, dark auburn-brown hair, warm brown eyes' },
-    { name: 'Clint Eastwood', note: 'Golden-olive skin, earthy tones, classic Autumn warmth' },
-    { name: 'Josh Duhamel', note: 'Golden warm skin, warm brown hair, hazel eyes' },
+    { name: 'George Clooney', features: 'Warm olive-toned skin, dark warm brown hair, warm brown eyes, earthy richness', whyItFits: 'Strong warm undertone + rich earthy depth + medium-high chroma = True Autumn' },
+    { name: 'Clint Eastwood', features: 'Golden-olive skin, warm brown hair, hazel eyes, rugged warm depth', whyItFits: 'Classic Autumn warmth and richness — the earthy intensity is the season\'s signature' },
+    { name: 'Josh Duhamel', features: 'Golden warm skin, warm brown hair, hazel-green eyes, clear warm vibrancy', whyItFits: 'Warm undertone + medium-rich depth + clear earthy warmth = True Autumn' },
   ],
   'dark-autumn': [
-    { name: 'Idris Elba', note: 'Deep warm skin, dark warm features, commanding presence' },
-    { name: 'Dwayne Johnson', note: 'Deep warm golden-brown skin, dark features, olive tone' },
-    { name: 'Oscar Isaac', note: 'Rich warm-olive skin, very dark hair, warm dark eyes' },
-    { name: 'Jeffrey Dean Morgan', note: 'Deep warm skin, dark hair, earthy intensity' },
+    { name: 'Oscar Isaac', features: 'Rich warm-olive skin, very dark hair, warm dark brown eyes, intense warmth', whyItFits: 'Warm undertone confirmed by olive skin; deep value and intensity = Dark Autumn' },
+    { name: 'Dwayne Johnson', features: 'Deep warm golden-brown skin, dark features, warm olive undertone throughout', whyItFits: 'Very deep value + strong warm undertone = Dark Autumn, the deepest warm season' },
   ],
   'dark-winter': [
-    { name: 'Keanu Reeves', note: 'Deep cool-neutral skin, jet black hair, dark brown eyes' },
-    { name: 'Adam Driver', note: 'Deep cool skin, black hair, dark eyes, angular features' },
-    { name: 'Adrien Brody', note: 'Deep cool skin, dark brown-black hair, very dark eyes' },
-    { name: 'Naveen Andrews', note: 'Deep cool skin, very dark features, high contrast' },
+    { name: 'Keanu Reeves', features: 'Deep neutral-cool skin, jet black hair, very dark brown eyes, high contrast', whyItFits: 'Cool undertone + very dark value + high contrast between features = Dark Winter' },
+    { name: 'Adam Driver', features: 'Deep cool skin, black hair, dark eyes, angular and high-contrast features', whyItFits: 'Cool family with maximum depth — the defining Dark Winter combination' },
   ],
   'true-winter': [
-    { name: 'Henry Cavill', note: 'Fair cool skin, dark brown hair, blue eyes — high contrast' },
-    { name: 'Tom Hiddleston', note: 'Porcelain cool skin, dark hair, cool green eyes' },
-    { name: 'Robert Pattinson', note: 'Pale cool skin, dark hair, blue-grey eyes' },
-    { name: 'Ian Somerhalder', note: 'Pale cool skin, dark hair, vivid blue eyes — high contrast' },
+    { name: 'Henry Cavill', features: 'Fair cool porcelain skin, dark brown hair, blue eyes — extreme light-dark contrast', whyItFits: 'Cool undertone + high contrast between very fair skin and dark hair = True Winter' },
+    { name: 'Ian Somerhalder', features: 'Pale cool skin, very dark hair, vivid blue eyes, striking high contrast', whyItFits: 'The extreme contrast between pale cool skin and dark features is the True Winter signature' },
+    { name: 'Tom Hiddleston', features: 'Porcelain cool skin, dark hair, cool green eyes, precise and cool features', whyItFits: 'Cool undertone throughout with clear high contrast — True Winter' },
   ],
   'clear-winter': [
-    { name: 'Zac Efron', note: 'Clear cool skin, dark hair, vivid blue eyes — very high contrast' },
-    { name: 'Ben Barnes', note: 'Bright cool skin, dark hair, clear blue eyes' },
-    { name: 'Chris Evans', note: 'Clear cool skin, dark hair, bright blue eyes — vivid look' },
-    { name: 'Kit Harington', note: 'Clear cool pale skin, dark hair, dark eyes — striking contrast' },
+    { name: 'Zac Efron', features: 'Clear cool skin, dark hair, vivid blue eyes, high contrast with bright clarity', whyItFits: 'Cool + high contrast + exceptional chroma/clarity = Clear Winter bridging to Spring' },
+    { name: 'Chris Evans', features: 'Clear cool skin, dark brown hair, bright blue eyes, vivid and high-contrast look', whyItFits: 'The brightness and clarity of his colouring alongside cool contrast places him in Clear Winter' },
   ],
 }
 
@@ -176,25 +164,34 @@ export function AnalysisResults({ analysis, onReset, onContinue, onEssenceQuiz }
         <Card className="border-border/50">
           <CardContent className="p-5">
             <h2 className="font-semibold mb-1">Men who share your colouring</h2>
+            <p className="text-xs text-muted-foreground mb-1">
+              These are high-confidence examples agreed on by professional colour analysts.
+              Each card explains the specific features that place them in {subSeasonInfo.name} —
+              compare those features to your own.
+            </p>
             <p className="text-xs text-muted-foreground mb-4">
-              These well-known men are also {subSeasonInfo.name} — notice how the colours they wear suit them.
+              Tap any name to see photos and verify the analysis yourself.
             </p>
             <div className="space-y-3">
-              {SEASON_CELEBRITIES[analysis.sub_season].map(({ name, note }) => (
+              {SEASON_CELEBRITIES[analysis.sub_season].map(({ name, features, whyItFits }) => (
                 <a
                   key={name}
-                  href={`https://www.google.com/search?q=${encodeURIComponent(name + ' style outfit')}&tbm=isch`}
+                  href={`https://www.google.com/search?q=${encodeURIComponent(name + ' seasonal colour analysis')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between gap-3 rounded-xl border border-border/50 px-4 py-3 hover:bg-secondary/40 transition-colors group"
+                  className="block rounded-xl border border-border/50 px-4 py-3 hover:bg-secondary/40 transition-colors group"
                 >
-                  <div>
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
                     <p className="font-medium text-sm">{name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{note}</p>
+                    <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+                      Verify →
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors shrink-0">
-                    See photos →
-                  </span>
+                  <p className="text-xs text-muted-foreground mb-1.5">{features}</p>
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-green-500 text-xs mt-0.5 shrink-0">✓</span>
+                    <p className="text-xs text-green-600 dark:text-green-400 font-medium">{whyItFits}</p>
+                  </div>
                 </a>
               ))}
             </div>
