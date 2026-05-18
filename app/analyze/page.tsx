@@ -11,6 +11,7 @@ import { Sparkles, LogIn, ArrowRight } from 'lucide-react'
 import type { ColorAnalysis } from '@/lib/types'
 import type { EssenceResult } from '@/lib/essenceData'
 import { analyzeColorsInBrowser, FaceNotDetectedError } from '@/lib/clientColorAnalysis'
+import { saveColorAnalysis } from './actions'
 
 type PageStep = 'undertone-question' | 'capture' | 'results' | 'essence-quiz'
 type Undertone = 'warm' | 'cool'
@@ -74,10 +75,13 @@ export default function AnalyzePage() {
     try {
       const result = await analyzeColorsInBrowser(imageData, undertone ?? undefined)
 
+      // Save to Supabase (silently — works only when logged in, ignored otherwise)
+      const saved = await saveColorAnalysis({ ...result, photo_url: '' })
+
       const fullAnalysis: ColorAnalysis = {
         ...result,
-        id: `guest-${Date.now()}`,
-        user_id: 'guest',
+        id: saved?.id ?? `guest-${Date.now()}`,
+        user_id: saved ? 'saved' : 'guest',
         photo_url: '',
         created_at: new Date().toISOString(),
       }
@@ -188,7 +192,7 @@ export default function AnalyzePage() {
                 <p className="font-semibold text-sm">Save your results permanently</p>
                 <p className="text-xs text-muted-foreground">Create a free account to access your palette any time.</p>
               </div>
-              <Button size="sm" onClick={() => router.push('/auth/signup')}>
+              <Button size="sm" onClick={() => router.push('/auth/sign-up')}>
                 <LogIn className="w-4 h-4 mr-2" />
                 Sign up free
               </Button>

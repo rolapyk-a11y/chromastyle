@@ -1,20 +1,38 @@
 import { createClient } from '@/lib/supabase/server'
 import { WardrobeClient } from '@/components/dashboard/wardrobe-client'
+import { LocalAnalysisSync } from '@/components/dashboard/local-analysis-sync'
 import { ColorAnalysis, ClothingItem } from '@/lib/types'
-import type { WardrobeSeedItem } from '@/lib/wardrobe-seed'
 
-// Attempt to load the agent-generated wardrobe seed (exists after populate-wardrobe runs).
-// Falls back gracefully when the file is empty (before the agent runs).
-async function getAgentWardrobeItems(subSeason: string | undefined): Promise<ClothingItem[]> {
-  if (!subSeason) return []
+// Fetch real products from Google Shopping via our Serper-backed API.
+// Results are cached in Supabase for 30 days — only the first load per
+// sub-season costs API credits.
+async function getRealProducts(subSeason: string | undefined): Promise<ClothingItem[]> {
+  if (!subSeason || !process.env.SERPER_API_KEY) return []
   try {
-    const { WARDROBE_BY_SUB_SEASON } = await import('@/lib/wardrobe-seed')
-    const seedItems = (WARDROBE_BY_SUB_SEASON[subSeason as keyof typeof WARDROBE_BY_SUB_SEASON] ?? []) as WardrobeSeedItem[]
-    return seedItems.map((item: WardrobeSeedItem, i: number) => ({
-      ...item,
-      id: `seed-${subSeason}-${i}`,
-      subcategory: item.subcategory ?? null,
-      product_url: item.product_url ?? null,
+    const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+    const res = await fetch(`${base}/api/products/search?sub_season=${subSeason}`, {
+      next: { revalidate: 60 * 60 * 24 }, // 24h Next.js cache on top of Supabase cache
+    })
+    if (!res.ok) return []
+    const { products } = await res.json()
+    return (products ?? []).map((p: {
+      id: string; name: string; brand: string; price: string;
+      image_url: string; product_url: string; colour_name: string;
+      colour_hex: string; category: string;
+    }, i: number) => ({
+      id: p.id ?? `product-${i}`,
+      name: p.name,
+      brand: p.brand,
+      category: p.category,
+      subcategory: p.colour_name,
+      price: parseFloat(p.price?.replace(/[^0-9.]/g, '') ?? '0') || 0,
+      currency: 'GBP',
+      image_url: p.image_url,
+      product_url: p.product_url,
+      colors: [p.colour_hex],
+      seasons: [],
+      style_tags: [p.colour_name, p.category],
+      is_trending: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })) as ClothingItem[]
@@ -57,17 +75,16 @@ export default async function WardrobePage() {
     clothingItems = refetched
   }
 
-  // Merge in agent-generated wardrobe items for the user's specific sub-season.
-  // These are pre-curated real H&M products matched to the user's exact palette.
-  const agentItems = await getAgentWardrobeItems(colorAnalysis?.sub_season)
+  // Fetch real Google Shopping products matched to the user's exact sub-season.
+  // Results are cached in Supabase — only the first load costs Serper credits.
+  const realProducts = await getRealProducts(colorAnalysis?.sub_season)
   const supabaseItems = (clothingItems ?? []) as ClothingItem[]
 
-  // Agent items take priority (shown first) since they are sub-season matched.
-  // De-duplicate by product_url so DB items don't appear twice if already seeded.
-  const agentUrls = new Set(agentItems.map(i => i.product_url).filter(Boolean))
+  // Real products take priority (shown first). De-duplicate by product_url.
+  const realUrls = new Set(realProducts.map(i => i.product_url).filter(Boolean))
   const merged = [
-    ...agentItems,
-    ...supabaseItems.filter(i => !agentUrls.has(i.product_url ?? '')),
+    ...realProducts,
+    ...supabaseItems.filter(i => !realUrls.has(i.product_url ?? '')),
   ]
 
   // Get user's saved items
@@ -79,10 +96,14 @@ export default async function WardrobePage() {
   const savedItemIds = savedItems?.map(item => item.clothing_item_id) ?? []
 
   return (
-    <WardrobeClient
-      colorAnalysis={colorAnalysis}
-      clothingItems={merged}
-      savedItemIds={savedItemIds}
-    />
+    <>
+      {/* If no Supabase analysis yet, sync from localStorage then refresh */}
+      {!colorAnalysis && <LocalAnalysisSync />}
+      <WardrobeClient
+        colorAnalysis={colorAnalysis}
+        clothingItems={merged}
+        savedItemIds={savedItemIds}
+      />
+    </>
   )
 }

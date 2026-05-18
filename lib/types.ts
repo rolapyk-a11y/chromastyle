@@ -36,7 +36,7 @@ export interface AnalysisDetails {
 export interface ClothingItem {
   id: string
   name: string
-  brand: 'H&M' | 'Zara' | 'Toj Eksperten'
+  brand: string
   category: string
   subcategory: string | null
   price: number

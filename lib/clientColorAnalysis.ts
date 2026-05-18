@@ -265,21 +265,27 @@ function classifySeason(colors: SampledColors, knownUndertone?: 'warm' | 'cool')
 
   if (isWarm) {
     // ── WARM FAMILY (Spring/Autumn) ──────────────────────────────────────────
-    if (skinL > 62) {
-      // Light + warm → Light Spring
+    if (skinL > 56) {
+      // Light + warm → Light Spring.
+      // Threshold lowered from 62: artificial light underestimates L* by ~5-8 points,
+      // so true Light Springs often read 56-62 on camera.
       subSeason = 'light-spring'; season = 'spring'
-    } else if (skinChroma > 28 && skinL > 48) {
+    } else if (skinChroma > 26 && skinL > 48) {
       // Medium-light + warm + vivid → True Spring
       subSeason = 'true-spring'; season = 'spring'
-    } else if (skinChroma > 22 && hairIsWarm && !hairIsDark) {
-      // Warm + some chroma + warm golden hair → True/Warm Spring
+    } else if (skinChroma > 20 && hairIsWarm && !hairIsDark) {
+      // Warm + some chroma + warm golden hair → Warm Spring
       subSeason = 'warm-spring'; season = 'spring'
-    } else if (skinChroma < 20) {
-      // Warm + muted → Soft Autumn
+    } else if (skinChroma < 20 && skinL < 58) {
+      // Warm + muted + medium-dark skin → Soft Autumn.
+      // skinL < 58 guard prevents light-skinned warm people from landing here.
       subSeason = 'soft-autumn'; season = 'autumn'
     } else if (skinL < 42 || (hairIsDark && skinB > 18)) {
       // Dark + warm → Dark Autumn
       subSeason = 'dark-autumn'; season = 'autumn'
+    } else if (skinL > 50 && skinChroma < 24) {
+      // Medium-light + warm + soft chroma → Light Spring (catches edge cases)
+      subSeason = 'light-spring'; season = 'spring'
     } else {
       // Medium warm, earthy → True Autumn
       subSeason = 'true-autumn'; season = 'autumn'
@@ -308,9 +314,9 @@ function classifySeason(colors: SampledColors, knownUndertone?: 'warm' | 'cool')
   } else {
     // ── NEUTRAL (b* 9-14): use hair as tiebreaker ────────────────────────────
     if (hairIsWarm) {
-      if (skinL > 60) {
+      if (skinL > 54) {
         subSeason = 'light-spring'; season = 'spring'
-      } else if (skinChroma < 20) {
+      } else if (skinChroma < 20 && skinL < 56) {
         subSeason = 'soft-autumn'; season = 'autumn'
       } else {
         subSeason = 'true-autumn'; season = 'autumn'
