@@ -62,6 +62,7 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<ColorAnalysis | null>(null)
   const [showSignUpPrompt, setShowSignUpPrompt] = useState(false)
+  const [analysisSaved, setAnalysisSaved] = useState(false)
 
   function handleUndertoneSelect(choice: Undertone) {
     setUndertone(choice)
@@ -89,7 +90,8 @@ export default function AnalyzePage() {
       localStorage.setItem('chromastyle_analysis', JSON.stringify(fullAnalysis))
       setAnalysis(fullAnalysis)
       setStep('results')
-      setShowSignUpPrompt(true)
+      setAnalysisSaved(!!saved?.id)
+      setShowSignUpPrompt(!saved?.id) // only show sign-up if not already saved
     } catch (err) {
       if (err instanceof FaceNotDetectedError) {
         setError('No face detected. Please try again: face the camera directly, make sure your face is well-lit, and keep your whole face in frame.')
@@ -185,20 +187,38 @@ export default function AnalyzePage() {
   if (step === 'results' && analysis) {
     return (
       <div className="space-y-4">
-        {showSignUpPrompt && (
+        {analysisSaved ? (
+          <Card className="border-green-500/40 bg-green-500/5 max-w-2xl mx-auto">
+            <CardContent className="p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold text-sm">Analysis saved to your account</p>
+                <p className="text-xs text-muted-foreground">Your palette is ready in the wardrobe.</p>
+              </div>
+              <Button size="sm" onClick={() => router.push('/dashboard/wardrobe')}>
+                <ArrowRight className="w-4 h-4 mr-2" />
+                Go to wardrobe
+              </Button>
+            </CardContent>
+          </Card>
+        ) : showSignUpPrompt ? (
           <Card className="border-primary/40 bg-primary/5 max-w-2xl mx-auto">
             <CardContent className="p-4 flex items-center justify-between gap-4">
               <div>
                 <p className="font-semibold text-sm">Save your results permanently</p>
-                <p className="text-xs text-muted-foreground">Create a free account to access your palette any time.</p>
+                <p className="text-xs text-muted-foreground">Log in or create a free account to save your palette.</p>
               </div>
-              <Button size="sm" onClick={() => router.push('/auth/sign-up')}>
-                <LogIn className="w-4 h-4 mr-2" />
-                Sign up free
-              </Button>
+              <div className="flex gap-2 shrink-0">
+                <Button size="sm" variant="outline" onClick={() => router.push('/auth/login')}>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Log in
+                </Button>
+                <Button size="sm" onClick={() => router.push('/auth/sign-up')}>
+                  Sign up free
+                </Button>
+              </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
         <AnalysisResults
           analysis={analysis}
           onReset={handleReset}
