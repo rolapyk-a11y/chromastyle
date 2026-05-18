@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Palette, Sparkles, LogIn } from 'lucide-react'
 import type { ColorAnalysis } from '@/lib/types'
 import type { EssenceResult } from '@/lib/essenceData'
-import { analyzeColorsInBrowser } from '@/lib/clientColorAnalysis'
+import { analyzeColorsInBrowser, FaceNotDetectedError } from '@/lib/clientColorAnalysis'
 
 type PageStep = 'capture' | 'results' | 'essence-quiz' | 'essence-results'
 
@@ -45,7 +45,11 @@ export default function AnalyzePage() {
       setStep('results')
       setShowSignUpPrompt(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not analyse your photo. Please try again.')
+      if (err instanceof FaceNotDetectedError) {
+        setError('No face detected. Please try again: face the camera directly, make sure your face is well-lit, and keep your whole face in frame.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Could not analyse your photo. Please try again.')
+      }
     } finally {
       setIsProcessing(false)
     }
