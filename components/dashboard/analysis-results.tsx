@@ -93,6 +93,22 @@ const SEASON_CELEBRITIES: Record<string, Array<{
 
 // Map hex codes to readable colour names
 const HEX_NAMES: Record<string, string> = {
+  // Light Spring
+  '#F5A886': 'Apricot', '#F4C4A4': 'Peach', '#ECA0A0': 'Soft Watermelon',
+  '#F0B4C4': 'Taffy Pink', '#F8E080': 'Banana Yellow', '#E8C058': 'Honey',
+  '#94D4B0': 'Warm Mint', '#B4D890': 'Pistachio', '#A8C4DC': 'Powder Blue',
+  '#D4BCAC': 'Blush Beige', '#C4A070': 'Camel', '#F2E4D0': 'Ivory Cream',
+  // True Spring
+  '#F4892C': 'Coral Orange', '#F5B030': 'Golden Yellow', '#F9D840': 'Daisy Yellow',
+  '#F5A870': 'Warm Peach', '#48C898': 'Clear Turquoise', '#70C870': 'Clear Green',
+  '#F09060': 'Warm Orange', '#E8C060': 'Warm Gold', '#C89050': 'Caramel',
+  '#D4A840': 'Warm Amber', '#A0785A': 'Warm Brown', '#F8E8C0': 'Warm Cream',
+  // Warm Spring
+  '#E8782A': 'Rich Coral', '#D4942A': 'Warm Amber', '#E8C430': 'Rich Yellow',
+  '#C8A040': 'Dark Gold', '#60B878': 'Warm Olive', '#A0C050': 'Yellow-Green',
+  '#F0A860': 'Warm Peach', '#C87840': 'Caramel Brown', '#A06030': 'Warm Cognac',
+  '#D4A870': 'Warm Tan', '#E8D4A0': 'Warm Sand', '#6A4020': 'Warm Dark Brown',
+  // Legacy Spring codes
   '#E3A274': 'Peach', '#ECA299': 'Soft Coral', '#F5D4C0': 'Apricot', '#A8D8C4': 'Warm Mint',
   '#F5E6D8': 'Warm Cream', '#F9EBD0': 'Ivory', '#D4EAD8': 'Celery', '#FDDDB3': 'Buttercream',
   '#F9C74F': 'Golden Yellow', '#FFC857': 'Warm Gold', '#F3722C': 'Warm Coral',

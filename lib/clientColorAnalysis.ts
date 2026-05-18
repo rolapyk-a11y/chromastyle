@@ -344,51 +344,118 @@ const SEASON_PALETTES: Record<SubSeason, {
   styleTips: string[]
 }> = {
   'light-spring': {
-    best: ['#E3A274','#ECA299','#F5D4C0','#A8D8C4','#F5E6D8','#F9EBD0','#D4EAD8','#C8E8E0','#FDDDB3','#E8C4B8','#B8DDD4','#F2E4D8'],
-    avoid: ['#0D0D0D','#F5F5F5','#1A237E','#36454F','#333333','#008000'],
-    eyeEnhancing: ['#A8D8C4','#C8E8E0','#88C8B4','#B8D8D0'],
+    // Validated against reference palettes (dream-wardrobe.com, 30somethingurbangirl.com)
+    // Warm + Light + soft chroma. Characteristic colours: peach, apricot, warm mint,
+    // banana yellow, honey, taffy pink, powder blue (warm-tinted), camel, ivory.
+    best: [
+      '#F5A886', // Apricot — the Light Spring signature warm coral-orange
+      '#F4C4A4', // Peach — soft warm peachy, essential Spring
+      '#ECA0A0', // Soft Watermelon — warm pink-red, very flattering
+      '#F0B4C4', // Taffy Pink — warm candy pink
+      '#F8E080', // Banana Yellow — pale warm yellow, typical Light Spring
+      '#E8C058', // Honey — golden warm yellow
+      '#94D4B0', // Warm Mint — Spring's signature green, warm-tinted not cool
+      '#B4D890', // Pistachio — warm yellow-green
+      '#A8C4DC', // Powder/Denim Blue — warm-tinted muted blue (key Light Spring neutral)
+      '#D4BCAC', // Warm Blush Beige — neutral close to skin
+      '#C4A070', // Camel — the Light Spring neutral (replaces black)
+      '#F2E4D0', // Ivory Cream — warm off-white (replaces stark white)
+    ],
+    avoid: [
+      '#1A1A1A', // Near black — too harsh, drains Light Spring
+      '#F5F5F5', // Stark white — use ivory instead
+      '#1A237E', // Dark navy — too cool and deep
+      '#36454F', // Charcoal grey — too cool
+      '#4A148C', // Deep purple — too cool and vivid
+      '#1B5E20', // Dark forest green — too dark and cool
+    ],
+    eyeEnhancing: ['#94D4B0','#A8C4DC','#F5A886','#ECA0A0'],
     skinAnalysis: 'Light, delicate skin with warm peachy-golden undertones. Soft and luminous — typical of Light Spring.',
     eyeAnalysis: 'Soft, clear eyes — light to medium in depth with warm undertones. Sparkle most against warm mint and soft coral.',
-    hairAnalysis: 'Light to medium hair with golden or warm blonde highlights.',
-    recommendation: 'Your palette is sun-warmed and delicate. Wear peach, soft coral, and warm mint close to your face. Avoid stark black or white — reach for warm brown and ivory instead.',
+    hairAnalysis: 'Light to medium hair with golden or warm highlights — blonde, red-gold, or warm light brown.',
+    recommendation: 'Your palette is sun-warmed and delicate. Peach, apricot, warm mint, and honey yellow are your signature colours. Always reach for ivory over white, and camel over black.',
     styleTips: [
-      'Replace black with warm chocolate brown or dark camel',
-      'Ivory and cream instead of stark white',
-      'Gold and rose gold jewellery will enhance your warm undertones',
-      'Soft coral and apricot near your face will make your skin glow',
-      'Avoid navy and dark grey — they will drain your complexion',
+      'Replace black with camel or warm chocolate brown — much more flattering',
+      'Replace stark white with ivory or warm cream',
+      'Peach and apricot near your face will make your complexion glow',
+      'Warm mint and pistachio green are your best cool-looking tones',
+      'Yellow gold jewellery only — silver will look cold against your skin',
     ],
   },
   'true-spring': {
-    best: ['#F9C74F','#FFC857','#F3722C','#F7B567','#C68642','#FFB347','#E8A830','#F4A460','#DEB887','#CD853F','#D4AF37','#FF8C00'],
-    avoid: ['#6A5ACD','#4169E1','#778899','#B0C4DE','#696969','#2F4F4F'],
-    eyeEnhancing: ['#F3722C','#E8963C','#D4AF37','#C68642'],
+    // Warmer and more vivid than Light Spring. Characteristic colours: warm coral,
+    // golden yellow, turquoise (warm-tinted), aqua, warm orange, clear greens, caramel.
+    best: [
+      '#F4892C', // Warm Coral Orange — vivid, the True Spring statement colour
+      '#F5B030', // Golden Yellow — clear and warm, not greenish
+      '#F9D840', // Daisy Yellow — bright warm yellow
+      '#F5A870', // Warm Peach — richer than Light Spring
+      '#48C898', // Clear Warm Turquoise — aqua-green, the Spring blue-green
+      '#70C870', // Clear Warm Green — bright and fresh
+      '#F09060', // Warm Orange — vivid, very True Spring
+      '#E8C060', // Warm Gold — medium warm yellow
+      '#C89050', // Caramel — warm medium neutral
+      '#D4A840', // Warm Amber — golden neutral
+      '#A0785A', // Warm Brown — the True Spring neutral (replaces black)
+      '#F8E8C0', // Warm Cream — off-white neutral
+    ],
+    avoid: [
+      '#6A5ACD', // Cool slate blue — clashes with warm colouring
+      '#4169E1', // Royal cool blue — too cool
+      '#778899', // Cool grey — drains warmth
+      '#696969', // Mid grey — no warmth, dulls complexion
+      '#2F4F4F', // Dark slate — too cool and muted
+      '#1A1A2E', // Dark cool navy — wrong family
+    ],
+    eyeEnhancing: ['#48C898','#F4892C','#E8C060','#70C870'],
     skinAnalysis: 'Warm golden skin with clear, bright undertones — the classic sunny Spring complexion.',
-    eyeAnalysis: 'Warm, clear eyes — green, hazel, or warm brown. Ignite against golden yellow and warm coral.',
-    hairAnalysis: 'Golden, warm-toned hair — blonde, strawberry, or warm brown.',
-    recommendation: 'Your colours are sunny and vibrant. Wear golden yellows and warm corals to amplify your natural glow.',
+    eyeAnalysis: 'Warm, clear eyes — green, hazel, or warm brown. Ignite against golden yellow, warm coral, and clear turquoise.',
+    hairAnalysis: 'Golden, warm-toned hair — blonde, strawberry, warm red, or golden brown.',
+    recommendation: 'Your colours are sunny and vibrant. Golden yellow, warm coral, and clear turquoise are your power colours. Avoid anything grey or cool-toned.',
     styleTips: [
-      'Turquoise and aqua in warm tones are your power colours',
-      'Warm coral and peach make your skin glow',
-      'Camel is your ideal neutral',
-      'Avoid cool-toned silver — yellow gold and brass only',
-      'Tropical prints in warm colours are made for you',
+      'Clear warm turquoise and aqua are your best blue alternatives',
+      'Warm coral near your face amplifies your natural glow',
+      'Caramel and warm brown are your everyday neutrals',
+      'Yellow gold and brass jewellery always — no silver',
+      'Bold warm colour-blocking works well on your colouring',
     ],
   },
   'warm-spring': {
-    best: ['#F9C74F','#FFC857','#F7B567','#E8963C','#D4AF37','#C68642','#DEB887','#CD853F','#DAA520','#B8860B','#D2691E','#8B6914'],
-    avoid: ['#708090','#B0C4DE','#4169E1','#6A5ACD','#2F4F4F','#1C1C1C'],
-    eyeEnhancing: ['#DAA520','#C68642','#D4AF37','#B8860B'],
-    skinAnalysis: 'Rich warm skin with golden-amber undertones — bridging Spring and Autumn.',
-    eyeAnalysis: 'Deep warm eyes — hazel, amber, or warm dark brown. Most enhanced by rich golds and warm ambers.',
-    hairAnalysis: 'Medium to dark warm hair with golden or auburn tones.',
-    recommendation: 'Your palette bridges warm Spring and Autumn. Reach for rich golds, warm camel, and earthy amber.',
+    // Bridges Spring → Autumn. Richer and deeper than True Spring.
+    // Characteristic colours: rich coral, warm amber, golden yellow, warm olive, camel.
+    best: [
+      '#E8782A', // Rich Coral — deeper than True Spring
+      '#D4942A', // Warm Amber — golden brown-orange
+      '#E8C430', // Rich Yellow — warm golden
+      '#C8A040', // Dark Gold — warm rich neutral
+      '#60B878', // Warm Olive Green — yellow-green, earthy
+      '#A0C050', // Yellow-Green — warm and slightly earthy
+      '#F0A860', // Warm Peach — richer than lighter Springs
+      '#C87840', // Caramel Brown — warm medium neutral
+      '#A06030', // Warm Cognac — deep warm neutral
+      '#D4A870', // Warm Tan — light warm neutral
+      '#E8D4A0', // Warm Sand — light neutral
+      '#6A4020', // Warm Dark Brown — replaces black
+    ],
+    avoid: [
+      '#708090', // Slate grey — too cool
+      '#B0C4DE', // Light steel blue — too cool
+      '#4169E1', // Royal blue — too cool
+      '#6A5ACD', // Slate blue — wrong family
+      '#2F4F4F', // Dark cool slate — too cool
+      '#1C1C1C', // Near black — use warm dark brown instead
+    ],
+    eyeEnhancing: ['#E8782A','#D4942A','#60B878','#C8A040'],
+    skinAnalysis: 'Rich warm skin with golden-amber undertones — bridging Spring and Autumn with depth and warmth.',
+    eyeAnalysis: 'Deep warm eyes — hazel, amber, or warm green. Ignite against rich coral, amber, and warm olive.',
+    hairAnalysis: 'Medium to dark warm hair with golden, auburn, or red-brown tones.',
+    recommendation: 'You carry richer warm colours than most Springs. Amber, rich coral, and warm olive are your signature. Go deeper than Light Spring, but stay firmly warm.',
     styleTips: [
-      'You can wear richer, deeper versions of Spring colours — deep coral over pale peach',
-      'Camel and warm tan are perfect everyday neutrals',
-      'Yellow gold jewellery is essential — avoid silver entirely',
-      'Warm brown replaces black perfectly',
-      'Layer warm amber tones for a rich, put-together look',
+      'You can wear richer, deeper warm colours than lighter Springs',
+      'Warm dark brown replaces black — rich chocolate works well',
+      'Amber and cognac are your best neutrals',
+      'Yellow gold jewellery is essential — avoid silver',
+      'Olive green is your best green — avoid cool or dark greens',
     ],
   },
   'light-summer': {
