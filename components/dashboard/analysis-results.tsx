@@ -27,6 +27,82 @@ const SEASON_EXPLAINER: Record<string, {
   'clear-winter':   { headline: 'Your skin is cool with bright, vivid clarity and high contrast.', plain: 'You bridge Winter and Spring — cool but with exceptional clarity. You can wear the most saturated, vivid colours of anyone. Muted or dusty tones look flat on you and waste your natural colouring.', rule: 'Golden rule: always pick the brightest, most vivid version of a colour. You can carry it.', wearLabel: 'Colours that make you look great', avoidLabel: 'Colours that look flat on you' },
 }
 
+// Famous men by sub-season — used in the "You're in good company" section
+const SEASON_CELEBRITIES: Record<string, Array<{ name: string; note: string }>> = {
+  'light-spring': [
+    { name: 'Paul Bettany', note: 'Fair peachy skin, light golden-brown hair, blue eyes' },
+    { name: 'Eddie Redmayne', note: 'Porcelain skin, auburn-tinted hair, green eyes' },
+    { name: 'Domhnall Gleeson', note: 'Very fair skin, red-gold hair, blue-green eyes' },
+    { name: 'Owen Wilson', note: 'Sandy blonde hair, warm peachy skin, relaxed warm look' },
+  ],
+  'true-spring': [
+    { name: 'Simon Baker', note: 'Golden-blonde hair, warm tan skin, blue-green eyes' },
+    { name: 'Ryan Gosling', note: 'Sandy hair, warm skin, clear blue eyes — classic warm Spring' },
+    { name: 'Kevin McKidd', note: 'Auburn hair, warm ruddy skin, blue eyes' },
+    { name: 'Chris Pine', note: 'Golden hair, warm skin, vivid blue eyes' },
+  ],
+  'warm-spring': [
+    { name: 'Brad Pitt', note: 'Warm golden skin, sandy-blonde hair, green eyes' },
+    { name: 'Jude Law', note: 'Golden-toned skin, warm blonde hair, blue-green eyes' },
+    { name: 'Matthew McConaughey', note: 'Very warm golden skin, blonde hair, green eyes' },
+    { name: 'Jensen Ackles', note: 'Warm medium skin, sandy hair, green eyes' },
+  ],
+  'light-summer': [
+    { name: 'Bradley Cooper', note: 'Fair cool skin, ash-brown hair, grey-blue eyes' },
+    { name: 'Cillian Murphy', note: 'Porcelain cool skin, dark ash hair, vivid blue eyes' },
+    { name: 'Prince William', note: 'Fair cool complexion, ash-blonde hair, blue eyes' },
+    { name: 'Tobey Maguire', note: 'Light cool skin, soft brown hair, blue eyes' },
+  ],
+  'true-summer': [
+    { name: 'Colin Firth', note: 'Medium cool skin, ash-brown hair, cool grey eyes' },
+    { name: 'David Beckham', note: 'Cool-toned medium skin, dark ash hair, light eyes' },
+    { name: 'Paul Newman', note: 'Classic cool complexion, blue eyes, refined look' },
+    { name: 'Liam Hemsworth', note: 'Cool medium skin, ash hair, muted blue eyes' },
+  ],
+  'soft-summer': [
+    { name: 'Harry Styles', note: 'Neutral-cool skin, soft brown hair, grey-green eyes' },
+    { name: 'Timothée Chalamet', note: 'Muted cool skin, soft dark hair, grey-green eyes' },
+    { name: 'Jake Gyllenhaal', note: 'Neutral medium skin, soft brown hair, muted blue eyes' },
+    { name: 'Shawn Mendes', note: 'Soft neutral-cool skin, dark hair, warm but muted look' },
+  ],
+  'soft-autumn': [
+    { name: 'Tom Hanks', note: 'Warm-neutral medium skin, sandy-brown hair, hazel eyes' },
+    { name: 'Ewan McGregor', note: 'Warm-neutral skin, sandy hair, hazel eyes' },
+    { name: 'Clive Owen', note: 'Warm-neutral medium skin, dark warm hair, hazel eyes' },
+    { name: 'Hugh Jackman', note: 'Warm skin, dark warm-brown hair, hazel eyes' },
+  ],
+  'true-autumn': [
+    { name: 'George Clooney', note: 'Rich warm olive skin, dark brown hair, warm brown eyes' },
+    { name: 'Johnny Depp', note: 'Warm olive skin, dark auburn-brown hair, warm brown eyes' },
+    { name: 'Clint Eastwood', note: 'Golden-olive skin, earthy tones, classic Autumn warmth' },
+    { name: 'Josh Duhamel', note: 'Golden warm skin, warm brown hair, hazel eyes' },
+  ],
+  'dark-autumn': [
+    { name: 'Idris Elba', note: 'Deep warm skin, dark warm features, commanding presence' },
+    { name: 'Dwayne Johnson', note: 'Deep warm golden-brown skin, dark features, olive tone' },
+    { name: 'Oscar Isaac', note: 'Rich warm-olive skin, very dark hair, warm dark eyes' },
+    { name: 'Jeffrey Dean Morgan', note: 'Deep warm skin, dark hair, earthy intensity' },
+  ],
+  'dark-winter': [
+    { name: 'Keanu Reeves', note: 'Deep cool-neutral skin, jet black hair, dark brown eyes' },
+    { name: 'Adam Driver', note: 'Deep cool skin, black hair, dark eyes, angular features' },
+    { name: 'Adrien Brody', note: 'Deep cool skin, dark brown-black hair, very dark eyes' },
+    { name: 'Naveen Andrews', note: 'Deep cool skin, very dark features, high contrast' },
+  ],
+  'true-winter': [
+    { name: 'Henry Cavill', note: 'Fair cool skin, dark brown hair, blue eyes — high contrast' },
+    { name: 'Tom Hiddleston', note: 'Porcelain cool skin, dark hair, cool green eyes' },
+    { name: 'Robert Pattinson', note: 'Pale cool skin, dark hair, blue-grey eyes' },
+    { name: 'Ian Somerhalder', note: 'Pale cool skin, dark hair, vivid blue eyes — high contrast' },
+  ],
+  'clear-winter': [
+    { name: 'Zac Efron', note: 'Clear cool skin, dark hair, vivid blue eyes — very high contrast' },
+    { name: 'Ben Barnes', note: 'Bright cool skin, dark hair, clear blue eyes' },
+    { name: 'Chris Evans', note: 'Clear cool skin, dark hair, bright blue eyes — vivid look' },
+    { name: 'Kit Harington', note: 'Clear cool pale skin, dark hair, dark eyes — striking contrast' },
+  ],
+}
+
 // Map hex codes to readable colour names
 const HEX_NAMES: Record<string, string> = {
   '#E3A274': 'Peach', '#ECA299': 'Soft Coral', '#F5D4C0': 'Apricot', '#A8D8C4': 'Warm Mint',
@@ -94,6 +170,37 @@ export function AnalysisResults({ analysis, onReset, onContinue, onEssenceQuiz }
           {explainer?.plain}
         </p>
       </div>
+
+      {/* ── Famous men with this season ── */}
+      {SEASON_CELEBRITIES[analysis.sub_season] && (
+        <Card className="border-border/50">
+          <CardContent className="p-5">
+            <h2 className="font-semibold mb-1">Men who share your colouring</h2>
+            <p className="text-xs text-muted-foreground mb-4">
+              These well-known men are also {subSeasonInfo.name} — notice how the colours they wear suit them.
+            </p>
+            <div className="space-y-3">
+              {SEASON_CELEBRITIES[analysis.sub_season].map(({ name, note }) => (
+                <a
+                  key={name}
+                  href={`https://www.google.com/search?q=${encodeURIComponent(name + ' style outfit')}&tbm=isch`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border/50 px-4 py-3 hover:bg-secondary/40 transition-colors group"
+                >
+                  <div>
+                    <p className="font-medium text-sm">{name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{note}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+                    See photos →
+                  </span>
+                </a>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── The golden rule ── */}
       {explainer?.rule && (
