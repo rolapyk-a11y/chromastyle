@@ -17,7 +17,7 @@ const CACHE_DAYS = 30
 interface SerpApiShoppingResult {
   title: string
   source: string
-  link: string
+  product_link: string
   thumbnail: string
   price: string
   rating?: number
@@ -111,14 +111,14 @@ export async function GET(request: NextRequest) {
       const results = await searchSerpApi(query)
 
       for (const r of results.slice(0, 3)) {
-        if (!r.thumbnail || !r.link) continue
+        if (!r.thumbnail || !r.product_link) continue
         products.push({
           id: `${subSeason}-${colour.hex}-${category}-${products.length}`,
           name: r.title,
           brand: r.source,
           price: r.price,
           image_url: r.thumbnail,
-          product_url: r.link,
+          product_url: r.product_link,
           colour_name: colour.name,
           colour_hex: colour.hex,
           category,

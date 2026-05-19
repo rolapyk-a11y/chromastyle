@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "WebFetch(domain:www.youtube.com)",
+      "WebFetch(domain:uk.pinterest.com)",
+      "PowerShell(if \\($env:ANTHROPIC_API_KEY\\) { \"Key found in environment\" } else { \"No key in environment\" })",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\".env.local\"\\); Write-Host \"First 3 bytes \\(BOM check\\):\" \\($bytes[0..2] -join \",\"\\); $content = [System.IO.File]::ReadAllText\\(\".env.local\"\\); Write-Host \"Content length:\" $content.Length; $lines = $content -split \"`n\"; foreach \\($line in $lines\\) { if \\($line -match \"ANTHROPIC\"\\) { Write-Host \"Key line length:\" $line.Length; Write-Host \"Starts with:\" $line.Substring\\(0, [Math]::Min\\(20, $line.Length\\)\\) } })",
+      "PowerShell($env:ANTHROPIC_API_KEY = \\(Get-Content \".env.local\" | Where-Object { $_ -match \"^ANTHROPIC_API_KEY=\" } | ForEach-Object { \\($_ -split \"=\", 2\\)[1] }\\); npm run research-seasons)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(npx tsc *)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

@@ -7,7 +7,8 @@ export async function saveColorAnalysis(
   analysis: Omit<ColorAnalysis, 'id' | 'user_id' | 'created_at'>
 ): Promise<{ id: string } | null> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  console.log('[saveColorAnalysis] user:', user?.id ?? 'NOT LOGGED IN', authError?.message ?? '')
   if (!user) return null
 
   const { data, error } = await supabase
@@ -29,9 +30,10 @@ export async function saveColorAnalysis(
     .single()
 
   if (error) {
-    console.error('saveColorAnalysis error:', error)
+    console.error('[saveColorAnalysis] DB error:', error.message, error.details, error.hint)
     return null
   }
 
+  console.log('[saveColorAnalysis] saved OK, id:', data.id)
   return { id: data.id }
 }

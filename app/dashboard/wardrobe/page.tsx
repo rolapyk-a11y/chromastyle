@@ -1,45 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { WardrobeClient } from '@/components/dashboard/wardrobe-client'
 import { LocalAnalysisSync } from '@/components/dashboard/local-analysis-sync'
-import { ColorAnalysis, ClothingItem } from '@/lib/types'
-
-// Fetch real products from Google Shopping via our Serper-backed API.
-// Results are cached in Supabase for 30 days — only the first load per
-// sub-season costs API credits.
-async function getRealProducts(subSeason: string | undefined): Promise<ClothingItem[]> {
-  if (!subSeason || !process.env.SERPER_API_KEY) return []
-  try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-    const res = await fetch(`${base}/api/products/search?sub_season=${subSeason}`, {
-      next: { revalidate: 60 * 60 * 24 }, // 24h Next.js cache on top of Supabase cache
-    })
-    if (!res.ok) return []
-    const { products } = await res.json()
-    return (products ?? []).map((p: {
-      id: string; name: string; brand: string; price: string;
-      image_url: string; product_url: string; colour_name: string;
-      colour_hex: string; category: string;
-    }, i: number) => ({
-      id: p.id ?? `product-${i}`,
-      name: p.name,
-      brand: p.brand,
-      category: p.category,
-      subcategory: p.colour_name,
-      price: parseFloat(p.price?.replace(/[^0-9.]/g, '') ?? '0') || 0,
-      currency: 'GBP',
-      image_url: p.image_url,
-      product_url: p.product_url,
-      colors: [p.colour_hex],
-      seasons: [],
-      style_tags: [p.colour_name, p.category],
-      is_trending: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })) as ClothingItem[]
-  } catch {
-    return []
-  }
-}
+import { fetchProductsForSeason } from '@/lib/products/fetchProducts'
+import { ColorAnalysis, ClothingItem, SubSeason } from '@/lib/types'
 
 export default async function WardrobePage() {
   const supabase = await createClient()
@@ -77,7 +40,9 @@ export default async function WardrobePage() {
 
   // Fetch real Google Shopping products matched to the user's exact sub-season.
   // Results are cached in Supabase — only the first load costs Serper credits.
-  const realProducts = await getRealProducts(colorAnalysis?.sub_season)
+  const realProducts = colorAnalysis?.sub_season
+    ? await fetchProductsForSeason(colorAnalysis.sub_season as SubSeason)
+    : []
   const supabaseItems = (clothingItems ?? []) as ClothingItem[]
 
   // Real products take priority (shown first). De-duplicate by product_url.
