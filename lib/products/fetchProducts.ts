@@ -3,8 +3,8 @@ import seasonReferences from '@/lib/agents/research-output/season-references.jso
 import type { SubSeason, ClothingItem } from '@/lib/types'
 
 const SERPAPI_URL = 'https://serpapi.com/search'
-const SEARCH_CATEGORIES = ['shirt', 'trousers', 'jacket', 'knitwear']
-const TOP_COLOURS = 6
+const SEARCH_CATEGORIES = ['shirt', 'trousers', 'jacket']
+const TOP_COLOURS = 3
 const CACHE_DAYS = 30
 
 interface SerpResult {
@@ -30,7 +30,17 @@ async function serpSearch(query: string, apiKey: string): Promise<SerpResult[]> 
       return []
     }
     const data = await res.json()
-    return data.shopping_results ?? []
+    if (data.error) {
+      console.error(`[fetchProducts] SerpAPI error for "${query}":`, data.error)
+      return []
+    }
+    const results = data.shopping_results ?? []
+    if (results.length === 0) console.warn(`[fetchProducts] 0 results for "${query}"`)
+    else {
+      const sample = results[0]
+      console.log(`[fetchProducts] sample fields for "${query}":`, Object.keys(sample).filter(k => ['title','product_link','thumbnail','price'].includes(k)))
+    }
+    return results
   } catch (e) {
     console.error(`[fetchProducts] fetch error for "${query}":`, e)
     return []
