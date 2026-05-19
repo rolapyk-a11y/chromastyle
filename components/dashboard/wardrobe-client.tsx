@@ -71,7 +71,7 @@ export function WardrobeClient({
   const [searchQuery, setSearchQuery] = useState('')
   const [brandFilter, setBrandFilter] = useState<FilterBrand>('all')
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('all')
-  const [showOnlyMatching, setShowOnlyMatching] = useState(false)
+  const [showOnlyMatching, setShowOnlyMatching] = useState(!!colorAnalysis)
   const [sortBy, setSortBy] = useState<SortOption>('recommended')
   const [savedItemIds, setSavedItemIds] = useState<string[]>(initialSavedIds)
   const [showFilters, setShowFilters] = useState(false)
