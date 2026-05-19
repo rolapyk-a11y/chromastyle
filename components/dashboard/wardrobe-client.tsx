@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { ColorAnalysis, ClothingItem, Season, SEASON_INFO } from '@/lib/types'
+import { getStyleGuide } from '@/lib/seasonStyle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -202,6 +203,56 @@ export function WardrobeClient({
           </div>
         )}
       </div>
+
+      {/* Style Guide — fit & fabric recommendations */}
+      {colorAnalysis?.sub_season && (() => {
+        const guide = getStyleGuide(colorAnalysis.sub_season)
+        return (
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <h2 className="font-semibold text-sm">Your Style Guide — {colorAnalysis.sub_season.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                {/* Fit */}
+                <div className="space-y-2">
+                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fits</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.fits.map(f => (
+                      <span key={f} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">{f}</span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{guide.fitAdvice}</p>
+                </div>
+                {/* Fabrics */}
+                <div className="space-y-2">
+                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fabrics</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.fabrics.map(f => (
+                      <span key={f} className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 text-xs font-medium">{f}</span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{guide.fabricAdvice}</p>
+                </div>
+                {/* Avoid + formula */}
+                <div className="space-y-2">
+                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Avoid</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.avoid.map(f => (
+                      <span key={f} className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-medium">{f}</span>
+                    ))}
+                  </div>
+                  <div className="mt-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
+                    <p className="text-xs font-medium text-primary mb-0.5">Go-to outfit formula</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{guide.outfitFormula}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })()}
 
       {/* No analysis warning */}
       {!colorAnalysis && (
