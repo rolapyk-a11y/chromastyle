@@ -232,8 +232,11 @@ Run all 5 searches from your instructions, gather sources, then synthesise the r
 
     // ── Tool use: execute searches ────────────────────────────────────────────
     if (response.stop_reason === 'tool_use') {
-      // Add assistant message to history
-      messages.push({ role: 'assistant', content: response.content })
+      // Filter out empty text blocks — Anthropic rejects them on subsequent calls
+      const assistantContent = response.content.filter(
+        block => block.type !== 'text' || block.text.trim() !== ''
+      )
+      messages.push({ role: 'assistant', content: assistantContent })
 
       const toolResults: Anthropic.ToolResultBlockParam[] = []
 
