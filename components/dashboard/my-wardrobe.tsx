@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2, Shirt, ShoppingBag, Footprints, Layers, Star } from 'lucide-react'
+import { Plus, Trash2, Shirt, ShoppingBag, Footprints, Layers, Star, Sparkles } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, ColorAnalysis, OutfitCombo } from '@/lib/types'
 import {
   loadLocalWardrobe,
@@ -13,6 +13,7 @@ import {
 import { AddItemSheet } from './add-item-sheet'
 import { OutfitSuggestions } from './outfit-suggestions'
 import { ColourMatches } from './colour-matches'
+import { StyleItemModal } from './style-item-modal'
 import { shopLinksFor } from '@/lib/shopLinks'
 
 const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
@@ -40,6 +41,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
   const [addOpen, setAddOpen] = useState(false)
   const [activeView, setActiveView] = useState<ActiveView>('wardrobe')
   const [outfits, setOutfits] = useState<OutfitCombo[]>([])
+  const [styleAnchor, setStyleAnchor] = useState<UserWardrobeItem | null>(null)
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -63,6 +65,21 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 
   function removeItem(id: string) {
     const updated = items.filter(i => i.id !== id)
+    saveLocalWardrobe(updated)
+    setItems(updated)
+  }
+
+  // From "what goes with this?", quickly add a suggested season colour you own
+  function addSuggestedColour(hex: string, name: string, category: ItemCategory) {
+    const item: UserWardrobeItem = {
+      id: `item-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      name: `${name} ${category}`,
+      category,
+      color_hex: hex,
+      color_name: name,
+      created_at: new Date().toISOString(),
+    }
+    const updated = [...items, item]
     saveLocalWardrobe(updated)
     setItems(updated)
   }
@@ -137,7 +154,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {catItems.map(item => (
-                    <WardrobeItemCard key={item.id} item={item} onRemove={removeItem} />
+                    <WardrobeItemCard key={item.id} item={item} onRemove={removeItem} onStyle={setStyleAnchor} />
                   ))}
                 </div>
               </div>
@@ -183,6 +200,16 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
         colorAnalysis={colorAnalysis}
         onAdded={refresh}
       />
+
+      {styleAnchor && (
+        <StyleItemModal
+          anchor={styleAnchor}
+          items={items}
+          subSeason={colorAnalysis?.sub_season}
+          onClose={() => setStyleAnchor(null)}
+          onAddColour={addSuggestedColour}
+        />
+      )}
     </div>
   )
 }
@@ -192,9 +219,11 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 function WardrobeItemCard({
   item,
   onRemove,
+  onStyle,
 }: {
   item: UserWardrobeItem
   onRemove: (id: string) => void
+  onStyle: (item: UserWardrobeItem) => void
 }) {
   return (
     <div className="relative group rounded-xl border border-border/50 p-3 flex items-center gap-3 bg-card hover:bg-secondary/30 transition-colors">
@@ -206,14 +235,22 @@ function WardrobeItemCard({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground">{item.color_name}</p>
-        <a
-          href={shopLinksFor(item.color_hex, item.category)[0].url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
-        >
-          <ShoppingBag className="w-3 h-3" /> Shop this colour
-        </a>
+        <div className="flex items-center gap-3 mt-1">
+          <button
+            onClick={() => onStyle(item)}
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+          >
+            <Sparkles className="w-3 h-3" /> What goes with this?
+          </button>
+          <a
+            href={shopLinksFor(item.color_hex, item.category)[0].url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+          >
+            <ShoppingBag className="w-3 h-3" /> Shop
+          </a>
+        </div>
       </div>
       <button
         onClick={() => onRemove(item.id)}

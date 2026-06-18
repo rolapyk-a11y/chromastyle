@@ -6,7 +6,8 @@
  * season-specific palette compatibility.
  */
 
-import type { UserWardrobeItem, OutfitCombo, SubSeason } from './types'
+import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory } from './types'
+import { paletteFor, type PaletteColour } from './palettes'
 
 // ─── Colour utilities ─────────────────────────────────────────────────────────
 
@@ -174,6 +175,70 @@ export function generateOutfits(
   return combos
     .sort((a, b) => b.score - a.score)
     .slice(0, 8)
+}
+
+// ─── "What goes with this?" — style one anchor item ───────────────────────────
+
+// Which categories complete an outfit around a given anchor category
+const COMPLEMENT_CATEGORIES: Record<ItemCategory, ItemCategory[]> = {
+  top:       ['bottom', 'jacket', 'shoes'],
+  bottom:    ['top', 'jacket', 'shoes'],
+  jacket:    ['top', 'bottom', 'shoes'],
+  shoes:     ['top', 'bottom'],
+  accessory: ['top', 'bottom'],
+}
+
+// Score an anchor item against a bare palette colour (reuses pairScore)
+function pairColourScore(anchor: UserWardrobeItem, hex: string, subSeason: SubSeason): number {
+  const pseudo = { color_hex: hex } as UserWardrobeItem
+  return pairScore(anchor, pseudo, subSeason).score
+}
+
+export interface ColourSuggestion {
+  colour: PaletteColour
+  score: number
+}
+
+export interface AnchorStyleResult {
+  partners: Partial<Record<ItemCategory, UserWardrobeItem[]>>            // best matches you already own
+  suggestions: Partial<Record<ItemCategory, ColourSuggestion[]>>        // season-correct colours to add
+}
+
+/**
+ * Build a season-correct outfit around one item the user owns.
+ * For each complementary category it returns:
+ *  - partners: items already in the wardrobe, ranked by how well they pair
+ *  - suggestions: palette colours (season + neutrals) that pair best, so the
+ *    user knows exactly which colour to buy if they don't own a match.
+ * All suggestions come from the user's palette — never random colours.
+ */
+export function styleAnchorItem(
+  anchor: UserWardrobeItem,
+  items: UserWardrobeItem[],
+  subSeason: SubSeason,
+): AnchorStyleResult {
+  const targets = COMPLEMENT_CATEGORIES[anchor.category]
+  const palette = paletteFor(subSeason)
+
+  const partners: AnchorStyleResult['partners'] = {}
+  const suggestions: AnchorStyleResult['suggestions'] = {}
+
+  for (const cat of targets) {
+    // Best partners from the user's own wardrobe
+    const owned = items
+      .filter(i => i.category === cat && i.id !== anchor.id)
+      .map(i => ({ item: i, score: pairScore(anchor, i, subSeason).score }))
+      .sort((a, b) => b.score - a.score)
+    if (owned.length > 0) partners[cat] = owned.map(o => o.item)
+
+    // Season-correct colours to add for this category
+    suggestions[cat] = palette
+      .map(colour => ({ colour, score: pairColourScore(anchor, colour.hex, subSeason) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+  }
+
+  return { partners, suggestions }
 }
 
 // ─── localStorage helpers (guest users) ──────────────────────────────────────
