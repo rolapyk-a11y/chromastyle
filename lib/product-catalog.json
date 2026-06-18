@@ -303,4 +303,41 @@
     "colorHex": "#1b2a45",
     "colorName": "Navy"
   }
+  ,
+  {
+    "id": "hm-washed-tshirt-darkgrey",
+    "name": "Vasket T-shirt Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 149,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1312037005.html",
+    "colorHex": "#404040",
+    "colorName": "Mørkegrå"
+  },
+  {
+    "id": "hm-washed-tshirt-cream",
+    "name": "Vasket T-shirt Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 149,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1312037005.html",
+    "colorHex": "#ede5d0",
+    "colorName": "Creme"
+  },
+  {
+    "id": "hm-washed-tshirt-navy",
+    "name": "Vasket T-shirt Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 149,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1312037005.html",
+    "colorHex": "#1e3a6e",
+    "colorName": "Navy"
+  }
 ]
