@@ -98,8 +98,12 @@ function ProductMatchCard({
     <div className="group rounded-xl border border-border/50 overflow-hidden hover:border-primary transition-colors">
       <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="block">
         <div className="relative aspect-[3/4] bg-secondary/30">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+          {product.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div className="w-full h-full" style={{ backgroundColor: product.colorHex }} />
+          )}
           <span className="absolute top-1.5 right-1.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-background/90 text-primary">
             {matchPercent}% match
           </span>

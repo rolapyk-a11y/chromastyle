@@ -6,8 +6,8 @@
     "category": "bottom",
     "price": 0,
     "currency": "DKK",
-    "image_url": "https://image.hm.com/assets/hm/e3/f7/e3f7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2.jpg",
-    "product_url": "https://www2.hm.com/da_dk/productpage.html",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1253401001.html",
     "colorHex": "#8fa090",
     "colorName": "Salviegrøn"
   },
@@ -18,8 +18,8 @@
     "category": "bottom",
     "price": 0,
     "currency": "DKK",
-    "image_url": "https://image.hm.com/assets/hm/e3/f7/e3f7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2.jpg",
-    "product_url": "https://www2.hm.com/da_dk/productpage.html",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1253401001.html",
     "colorHex": "#7d6b5a",
     "colorName": "Mørk beige"
   },
@@ -30,8 +30,8 @@
     "category": "bottom",
     "price": 0,
     "currency": "DKK",
-    "image_url": "https://image.hm.com/assets/hm/e3/f7/e3f7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2.jpg",
-    "product_url": "https://www2.hm.com/da_dk/productpage.html",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1253401001.html",
     "colorHex": "#e8dcc4",
     "colorName": "Creme"
   }
