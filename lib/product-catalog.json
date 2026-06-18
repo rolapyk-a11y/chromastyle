@@ -107,4 +107,77 @@
     "colorHex": "#1b2a45",
     "colorName": "Navy"
   }
+  ,
+  {
+    "id": "hm-linen-shorts-lightbeige",
+    "name": "Shorts i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1258657001.html",
+    "colorHex": "#c9b898",
+    "colorName": "Lys beige"
+  },
+  {
+    "id": "hm-linen-shorts-black",
+    "name": "Shorts i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1258657001.html",
+    "colorHex": "#111111",
+    "colorName": "Sort"
+  },
+  {
+    "id": "hm-linen-shorts-brown",
+    "name": "Shorts i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1258657001.html",
+    "colorHex": "#7a5c45",
+    "colorName": "Brun"
+  },
+  {
+    "id": "hm-linen-shorts-offwhite",
+    "name": "Shorts i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1258657001.html",
+    "colorHex": "#ede8dc",
+    "colorName": "Off-white"
+  },
+  {
+    "id": "hm-linen-shorts-navy",
+    "name": "Shorts i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1258657001.html",
+    "colorHex": "#1b2a45",
+    "colorName": "Navy"
+  },
+  {
+    "id": "hm-linen-shorts-darkgrey",
+    "name": "Shorts i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1258657001.html",
+    "colorHex": "#4a4a4a",
+    "colorName": "Mørkegrå"
+  }
 ]
