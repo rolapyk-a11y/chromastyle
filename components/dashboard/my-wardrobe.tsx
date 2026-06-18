@@ -12,6 +12,7 @@ import {
 } from '@/lib/outfitEngine'
 import { AddItemSheet } from './add-item-sheet'
 import { OutfitSuggestions } from './outfit-suggestions'
+import { shopLinksFor } from '@/lib/shopLinks'
 
 const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
   top:       <Shirt className="w-4 h-4" />,
@@ -195,6 +196,14 @@ function WardrobeItemCard({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground">{item.color_name}</p>
+        <a
+          href={shopLinksFor(item.color_hex, item.category)[0].url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+        >
+          <ShoppingBag className="w-3 h-3" /> Shop this colour
+        </a>
       </div>
       <button
         onClick={() => onRemove(item.id)}

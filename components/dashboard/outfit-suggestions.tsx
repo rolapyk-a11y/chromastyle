@@ -2,9 +2,10 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Plus, TrendingUp } from 'lucide-react'
+import { Sparkles, Plus, TrendingUp, ShoppingBag } from 'lucide-react'
 import type { OutfitCombo, ItemCategory, SubSeason } from '@/lib/types'
 import { SUB_SEASON_INFO } from '@/lib/types'
+import { shopLinksFor } from '@/lib/shopLinks'
 
 const SCORE_COLOURS: Record<OutfitCombo['scoreLabel'], string> = {
   Great: 'text-green-600 dark:text-green-400 bg-green-500/10',
@@ -102,18 +103,35 @@ function OutfitCard({ outfit, rank }: { outfit: OutfitCombo; rank: number }) {
           ))}
         </div>
 
-        {/* Item list */}
-        <div className="space-y-1">
-          {outfit.items.map((item, j) => (
-            <div key={j} className="flex items-center gap-2 text-sm">
-              <div
-                className="w-3 h-3 rounded-sm shrink-0 border border-border/40"
-                style={{ backgroundColor: item.color_hex }}
-              />
-              <span className="font-medium">{item.name}</span>
-              <span className="text-muted-foreground text-xs">· {item.color_name}</span>
-            </div>
-          ))}
+        {/* Item list with shop links */}
+        <div className="space-y-2">
+          {outfit.items.map((item, j) => {
+            const links = shopLinksFor(item.color_hex, item.category)
+            return (
+              <div key={j} className="flex items-center gap-2 text-sm flex-wrap">
+                <div
+                  className="w-3 h-3 rounded-sm shrink-0 border border-border/40"
+                  style={{ backgroundColor: item.color_hex }}
+                />
+                <span className="font-medium">{item.name}</span>
+                <span className="text-muted-foreground text-xs">· {item.color_name}</span>
+                <div className="flex items-center gap-1 ml-auto">
+                  {links.map(link => (
+                    <a
+                      key={link.retailer}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border border-border/60 text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+                    >
+                      <ShoppingBag className="w-3 h-3" />
+                      {link.retailer}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
 
         {/* Styling tip */}
