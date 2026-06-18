@@ -15,6 +15,7 @@ import { OutfitSuggestions } from './outfit-suggestions'
 import { ColourMatches } from './colour-matches'
 import { StyleItemModal } from './style-item-modal'
 import { shopLinksFor } from '@/lib/shopLinks'
+import type { CatalogProduct } from '@/lib/productCatalog'
 
 const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
   top:       <Shirt className="w-4 h-4" />,
@@ -77,6 +78,23 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
       category,
       color_hex: hex,
       color_name: name,
+      created_at: new Date().toISOString(),
+    }
+    const updated = [...items, item]
+    saveLocalWardrobe(updated)
+    setItems(updated)
+  }
+
+  // From "Shop My Colours", add a real catalog product to your inventory
+  function addCatalogProduct(p: CatalogProduct) {
+    const item: UserWardrobeItem = {
+      id: `item-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      name: p.name,
+      category: p.category,
+      color_hex: p.colorHex,
+      color_name: p.colorName ?? p.colorHex,
+      brand: p.brand,
+      image_url: p.image_url,
       created_at: new Date().toISOString(),
     }
     const updated = [...items, item]
@@ -191,7 +209,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 
       {/* ── Shop My Colours view (real products matched by colour distance) ── */}
       {activeView === 'shop-colours' && (
-        <ColourMatches colorAnalysis={colorAnalysis} />
+        <ColourMatches colorAnalysis={colorAnalysis} onAddToInventory={addCatalogProduct} />
       )}
 
       <AddItemSheet

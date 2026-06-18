@@ -8,18 +8,19 @@
  * nuance-accurate recommendation — "my exact yellow", not "any yellow".
  */
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Palette, ExternalLink, Info } from 'lucide-react'
+import { Palette, ExternalLink, Info, Plus, Check } from 'lucide-react'
 import type { ColorAnalysis } from '@/lib/types'
 import { PRODUCT_CATALOG, catalogIsEmpty, type CatalogProduct } from '@/lib/productCatalog'
 import { matchProducts, type ProductMatch } from '@/lib/colorMatch'
 
 interface ColourMatchesProps {
   colorAnalysis: ColorAnalysis | undefined
+  onAddToInventory: (product: CatalogProduct) => void
 }
 
-export function ColourMatches({ colorAnalysis }: ColourMatchesProps) {
+export function ColourMatches({ colorAnalysis, onAddToInventory }: ColourMatchesProps) {
   const palette = colorAnalysis?.best_colors ?? []
 
   const matchesByColour = useMemo(() => {
@@ -73,7 +74,7 @@ export function ColourMatches({ colorAnalysis }: ColourMatchesProps) {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {matches.map(m => (
-                <ProductMatchCard key={m.product.id} match={m} />
+                <ProductMatchCard key={m.product.id} match={m} onAdd={onAddToInventory} />
               ))}
             </div>
           )}
@@ -83,39 +84,64 @@ export function ColourMatches({ colorAnalysis }: ColourMatchesProps) {
   )
 }
 
-function ProductMatchCard({ match }: { match: ProductMatch<CatalogProduct> }) {
+function ProductMatchCard({
+  match,
+  onAdd,
+}: {
+  match: ProductMatch<CatalogProduct>
+  onAdd: (product: CatalogProduct) => void
+}) {
   const { product, matchPercent } = match
+  const [added, setAdded] = useState(false)
+
   return (
-    <a
-      href={product.product_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block rounded-xl border border-border/50 overflow-hidden hover:border-primary transition-colors"
-    >
-      <div className="relative aspect-[3/4] bg-secondary/30">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
-        <span className="absolute top-1.5 right-1.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-background/90 text-primary">
-          {matchPercent}% match
-        </span>
-        <span
-          className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full border-2 border-background shadow"
-          style={{ backgroundColor: product.colorHex }}
-          title={`Actual colour ${product.colorHex}`}
-        />
-      </div>
-      <div className="p-2">
-        <p className="text-xs font-medium truncate group-hover:text-primary">{product.name}</p>
-        <div className="flex items-center justify-between mt-0.5">
-          <span className="text-xs text-muted-foreground">{product.brand}</span>
-          {product.price > 0 && (
-            <span className="text-xs font-medium">{product.price} {product.currency}</span>
-          )}
+    <div className="group rounded-xl border border-border/50 overflow-hidden hover:border-primary transition-colors">
+      <a href={product.product_url} target="_blank" rel="noopener noreferrer" className="block">
+        <div className="relative aspect-[3/4] bg-secondary/30">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+          <span className="absolute top-1.5 right-1.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-background/90 text-primary">
+            {matchPercent}% match
+          </span>
+          <span
+            className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full border-2 border-background shadow"
+            style={{ backgroundColor: product.colorHex }}
+            title={`Actual colour ${product.colorHex}`}
+          />
         </div>
-        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground mt-1">
-          <ExternalLink className="w-2.5 h-2.5" /> View
-        </span>
+      </a>
+      <div className="p-2 space-y-1.5">
+        <div>
+          <p className="text-xs font-medium truncate">{product.name}</p>
+          <div className="flex items-center justify-between mt-0.5">
+            <span className="text-xs text-muted-foreground">{product.brand}</span>
+            {product.price > 0 && (
+              <span className="text-xs font-medium">{product.price} {product.currency}</span>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => { onAdd(product); setAdded(true) }}
+            disabled={added}
+            className={`flex-1 inline-flex items-center justify-center gap-1 text-[10px] px-1.5 py-1 rounded border transition-colors ${
+              added
+                ? 'border-green-500/50 text-green-600 dark:text-green-400'
+                : 'border-border/60 hover:border-primary hover:text-primary'
+            }`}
+          >
+            {added ? <><Check className="w-2.5 h-2.5" /> Added</> : <><Plus className="w-2.5 h-2.5" /> Add to inventory</>}
+          </button>
+          <a
+            href={product.product_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1 text-[10px] px-1.5 py-1 rounded border border-border/60 hover:border-primary hover:text-primary transition-colors"
+          >
+            <ExternalLink className="w-2.5 h-2.5" /> View
+          </a>
+        </div>
       </div>
-    </a>
+    </div>
   )
 }
