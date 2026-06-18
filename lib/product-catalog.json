@@ -180,4 +180,41 @@
     "colorHex": "#4a4a4a",
     "colorName": "Mørkegrå"
   }
+  ,
+  {
+    "id": "hm-loose-shirt-beige",
+    "name": "Skjorte med Korte Ærmer Loose Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1332149001.html",
+    "colorHex": "#8b7055",
+    "colorName": "Beige"
+  },
+  {
+    "id": "hm-loose-shirt-cream",
+    "name": "Skjorte med Korte Ærmer Loose Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1332149001.html",
+    "colorHex": "#e5d89a",
+    "colorName": "Creme"
+  },
+  {
+    "id": "hm-loose-shirt-lightblue",
+    "name": "Skjorte med Korte Ærmer Loose Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1332149001.html",
+    "colorHex": "#b0c8da",
+    "colorName": "Lyseblå"
+  }
 ]
