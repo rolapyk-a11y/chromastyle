@@ -377,4 +377,65 @@
     "colorHex": "#e8a88a",
     "colorName": "Ferskenrosa"
   }
+  ,
+  {
+    "id": "hummel-pulse-tshirt-black",
+    "name": "Hummel HmlPulse T-shirt Basic",
+    "brand": "Hummel",
+    "category": "top",
+    "price": 90,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www.zalando.dk/hummel-t-shirts-basic-black-hu342d0kb-q11.html",
+    "colorHex": "#111111",
+    "colorName": "Sort"
+  },
+  {
+    "id": "hummel-pulse-tshirt-white",
+    "name": "Hummel HmlPulse T-shirt Basic",
+    "brand": "Hummel",
+    "category": "top",
+    "price": 90,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www.zalando.dk/hummel-t-shirts-basic-black-hu342d0kb-q11.html",
+    "colorHex": "#f0f0f0",
+    "colorName": "Hvid"
+  },
+  {
+    "id": "hummel-pulse-tshirt-grey",
+    "name": "Hummel HmlPulse T-shirt Basic",
+    "brand": "Hummel",
+    "category": "top",
+    "price": 90,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www.zalando.dk/hummel-t-shirts-basic-black-hu342d0kb-q11.html",
+    "colorHex": "#909090",
+    "colorName": "Grå"
+  },
+  {
+    "id": "hummel-pulse-tshirt-steelblue",
+    "name": "Hummel HmlPulse T-shirt Basic",
+    "brand": "Hummel",
+    "category": "top",
+    "price": 90,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www.zalando.dk/hummel-t-shirts-basic-black-hu342d0kb-q11.html",
+    "colorHex": "#6b80a0",
+    "colorName": "Stålblå"
+  },
+  {
+    "id": "hummel-pulse-tshirt-anthracite",
+    "name": "Hummel HmlPulse T-shirt Basic",
+    "brand": "Hummel",
+    "category": "top",
+    "price": 90,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www.zalando.dk/hummel-t-shirts-basic-black-hu342d0kb-q11.html",
+    "colorHex": "#404040",
+    "colorName": "Antracit"
+  }
 ]
