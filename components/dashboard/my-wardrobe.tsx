@@ -12,6 +12,7 @@ import {
 } from '@/lib/outfitEngine'
 import { AddItemSheet } from './add-item-sheet'
 import { OutfitSuggestions } from './outfit-suggestions'
+import { ColourMatches } from './colour-matches'
 import { shopLinksFor } from '@/lib/shopLinks'
 
 const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
@@ -32,7 +33,7 @@ interface MyWardrobeProps {
   colorAnalysis: ColorAnalysis | undefined
 }
 
-type ActiveView = 'wardrobe' | 'outfits'
+type ActiveView = 'wardrobe' | 'outfits' | 'shop-colours'
 
 export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
   const [items, setItems] = useState<UserWardrobeItem[]>([])
@@ -78,17 +79,21 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 
       {/* ── Tab bar ── */}
       <div className="flex gap-2 border-b border-border pb-0">
-        {(['wardrobe', 'outfits'] as const).map(view => (
+        {(['wardrobe', 'outfits', 'shop-colours'] as const).map(view => (
           <button
             key={view}
             onClick={() => setActiveView(view)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors capitalize ${
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeView === view
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
-            {view === 'outfits' ? `Outfits${outfits.length > 0 ? ` (${outfits.length})` : ''}` : 'My Items'}
+            {view === 'outfits'
+              ? `Outfits${outfits.length > 0 ? ` (${outfits.length})` : ''}`
+              : view === 'shop-colours'
+                ? 'Shop My Colours'
+                : 'My Items'}
           </button>
         ))}
       </div>
@@ -165,6 +170,11 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
           onAddItem={() => { setAddOpen(true); setActiveView('wardrobe') }}
           hasItems={items.length > 0}
         />
+      )}
+
+      {/* ── Shop My Colours view (real products matched by colour distance) ── */}
+      {activeView === 'shop-colours' && (
+        <ColourMatches colorAnalysis={colorAnalysis} />
       )}
 
       <AddItemSheet

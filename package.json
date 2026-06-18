@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "research-seasons": "tsx scripts/research-seasons.ts",
-    "populate-wardrobe": "tsx scripts/populate-wardrobe.ts"
+    "populate-wardrobe": "tsx scripts/populate-wardrobe.ts",
+    "ingest-feed": "tsx scripts/ingest-feed.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.63",
@@ -73,7 +74,9 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "csv-parse": "^5.6.0",
     "dotenv": "^16.6.1",
+    "jimp": "^1.6.1",
     "postcss": "^8.5",
     "tailwindcss": "^4.2.0",
     "tsx": "^4.22.2",
