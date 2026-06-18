@@ -254,4 +254,53 @@
     "colorHex": "#c4b090",
     "colorName": "Sand"
   }
+  ,
+  {
+    "id": "hm-twill-shorts-black",
+    "name": "Shorts i Twill med 5 Lommer Regular Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1260543001.html",
+    "colorHex": "#111111",
+    "colorName": "Sort"
+  },
+  {
+    "id": "hm-twill-shorts-sand",
+    "name": "Shorts i Twill med 5 Lommer Regular Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1260543001.html",
+    "colorHex": "#c8bca0",
+    "colorName": "Lys sand"
+  },
+  {
+    "id": "hm-twill-shorts-washedblack",
+    "name": "Shorts i Twill med 5 Lommer Regular Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1260543001.html",
+    "colorHex": "#2e2e2e",
+    "colorName": "Vasket sort"
+  },
+  {
+    "id": "hm-twill-shorts-navy",
+    "name": "Shorts i Twill med 5 Lommer Regular Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 99,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1260543001.html",
+    "colorHex": "#1b2a45",
+    "colorName": "Navy"
+  }
 ]
