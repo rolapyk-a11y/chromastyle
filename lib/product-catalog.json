@@ -217,4 +217,41 @@
     "colorHex": "#b0c8da",
     "colorName": "Lyseblå"
   }
+  ,
+  {
+    "id": "hm-styled-trousers-white",
+    "name": "Stylede Bukser i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 149,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1283074001.html",
+    "colorHex": "#ede8dc",
+    "colorName": "Hvid"
+  },
+  {
+    "id": "hm-styled-trousers-black",
+    "name": "Stylede Bukser i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 149,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1283074001.html",
+    "colorHex": "#0d0e1a",
+    "colorName": "Sort"
+  },
+  {
+    "id": "hm-styled-trousers-sand",
+    "name": "Stylede Bukser i Hørblanding Relaxed Fit",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 149,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1283074001.html",
+    "colorHex": "#c4b090",
+    "colorName": "Sand"
+  }
 ]
