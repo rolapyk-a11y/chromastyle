@@ -34,8 +34,7 @@
     "product_url": "https://www2.hm.com/da_dk/productpage.1253401001.html",
     "colorHex": "#e8dcc4",
     "colorName": "Creme"
-  }
-  ,
+  },
   {
     "id": "hm-ribbed-granddad-black",
     "name": "Ribbet Bedstefartrøje Slim Fit",
@@ -47,5 +46,65 @@
     "product_url": "https://www2.hm.com/da_dk/productpage.1337001001.html",
     "colorHex": "#111111",
     "colorName": "Sort"
+  },
+  {
+    "id": "hm-linen-shirt-lightbeige",
+    "name": "Kortærmet Skjorte i Hørblanding Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 129,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1256946001.html",
+    "colorHex": "#c9b898",
+    "colorName": "Lys beige"
+  },
+  {
+    "id": "hm-linen-shirt-black",
+    "name": "Kortærmet Skjorte i Hørblanding Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 129,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1256946001.html",
+    "colorHex": "#111111",
+    "colorName": "Sort"
+  },
+  {
+    "id": "hm-linen-shirt-taupe",
+    "name": "Kortærmet Skjorte i Hørblanding Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 129,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1256946001.html",
+    "colorHex": "#8b7865",
+    "colorName": "Taupe"
+  },
+  {
+    "id": "hm-linen-shirt-white",
+    "name": "Kortærmet Skjorte i Hørblanding Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 129,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1256946001.html",
+    "colorHex": "#f2ede4",
+    "colorName": "Hvid"
+  },
+  {
+    "id": "hm-linen-shirt-navy",
+    "name": "Kortærmet Skjorte i Hørblanding Regular Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 129,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1256946001.html",
+    "colorHex": "#1b2a45",
+    "colorName": "Navy"
   }
 ]
