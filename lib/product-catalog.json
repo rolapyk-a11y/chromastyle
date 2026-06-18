@@ -340,4 +340,41 @@
     "colorHex": "#1e3a6e",
     "colorName": "Navy"
   }
+  ,
+  {
+    "id": "hm-vest-top-black",
+    "name": "Regular Fit Washed Vest Top",
+    "brand": "H&M",
+    "category": "top",
+    "price": 60,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1275976004.html",
+    "colorHex": "#111111",
+    "colorName": "Sort"
+  },
+  {
+    "id": "hm-vest-top-darkgrey",
+    "name": "Regular Fit Washed Vest Top",
+    "brand": "H&M",
+    "category": "top",
+    "price": 60,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1275976004.html",
+    "colorHex": "#555555",
+    "colorName": "Mørkegrå"
+  },
+  {
+    "id": "hm-vest-top-peach",
+    "name": "Regular Fit Washed Vest Top",
+    "brand": "H&M",
+    "category": "top",
+    "price": 60,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1275976004.html",
+    "colorHex": "#e8a88a",
+    "colorName": "Ferskenrosa"
+  }
 ]
