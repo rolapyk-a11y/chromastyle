@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "id": "hm-linen-trousers-sage",
+    "name": "Regular Fit Linen-blend Trousers",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 0,
+    "currency": "DKK",
+    "image_url": "https://image.hm.com/assets/hm/e3/f7/e3f7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2.jpg",
+    "product_url": "https://www2.hm.com/da_dk/productpage.html",
+    "colorHex": "#8fa090",
+    "colorName": "Salviegrøn"
+  },
+  {
+    "id": "hm-linen-trousers-darkbeige",
+    "name": "Regular Fit Linen-blend Trousers",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 0,
+    "currency": "DKK",
+    "image_url": "https://image.hm.com/assets/hm/e3/f7/e3f7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2.jpg",
+    "product_url": "https://www2.hm.com/da_dk/productpage.html",
+    "colorHex": "#7d6b5a",
+    "colorName": "Mørk beige"
+  },
+  {
+    "id": "hm-linen-trousers-cream",
+    "name": "Regular Fit Linen-blend Trousers",
+    "brand": "H&M",
+    "category": "bottom",
+    "price": 0,
+    "currency": "DKK",
+    "image_url": "https://image.hm.com/assets/hm/e3/f7/e3f7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2.jpg",
+    "product_url": "https://www2.hm.com/da_dk/productpage.html",
+    "colorHex": "#e8dcc4",
+    "colorName": "Creme"
+  }
+]
