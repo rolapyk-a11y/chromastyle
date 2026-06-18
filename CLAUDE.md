@@ -50,3 +50,38 @@ npm run populate-wardrobe         # generate H&M clothing seed (needs credits)
 - [ ] Push wardrobe builder commit to GitHub (local commit `dbbcca7` not yet pushed)
 - [ ] Rename app-visible strings from "ChromaStyle" → "Outfitter"
 - [ ] Use `public/brand/icon-candidate.jpg` as favicon / OG image
+
+## Next steps — get real products into "Shop My Colours"
+
+Website used for Partner-ads signup: `https://chromastyle-bxb7.vercel.app/`
+
+### Step 1 — Sign up at Partner-ads.com ✅ in progress
+Sign up as publisher using the Vercel URL as the website. Category: Tøj & mode.
+
+### Step 2 — Apply to fashion advertisers
+Once approved, go to **"Find annoncør"** and filter by `Tøj & mode`. Apply to shops
+that offer product feeds. Good ones to start with:
+- **Zalando** (large feed, good coverage)
+- **Boozt** (Scandinavian, good colour variety)
+- **Ellos** (Danish/Swedish, often approves quickly)
+- **Vila / Only / Vero Moda** (Bestseller brands)
+
+Apply to each — write a short note that you match products by colour science, so you
+need feed access.
+
+### Step 3 — Download your feed CSV
+After a shop approves you, find their feed under **"Produktfeeds"** in your Publisher
+dashboard. Download the CSV (usually contains: product name, brand, price, image URL,
+product URL).
+
+### Step 4 — Ingest it
+In your chromastyle folder:
+```bash
+npm run ingest-feed -- path/to/zalando-feed.csv
+```
+This downloads each product image, extracts the true garment colour, and fills the
+**Shop My Colours** tab with real, delta-E matched products.
+
+> The whole signup + first feed is probably 2–4 days of waiting, then ~30 min of
+> technical setup. When you have a feed CSV, map its column names to the expected
+> format (name, brand, category, price, currency, image_url, product_url).
