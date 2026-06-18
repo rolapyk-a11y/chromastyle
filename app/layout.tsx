@@ -14,26 +14,27 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'ChromaStyle — Colour Analysis',
-  description: 'Discover your seasonal colour palette and find clothing that enhances your natural features. Free AI-powered colour analysis and outfit recommendations.',
-  keywords: ['colour analysis', 'seasonal colours', 'personal colour', 'style guide', 'outfit recommendations', 'fashion'],
+  title: 'Outfitter — Farveanalyse & Outfit-forslag',
+  description: 'Find din farvesæson og få outfit-forslag der passer til dig. Gratis AI-farveanalyse.',
+  keywords: ['farveanalyse', 'farvesæson', 'outfit', 'tøj', 'personlig stil', 'colour analysis'],
+
+  manifest: '/manifest.json',
 
   // PWA / home screen settings
   appleWebApp: {
     capable: true,
-    title: 'ChromaStyle',
-    statusBarStyle: 'black-translucent', // lets the app bleed under the iOS status bar
+    title: 'Outfitter',
+    statusBarStyle: 'black-translucent',
   },
 
-  // Open Graph (looks good when shared on social/WhatsApp)
+  // Open Graph
   openGraph: {
-    title: 'ChromaStyle — Discover Your Colour Season',
-    description: 'Upload a photo and find out your seasonal colour type in seconds. Free, no sign-up needed.',
+    title: 'Outfitter — Find din farvesæson',
+    description: 'Upload et foto og find din farvesæson på sekunder. Gratis, ingen konto.',
     type: 'website',
-    siteName: 'ChromaStyle',
+    siteName: 'Outfitter',
   },
 
-  // Prevents phone numbers / emails being auto-linked
   formatDetection: {
     telephone: false,
     email: false,
