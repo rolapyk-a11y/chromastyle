@@ -35,4 +35,17 @@
     "colorHex": "#e8dcc4",
     "colorName": "Creme"
   }
+  ,
+  {
+    "id": "hm-ribbed-granddad-black",
+    "name": "Ribbet Bedstefartrøje Slim Fit",
+    "brand": "H&M",
+    "category": "top",
+    "price": 249,
+    "currency": "DKK",
+    "image_url": "",
+    "product_url": "https://www2.hm.com/da_dk/productpage.1337001001.html",
+    "colorHex": "#111111",
+    "colorName": "Sort"
+  }
 ]
