@@ -27,10 +27,13 @@ import {
 } from '@/components/ui/select'
 import Link from 'next/link'
 
+type MainTab = 'shop' | 'my-wardrobe'
+
 interface WardrobeClientProps {
   colorAnalysis: ColorAnalysis | undefined
   clothingItems: ClothingItem[]
   savedItemIds: string[]
+  initialMainTab?: MainTab
 }
 
 type FilterBrand = 'all' | 'H&M' | 'Zara' | 'Toj Eksperten'
@@ -64,14 +67,13 @@ function isColorMatch(itemColors: string[], userColors: string[], threshold = 10
   return false
 }
 
-type MainTab = 'shop' | 'my-wardrobe'
-
 export function WardrobeClient({
   colorAnalysis,
   clothingItems,
-  savedItemIds: initialSavedIds
+  savedItemIds: initialSavedIds,
+  initialMainTab = 'shop'
 }: WardrobeClientProps) {
-  const [mainTab, setMainTab] = useState<MainTab>('shop')
+  const [mainTab, setMainTab] = useState<MainTab>(initialMainTab)
   const [searchQuery, setSearchQuery] = useState('')
   const [brandFilter, setBrandFilter] = useState<FilterBrand>('all')
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('all')

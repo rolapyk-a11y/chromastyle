@@ -170,9 +170,9 @@ export default function AnalyzePage() {
       <EssenceQuiz
         onComplete={(result) => {
           localStorage.setItem('chromastyle_essence', JSON.stringify(result))
-          router.push('/dashboard/wardrobe')
+          router.push('/wardrobe')
         }}
-        onSkip={() => router.push('/dashboard/wardrobe')}
+        onSkip={() => router.push('/wardrobe')}
       />
     )
   }
@@ -198,7 +198,7 @@ export default function AnalyzePage() {
         <AnalysisResults
           analysis={analysis}
           onReset={handleReset}
-          onContinue={() => router.push('/dashboard/wardrobe')}
+          onContinue={() => router.push('/wardrobe')}
           onEssenceQuiz={() => setStep('essence-quiz')}
         />
       </div>

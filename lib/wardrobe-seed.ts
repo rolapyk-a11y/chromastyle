@@ -1,5 +1,5 @@
-// Placeholder — overwritten by 'npm run populate-wardrobe' once the season
-// research agent has completed. Safe to import at any time.
+// Placeholder wardrobe seed — no curated items yet.
+// Re-run 'npm run populate-wardrobe' to fill this, or replace with a curated seed.
 
 import type { SubSeason, Season } from './types'
 
