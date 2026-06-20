@@ -197,7 +197,7 @@ export function WardrobeClient({
           <h1 className="text-3xl font-bold tracking-tight">Wardrobe</h1>
           <p className="text-muted-foreground mt-1">
             {colorAnalysis
-              ? `Showing clothes that match your ${colorAnalysis.season} palette`
+              ? `Showing clothes that match your ${colorAnalysis.sub_season?.replace('-', ' ')} palette`
               : 'Browse clothing from our partner stores'
             }
           </p>
@@ -205,7 +205,7 @@ export function WardrobeClient({
         {colorAnalysis && (
           <div className="flex items-center gap-2">
             <div className={`h-8 w-8 rounded-lg bg-gradient-to-r ${SEASON_INFO[colorAnalysis.season].gradient}`} />
-            <span className="text-sm font-medium capitalize">{colorAnalysis.season}</span>
+            <span className="text-sm font-medium capitalize">{colorAnalysis.sub_season?.replace(/-/g, ' ')}</span>
           </div>
         )}
       </div>
