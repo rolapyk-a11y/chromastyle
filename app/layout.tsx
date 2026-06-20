@@ -20,11 +20,16 @@ export const metadata: Metadata = {
 
   manifest: '/manifest.json',
 
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
+
   // PWA / home screen settings
   appleWebApp: {
     capable: true,
     title: 'Outfitter',
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
   },
 
   // Open Graph
@@ -44,10 +49,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   // Matches the manifest background colour — prevents white flash on launch
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0a0a14' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a14' },
-  ],
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   // Prevents layout breaking if user pinch-zooms

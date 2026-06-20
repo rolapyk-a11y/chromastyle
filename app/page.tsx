@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Camera, Palette, Shirt, ArrowRight, Sparkles } from 'lucide-react'
 
@@ -10,9 +11,7 @@ export default function LandingPage() {
       <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
+            <Image src="/icons/icon-192.png" alt="Outfitter" width={28} height={28} className="rounded-lg" />
             <span className="font-bold text-lg">Outfitter</span>
           </div>
           <Button asChild size="sm">
