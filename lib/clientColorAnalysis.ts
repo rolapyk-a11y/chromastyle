@@ -265,8 +265,8 @@ function classifySeason(colors: SampledColors, knownUndertone?: 'warm' | 'cool')
 
   if (isWarm) {
     // ── WARM FAMILY (Spring/Autumn) ──────────────────────────────────────────
-    if (skinL > 62) {
-      // Light + warm → Light Spring
+    if (skinL > 58) {
+      // Light + warm → Light Spring (lowered from 62 — cameras underexpose slightly)
       subSeason = 'light-spring'; season = 'spring'
     } else if (skinChroma > 28 && skinL > 48) {
       // Medium-light + warm + vivid → True Spring
@@ -274,8 +274,11 @@ function classifySeason(colors: SampledColors, knownUndertone?: 'warm' | 'cool')
     } else if (skinChroma > 22 && hairIsWarm && !hairIsDark) {
       // Warm + some chroma + warm golden hair → True/Warm Spring
       subSeason = 'warm-spring'; season = 'spring'
+    } else if (skinChroma < 22 && !hairIsDark && skinL > 52) {
+      // Warm + muted + light hair + moderate lightness → Light Spring misread by camera
+      subSeason = 'light-spring'; season = 'spring'
     } else if (skinChroma < 20) {
-      // Warm + muted → Soft Autumn
+      // Warm + muted + darker overall → Soft Autumn
       subSeason = 'soft-autumn'; season = 'autumn'
     } else if (skinL < 42 || (hairIsDark && skinB > 18)) {
       // Dark + warm → Dark Autumn
@@ -308,7 +311,9 @@ function classifySeason(colors: SampledColors, knownUndertone?: 'warm' | 'cool')
   } else {
     // ── NEUTRAL (b* 9-14): use hair as tiebreaker ────────────────────────────
     if (hairIsWarm) {
-      if (skinL > 60) {
+      if (skinL > 58) {
+        subSeason = 'light-spring'; season = 'spring'
+      } else if (skinChroma < 22 && !hairIsDark && skinL > 52) {
         subSeason = 'light-spring'; season = 'spring'
       } else if (skinChroma < 20) {
         subSeason = 'soft-autumn'; season = 'autumn'
