@@ -25,10 +25,12 @@ export function ColourMatches({ colorAnalysis, onAddToInventory }: ColourMatches
 
   const matchesByColour = useMemo(() => {
     if (catalogIsEmpty()) return []
-    return palette.map(hex => ({
-      hex,
-      matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8),
-    }))
+    return palette
+      .map(hex => ({
+        hex,
+        matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8),
+      }))
+      .sort((a, b) => (b.matches[0]?.matchPercent ?? 0) - (a.matches[0]?.matchPercent ?? 0))
   }, [palette])
 
   if (catalogIsEmpty()) {
