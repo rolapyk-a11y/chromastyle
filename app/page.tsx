@@ -25,7 +25,7 @@ export default function LandingPage() {
 
         {/* Big centered branding */}
         <div className="flex flex-col items-center gap-3">
-          <Image src="/icons/icon-192.png" alt="Outfitter" width={88} height={88} className="rounded-2xl shadow-md" />
+          <Image src="/icons/icon-192.png" alt="Outfitter" width={140} height={140} className="rounded-3xl shadow-lg" />
           <h1 className="text-4xl font-extrabold tracking-tight">Outfitter</h1>
         </div>
 
