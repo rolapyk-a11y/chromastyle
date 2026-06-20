@@ -22,17 +22,24 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-2xl mx-auto px-4 py-16 text-center space-y-6">
+
+        {/* Big centered branding */}
+        <div className="flex flex-col items-center gap-3">
+          <Image src="/icons/icon-192.png" alt="Outfitter" width={88} height={88} className="rounded-2xl shadow-md" />
+          <h1 className="text-4xl font-extrabold tracking-tight">Outfitter</h1>
+        </div>
+
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-sm">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Gratis · Ingen konto krævet</span>
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+        <p className="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
           Find de farver der{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-400">
             klæder dig bedst
           </span>
-        </h1>
+        </p>
 
         <p className="text-lg text-gray-500 max-w-lg mx-auto">
           Upload et foto — appen finder din farvesæson og anbefaler tøj i de nuancer der passer præcist til dig.
