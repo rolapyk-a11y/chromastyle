@@ -51,6 +51,15 @@ export const PROVEN_PAIRS: StylePair[] = [
   // ── Accent tones ──
   { name: 'Burgundy + Black',families: ['burgundy','black'],  bonus: 10, tip: 'Burgundy + black — bold but grounded. Great for autumn/winter.' },
   { name: 'Burgundy + Grey', families: ['burgundy','grey'],   bonus: 9,  tip: 'Burgundy + grey — rich accent on a neutral base.' },
+  // ── Extended neutrals (from reference image set 2) ──
+  { name: 'Charcoal + Beige',families: ['charcoal','beige'],  bonus: 11, tip: 'Charcoal + beige — dark neutral on a warm light base. A sharper take on grey + beige.' },
+  { name: 'Blue + Cream',    families: ['blue',   'cream'],   bonus: 11, tip: 'Blue + cream — the effortless casual pairing. Works from denim and a knit to linen in summer.' },
+  { name: 'Blue + Beige',    families: ['blue',   'beige'],   bonus: 10, tip: 'Light blue + beige (taupe) — airy and easy. Ideal for warm weather and resort looks.' },
+  // ── Earth tones extended ──
+  { name: 'Camel + Brown',   families: ['camel',  'brown'],   bonus: 9,  tip: 'Camel + brown — warm tonal earth dressing. Vary textures (knit vs woven) for separation.' },
+  // ── Greens extended ──
+  { name: 'Green + Black',   families: ['green',  'black'],   bonus: 11, tip: 'Dark green + black — nature tone anchored by black. On-trend and effortless.' },
+  { name: 'Green + Beige',   families: ['green',  'beige'],   bonus: 10, tip: 'Green + beige — earthy and natural. The overshirt-over-tee formula in its best colours.' },
 ]
 
 // ─── Colour family detection from hex ────────────────────────────────────────
