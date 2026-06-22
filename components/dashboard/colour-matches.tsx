@@ -11,9 +11,26 @@
 import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Palette, ExternalLink, Info, Plus, Check } from 'lucide-react'
-import type { ColorAnalysis } from '@/lib/types'
+import type { ColorAnalysis, Season } from '@/lib/types'
 import { PRODUCT_CATALOG, catalogIsEmpty, type CatalogProduct } from '@/lib/productCatalog'
 import { matchProducts, type ProductMatch } from '@/lib/colorMatch'
+
+const FABRIC_LABEL: Record<string, string> = {
+  'linen': 'Linen',
+  'light-cotton': 'Light cotton',
+  'cotton': 'Cotton',
+  'denim': 'Denim',
+  'knit': 'Knit',
+  'fleece': 'Fleece',
+  'wool': 'Wool',
+}
+
+function subSeasonToSeason(sub: string): Season {
+  if (sub.includes('spring')) return 'spring'
+  if (sub.includes('summer')) return 'summer'
+  if (sub.includes('autumn')) return 'autumn'
+  return 'winter'
+}
 
 interface ColourMatchesProps {
   colorAnalysis: ColorAnalysis | undefined
@@ -22,16 +39,17 @@ interface ColourMatchesProps {
 
 export function ColourMatches({ colorAnalysis, onAddToInventory }: ColourMatchesProps) {
   const palette = colorAnalysis?.best_colors ?? []
+  const season = colorAnalysis?.sub_season ? subSeasonToSeason(colorAnalysis.sub_season) : undefined
 
   const matchesByColour = useMemo(() => {
     if (catalogIsEmpty()) return []
     return palette
       .map(hex => ({
         hex,
-        matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8),
+        matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8, season),
       }))
       .sort((a, b) => (b.matches[0]?.matchPercent ?? 0) - (a.matches[0]?.matchPercent ?? 0))
-  }, [palette])
+  }, [palette, season])
 
   if (catalogIsEmpty()) {
     return (
@@ -125,6 +143,11 @@ function ProductMatchCard({
               <span className="text-xs font-medium">{product.price} {product.currency}</span>
             )}
           </div>
+          {product.fabric && (
+            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground">
+              {FABRIC_LABEL[product.fabric] ?? product.fabric}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1">
           <button

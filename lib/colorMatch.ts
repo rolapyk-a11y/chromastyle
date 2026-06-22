@@ -5,7 +5,13 @@
  * so we can rank real products by how close their actual colour is to a target
  * palette colour. This is what makes "find clothes in MY exact yellow" possible —
  * we compare true colours, not keyword guesses.
+ *
+ * When a Season is passed, fabric weight is also factored in — a linen shirt
+ * rises in summer, a wool coat falls. The final matchPercent reflects both.
  */
+
+import type { FabricWeight, Season } from './types'
+import { fabricSeasonPenalty } from './styleGuide'
 
 export interface Lab {
   L: number
@@ -69,35 +75,48 @@ export function matchPercent(dE: number): number {
 
 export interface ColouredProduct {
   colorHex: string
+  fabric?: FabricWeight
 }
 
 export interface ProductMatch<T extends ColouredProduct> {
   product: T
   deltaE: number
-  matchPercent: number
+  matchPercent: number      // colour + fabric-season combined (0–100)
+  colourPercent: number     // colour only — for display reference
 }
 
 /**
- * Rank products by colour closeness to a target hex.
+ * Rank products by how well they match a target colour AND the user's season.
  * @param targetHex   the palette colour we want to match
- * @param products    catalog items, each with a real colorHex
+ * @param products    catalog items with colorHex (+ optional fabric)
  * @param maxDeltaE   discard anything further than this (default 25 — same colour family)
  * @param topN        return at most this many
+ * @param season      when provided, fabric weight is penalised if wrong for the season
  */
 export function matchProducts<T extends ColouredProduct>(
   targetHex: string,
   products: T[],
   maxDeltaE = 25,
   topN = 12,
+  season?: Season,
 ): ProductMatch<T>[] {
   const targetLab = hexToLab(targetHex)
 
   return products
     .map(product => {
       const dE = deltaE(targetLab, hexToLab(product.colorHex))
-      return { product, deltaE: dE, matchPercent: matchPercent(dE) }
+      const colourPct = matchPercent(dE)
+
+      // Apply fabric season penalty when season + fabric are both known
+      let fabricPenalty = 0
+      if (season && product.fabric) {
+        fabricPenalty = fabricSeasonPenalty(product.fabric, season)
+      }
+      const combined = Math.max(0, colourPct - fabricPenalty)
+
+      return { product, deltaE: dE, matchPercent: combined, colourPercent: colourPct }
     })
     .filter(m => m.deltaE <= maxDeltaE)
-    .sort((a, b) => a.deltaE - b.deltaE)
+    .sort((a, b) => b.matchPercent - a.matchPercent)
     .slice(0, topN)
 }

@@ -9,7 +9,7 @@
  * This file is generated. Run `npm run ingest-feed -- <feed.csv>` to (re)build it.
  */
 
-import type { ItemCategory } from './types'
+import type { ItemCategory, FabricWeight } from './types'
 import catalogData from './product-catalog.json'
 
 export interface CatalogProduct {
@@ -23,6 +23,7 @@ export interface CatalogProduct {
   product_url: string
   colorHex: string          // the real dominant garment colour, from the image
   colorName?: string
+  fabric?: FabricWeight     // fabric weight — used for season-fit scoring
 }
 
 export const PRODUCT_CATALOG: CatalogProduct[] = catalogData as CatalogProduct[]
