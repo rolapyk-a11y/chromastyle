@@ -6,9 +6,9 @@
  * season-specific palette compatibility.
  */
 
-import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory } from './types'
+import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory, Season } from './types'
 import { paletteFor, type PaletteColour } from './palettes'
-import { provenPairBonus, SCORE_TIPS } from './styleGuide'
+import { provenPairBonus, SCORE_TIPS, fabricSeasonPenalty, texturePairBonus } from './styleGuide'
 
 // ─── Colour utilities ─────────────────────────────────────────────────────────
 
@@ -74,6 +74,13 @@ function colourFitsSeasonAvoid(hex: string, subSeason: SubSeason): boolean {
 
 // ─── Pair two items and return a score + tip ──────────────────────────────────
 
+function subSeasonToSeason(sub: SubSeason): Season {
+  if (sub.includes('spring')) return 'spring'
+  if (sub.includes('summer')) return 'summer'
+  if (sub.includes('autumn')) return 'autumn'
+  return 'winter'
+}
+
 function pairScore(
   a: UserWardrobeItem,
   b: UserWardrobeItem,
@@ -92,35 +99,51 @@ function pairScore(
   const bFits = colourFitsSeasonAvoid(b.color_hex, subSeason)
   const seasonPenalty = (!aFits ? 20 : 0) + (!bFits ? 20 : 0)
 
+  // ── Texture modifier (fabric weight vs season + texture contrast) ──────────
+  const season = subSeasonToSeason(subSeason)
+  let textureDelta = 0
+  let textureTip = ''
+  if (a.fabric) textureDelta -= fabricSeasonPenalty(a.fabric, season)
+  if (b.fabric) textureDelta -= fabricSeasonPenalty(b.fabric, season)
+  if (a.fabric && b.fabric) {
+    const tb = texturePairBonus(a.fabric, b.fabric)
+    if (tb) { textureDelta += tb.bonus; textureTip = ' ' + tb.tip }
+  }
+
+  function finalise(rawColourScore: number, tip: string) {
+    const combined = Math.max(0, Math.min(100, rawColourScore + textureDelta))
+    return { score: combined, tip: tip + textureTip }
+  }
+
   // Check proven style-guide pairs first — gets a bonus + specific tip
   const proven = provenPairBonus(a.color_hex, b.color_hex)
   if (proven) {
     const raw = Math.min(100, 80 + proven.bonus - seasonPenalty)
-    return { score: Math.max(0, raw), tip: proven.tip }
+    return finalise(Math.max(0, raw), proven.tip)
   }
 
   // One or both are neutral → always works, just needs enough contrast
   if (aNeutral || bNeutral) {
-    if (valueDiff > 30) return { score: Math.max(0, 92 - seasonPenalty), tip: 'Neutral base with clear value contrast — very wearable. ' + SCORE_TIPS.great[0] }
-    if (valueDiff > 15) return { score: Math.max(0, 78 - seasonPenalty), tip: 'Neutral pairing. A slightly bigger difference in depth would sharpen it. ' + SCORE_TIPS.good[0] }
-    return { score: Math.max(0, 60 - seasonPenalty), tip: 'Both pieces are similar in depth — try one light, one dark. ' + SCORE_TIPS.okay[0] }
+    if (valueDiff > 30) return finalise(Math.max(0, 92 - seasonPenalty), 'Neutral base with clear value contrast — very wearable. ' + SCORE_TIPS.great[0])
+    if (valueDiff > 15) return finalise(Math.max(0, 78 - seasonPenalty), 'Neutral pairing. A slightly bigger difference in depth would sharpen it. ' + SCORE_TIPS.good[0])
+    return finalise(Math.max(0, 60 - seasonPenalty), 'Both pieces are similar in depth — try one light, one dark. ' + SCORE_TIPS.okay[0])
   }
 
   // Both in same family (warm+warm or cool+cool)
   if (aWarm === bWarm) {
-    if (valueDiff > 35) return { score: Math.max(0, 88 - seasonPenalty), tip: 'Same colour family, strong value contrast — cohesive and intentional. ' + SCORE_TIPS.great[1] }
-    if (valueDiff > 20) return { score: Math.max(0, 73 - seasonPenalty), tip: 'Same family, decent contrast. One piece a shade lighter or darker would perfect it.' }
-    return { score: Math.max(0, 45 - seasonPenalty), tip: 'Similar depth and temperature. ' + SCORE_TIPS.okay[2] }
+    if (valueDiff > 35) return finalise(Math.max(0, 88 - seasonPenalty), 'Same colour family, strong value contrast — cohesive and intentional. ' + SCORE_TIPS.great[1])
+    if (valueDiff > 20) return finalise(Math.max(0, 73 - seasonPenalty), 'Same family, decent contrast. One piece a shade lighter or darker would perfect it.')
+    return finalise(Math.max(0, 45 - seasonPenalty), 'Similar depth and temperature. ' + SCORE_TIPS.okay[2])
   }
 
   // Mixed warm + cool
   if (bNeutral || aNeutral) {
-    return { score: Math.max(0, 83 - seasonPenalty), tip: 'Statement colour on a neutral base — the most reliable formula. ' + SCORE_TIPS.good[1] }
+    return finalise(Math.max(0, 83 - seasonPenalty), 'Statement colour on a neutral base — the most reliable formula. ' + SCORE_TIPS.good[1])
   }
   if (valueDiff > 30) {
-    return { score: Math.max(0, 68 - seasonPenalty), tip: 'Mixed warm/cool with good contrast. Keep shoes and accessories in one family.' }
+    return finalise(Math.max(0, 68 - seasonPenalty), 'Mixed warm/cool with good contrast. Keep shoes and accessories in one family.')
   }
-  return { score: Math.max(0, 50 - seasonPenalty), tip: SCORE_TIPS.clash[0] }
+  return finalise(Math.max(0, 50 - seasonPenalty), SCORE_TIPS.clash[0])
 }
 
 function scoreLabel(score: number): OutfitCombo['scoreLabel'] {

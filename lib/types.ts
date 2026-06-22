@@ -10,6 +10,9 @@ export type SkinUndertone = 'warm' | 'cool' | 'neutral'
 
 export type ItemCategory = 'top' | 'bottom' | 'shoes' | 'jacket' | 'accessory'
 
+// 1 = lightest (linen), 6 = heaviest (wool). Used for texture contrast + season fit scoring.
+export type FabricWeight = 'linen' | 'light-cotton' | 'cotton' | 'denim' | 'knit' | 'fleece' | 'wool'
+
 export interface UserWardrobeItem {
   id: string
   user_id?: string           // undefined for guest (localStorage) items
@@ -17,6 +20,7 @@ export interface UserWardrobeItem {
   category: ItemCategory
   color_hex: string          // e.g. "#A8C4DC"
   color_name: string         // e.g. "Powder Blue"
+  fabric?: FabricWeight      // optional — unlocks texture scoring when set
   brand?: string
   image_url?: string
   created_at: string

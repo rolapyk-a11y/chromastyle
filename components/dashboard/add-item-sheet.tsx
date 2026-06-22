@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X, Check } from 'lucide-react'
-import type { UserWardrobeItem, ItemCategory, ColorAnalysis } from '@/lib/types'
+import type { UserWardrobeItem, ItemCategory, ColorAnalysis, FabricWeight } from '@/lib/types'
 import { addLocalWardrobeItem } from '@/lib/outfitEngine'
 import { SEASON_COLOURS, NEUTRAL_COLOURS } from '@/lib/palettes'
 
@@ -16,6 +16,16 @@ const CATEGORIES: { value: ItemCategory; label: string; example: string }[] = [
   { value: 'accessory', label: 'Accessory', example: 'Belt, scarf, bag' },
 ]
 
+const FABRICS: { value: FabricWeight; label: string; example: string }[] = [
+  { value: 'linen',        label: 'Linen',         example: 'Shirt, trousers, shorts' },
+  { value: 'light-cotton', label: 'Light cotton',  example: 'T-shirt, polo' },
+  { value: 'cotton',       label: 'Cotton',        example: 'Chinos, Oxford shirt' },
+  { value: 'denim',        label: 'Denim',         example: 'Jeans, denim shorts' },
+  { value: 'knit',         label: 'Knit',          example: 'Sweater, jumper, hoodie' },
+  { value: 'fleece',       label: 'Fleece',        example: 'Fleece jacket, tracksuit' },
+  { value: 'wool',         label: 'Wool',          example: 'Wool coat, heavy knit' },
+]
+
 interface AddItemSheetProps {
   open: boolean
   onClose: () => void
@@ -25,6 +35,7 @@ interface AddItemSheetProps {
 
 export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemSheetProps) {
   const [category, setCategory] = useState<ItemCategory>('top')
+  const [fabric, setFabric] = useState<FabricWeight | undefined>(undefined)
   const [name, setName] = useState('')
   const [selectedColour, setSelectedColour] = useState<{ hex: string; name: string } | null>(null)
   const [customHex, setCustomHex] = useState('#888888')
@@ -40,12 +51,14 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
       category,
       color_hex: colour.hex,
       color_name: colour.name,
+      ...(fabric ? { fabric } : {}),
       created_at: new Date().toISOString(),
     }
     addLocalWardrobeItem(item)
     onAdded()
     // Reset form
     setName('')
+    setFabric(undefined)
     setSelectedColour(null)
     onClose()
   }
@@ -93,6 +106,29 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
             <p className="text-xs text-muted-foreground mt-1">
               e.g. {CATEGORIES.find(c => c.value === category)?.example}
             </p>
+          </div>
+
+          {/* Fabric */}
+          <div>
+            <p className="text-sm font-medium mb-2">
+              Fabric <span className="text-muted-foreground font-normal">(optional — improves outfit scoring)</span>
+            </p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {FABRICS.map(fab => (
+                <button
+                  key={fab.value}
+                  onClick={() => setFabric(f => f === fab.value ? undefined : fab.value)}
+                  className={`flex flex-col items-start rounded-xl border p-2 text-xs transition-colors text-left ${
+                    fabric === fab.value
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border text-muted-foreground hover:border-border/80'
+                  }`}
+                >
+                  <span className="font-medium leading-tight">{fab.label}</span>
+                  <span className="leading-tight opacity-70 mt-0.5 text-[10px]">{fab.example}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Colour — season palette */}

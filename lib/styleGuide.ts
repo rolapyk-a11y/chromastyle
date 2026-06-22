@@ -1,10 +1,13 @@
 /**
  * Style Guide
  *
- * Rules and knowledge extracted from analysis of 15+ menswear reference images
- * covering casual, smart casual, street, and resort styles. Used by the outfit
- * engine to generate better tips and bonus scoring for proven colour combinations.
+ * Rules and knowledge extracted from analysis of 35+ menswear reference images
+ * covering casual, smart casual, street, resort, and summer styles. Used by the
+ * outfit engine to generate better tips and bonus scoring for proven colour
+ * combinations and fabric/texture pairings.
  */
+
+import type { FabricWeight, Season } from './types'
 
 // ─── Proven colour pair combinations ─────────────────────────────────────────
 // Each entry describes a combination that appears repeatedly across style guides.
@@ -172,6 +175,68 @@ export const SHOE_RULES = [
   'Brown leather/loafers elevate any outfit instantly.',
   'Match shoe depth to trouser: light shoes + light trousers, or dark + dark.',
   'Avoid coloured trainers unless the rest of the outfit is minimal and neutral.',
+]
+
+// ─── Fabric & texture ─────────────────────────────────────────────────────────
+// Numeric weight 1 (lightest) → 6 (heaviest). Drives season-fit penalties and
+// texture contrast bonuses in the outfit engine.
+
+export const FABRIC_WEIGHT: Record<FabricWeight, number> = {
+  'linen':        1,
+  'light-cotton': 2,
+  'cotton':       3,
+  'denim':        4,
+  'knit':         4,
+  'fleece':       5,
+  'wool':         6,
+}
+
+// Acceptable fabric-weight window [min, max] per season.
+// Sourced from 35+ reference images: linen dominates summer, wool/fleece = winter only.
+export const SEASON_WEIGHT_IDEAL: Record<Season, [number, number]> = {
+  spring: [2, 4],   // light cotton → denim/knit
+  summer: [1, 3],   // linen → cotton
+  autumn: [3, 5],   // cotton → fleece
+  winter: [4, 6],   // denim/knit → wool
+}
+
+// Penalty score for a fabric that's too light or too heavy for the season.
+export function fabricSeasonPenalty(fabric: FabricWeight, season: Season): number {
+  const w = FABRIC_WEIGHT[fabric]
+  const [min, max] = SEASON_WEIGHT_IDEAL[season]
+  if (w < min) return (min - w) * 8   // too light — e.g. linen in winter
+  if (w > max) return (w - max) * 10  // too heavy — e.g. wool coat in summer
+  return 0
+}
+
+// Texture-contrast bonus when two fabrics pair well together.
+// Smooth + textured is the dominant pattern across all reference images.
+export function texturePairBonus(
+  fabA: FabricWeight,
+  fabB: FabricWeight,
+): { bonus: number; tip: string } | null {
+  const wA = FABRIC_WEIGHT[fabA]
+  const wB = FABRIC_WEIGHT[fabB]
+  const diff = Math.abs(wA - wB)
+  // Matching linen: resort set formula — works when colours are tonal
+  if (fabA === 'linen' && fabB === 'linen') {
+    return { bonus: 4, tip: 'Two linen pieces — the resort formula. Keep colours tonal or contrast light + colour.' }
+  }
+  if (diff >= 3) return { bonus: 10, tip: 'Strong texture contrast — the weight difference between these fabrics adds depth and makes the combo feel considered.' }
+  if (diff === 2) return { bonus: 6,  tip: 'Smooth meets textured — this is what makes the pairing feel intentional rather than accidental.' }
+  if (diff === 1) return { bonus: 3,  tip: 'Subtle texture variation adds quiet depth without drawing attention.' }
+  return null
+}
+
+// Fabric styling rules extracted from all reference image sets (35+ images)
+export const FABRIC_RULES = [
+  'Linen is the summer staple — one linen piece makes any outfit feel seasonal and intentional.',
+  'Open woven overshirt over a plain tee: the texture contrast is what makes layering look intentional.',
+  'Ribbed knit + smooth chino — the texture difference makes both pieces look better.',
+  'Matching linen top + bottom in tonal colours = resort dressing. A classic summer move.',
+  'Never two heavy-weight pieces at once unless the outer layer stays open.',
+  'Denim + cotton tee is the most reliable casual formula across all seasons.',
+  'A structured (woven) piece paired with something relaxed (knit, tee) creates the right balance.',
 ]
 
 // ─── Tips by outfit score ─────────────────────────────────────────────────────
