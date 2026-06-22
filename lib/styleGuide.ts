@@ -51,6 +51,14 @@ export const PROVEN_PAIRS: StylePair[] = [
   // ── Accent tones ──
   { name: 'Burgundy + Black',families: ['burgundy','black'],  bonus: 10, tip: 'Burgundy + black — bold but grounded. Great for autumn/winter.' },
   { name: 'Burgundy + Grey', families: ['burgundy','grey'],   bonus: 9,  tip: 'Burgundy + grey — rich accent on a neutral base.' },
+  // ── Summer combos (from reference image set 3) ──
+  { name: 'White + Beige',    families: ['white',    'beige'],    bonus: 12, tip: 'White + beige — the most wearable summer formula. Linen versions of both look effortlessly good.' },
+  { name: 'Black + Khaki',   families: ['black',    'khaki'],    bonus: 11, tip: 'Black + khaki — easy to copy, always sharp. White sneakers seal the look.' },
+  { name: 'Green + Navy',    families: ['green',    'navy'],     bonus: 10, tip: 'Green + navy — warm tone meets cool base. Keep one piece solid, one textured.' },
+  { name: 'Blue + Grey',     families: ['blue',     'grey'],     bonus: 10, tip: 'Blue + grey — effortless pairing that rarely goes wrong. Easy casual summer go-to.' },
+  { name: 'Sage + Charcoal', families: ['sage',     'charcoal'], bonus: 11, tip: 'Sage + charcoal — soft nature tone on a strong dark base. Modern and wearable.' },
+  { name: 'Olive + Cream',   families: ['olive',    'cream'],    bonus: 12, tip: 'Olive + cream — the linen summer pairing. Relaxed, natural, works with sandals or white sneakers.' },
+  { name: 'Warm-red + White',families: ['warm-red', 'white'],    bonus: 10, tip: 'Terracotta / rust + white — bold warm accent on a clean base. A strong summer statement.' },
   // ── Extended neutrals (from reference image set 2) ──
   { name: 'Charcoal + Beige',families: ['charcoal','beige'],  bonus: 11, tip: 'Charcoal + beige — dark neutral on a warm light base. A sharper take on grey + beige.' },
   { name: 'Blue + Cream',    families: ['blue',   'cream'],   bonus: 11, tip: 'Blue + cream — the effortless casual pairing. Works from denim and a knit to linen in summer.' },
