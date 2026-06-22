@@ -6,9 +6,10 @@
  * season-specific palette compatibility.
  */
 
-import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory, Season } from './types'
+import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory, Season, BodyProfile } from './types'
 import { paletteFor, type PaletteColour } from './palettes'
 import { provenPairBonus, SCORE_TIPS, fabricSeasonPenalty, texturePairBonus } from './styleGuide'
+import { cutFitsBody } from './bodyGuide'
 
 // ─── Colour utilities ─────────────────────────────────────────────────────────
 
@@ -158,6 +159,7 @@ function scoreLabel(score: number): OutfitCombo['scoreLabel'] {
 export function generateOutfits(
   items: UserWardrobeItem[],
   subSeason: SubSeason,
+  bodyProfile?: BodyProfile,
 ): OutfitCombo[] {
   const tops    = items.filter(i => i.category === 'top')
   const bottoms = items.filter(i => i.category === 'bottom')
@@ -165,6 +167,20 @@ export function generateOutfits(
   const shoes   = items.filter(i => i.category === 'shoes')
 
   if (tops.length === 0 || bottoms.length === 0) return []
+
+  // Average body-fit delta across an outfit's items that have a known cut.
+  function bodyFit(outfitItems: UserWardrobeItem[]): { delta: number; reason: string } {
+    if (!bodyProfile) return { delta: 0, reason: '' }
+    const scored = outfitItems
+      .filter(i => i.cut)
+      .map(i => cutFitsBody(i.cut!, i.category, bodyProfile))
+    if (scored.length === 0) return { delta: 0, reason: '' }
+    const delta = Math.round(scored.reduce((s, x) => s + x.delta, 0) / scored.length)
+    // Surface the most negative reason (the thing to fix), else the most positive
+    const sorted = [...scored].sort((a, b) => a.delta - b.delta)
+    const pick = delta < 0 ? sorted[0] : sorted[sorted.length - 1]
+    return { delta, reason: pick.reason }
+  }
 
   const combos: OutfitCombo[] = []
 
@@ -191,13 +207,20 @@ export function generateOutfits(
       }
       if (bestShoes && bestShoesScore > 60) outfitItems.push(bestShoes)
 
-      const finalScore = Math.round(base * 0.7 + (bestJacketScore > 0 ? bestJacketScore * 0.15 : base * 0.15) + (bestShoesScore > 0 ? bestShoesScore * 0.15 : base * 0.15))
+      const colourScore = base * 0.7 + (bestJacketScore > 0 ? bestJacketScore * 0.15 : base * 0.15) + (bestShoesScore > 0 ? bestShoesScore * 0.15 : base * 0.15)
+
+      // Body-fit adjustment: nudge the score by how well the cuts suit the wearer
+      const fit = bodyFit(outfitItems)
+      const finalScore = Math.max(0, Math.min(100, Math.round(colourScore + fit.delta)))
+      const finalTip = fit.reason
+        ? `${tip} ${fit.delta >= 0 ? 'The cuts suit your shape — ' : 'Heads up: '}${fit.reason}.`
+        : tip
 
       combos.push({
         items: outfitItems,
-        score: Math.min(100, finalScore),
+        score: finalScore,
         scoreLabel: scoreLabel(finalScore),
-        tip,
+        tip: finalTip,
       })
     }
   }

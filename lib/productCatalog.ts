@@ -9,7 +9,8 @@
  * This file is generated. Run `npm run ingest-feed -- <feed.csv>` to (re)build it.
  */
 
-import type { ItemCategory, FabricWeight } from './types'
+import type { ItemCategory, FabricWeight, GarmentCut } from './types'
+import { inferCutFromName } from './bodyGuide'
 import catalogData from './product-catalog.json'
 
 export interface CatalogProduct {
@@ -24,9 +25,15 @@ export interface CatalogProduct {
   colorHex: string          // the real dominant garment colour, from the image
   colorName?: string
   fabric?: FabricWeight     // fabric weight — used for season-fit scoring
+  cut?: GarmentCut          // silhouette — used for body-fit scoring
 }
 
-export const PRODUCT_CATALOG: CatalogProduct[] = catalogData as CatalogProduct[]
+// Attach a garment cut to every product (from the JSON if present, otherwise
+// inferred from the product name — "Slim Fit", "Relaxed Fit", "Wide Leg", …).
+export const PRODUCT_CATALOG: CatalogProduct[] = (catalogData as CatalogProduct[]).map(p => ({
+  ...p,
+  cut: p.cut ?? inferCutFromName(p.name),
+}))
 
 export function catalogByCategory(category: ItemCategory): CatalogProduct[] {
   return PRODUCT_CATALOG.filter(p => p.category === category)

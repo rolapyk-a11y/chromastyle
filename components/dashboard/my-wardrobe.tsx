@@ -3,14 +3,16 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2, Shirt, ShoppingBag, Footprints, Layers, Star, Sparkles } from 'lucide-react'
-import type { UserWardrobeItem, ItemCategory, ColorAnalysis, OutfitCombo } from '@/lib/types'
+import { Plus, Trash2, Shirt, ShoppingBag, Footprints, Layers, Star, Sparkles, Ruler, X } from 'lucide-react'
+import type { UserWardrobeItem, ItemCategory, ColorAnalysis, OutfitCombo, BodyProfile } from '@/lib/types'
 import {
   loadLocalWardrobe,
   saveLocalWardrobe,
   generateOutfits,
 } from '@/lib/outfitEngine'
+import { loadBodyProfile, saveBodyProfile, fitTipsFor, bodyProfileSummary } from '@/lib/bodyGuide'
 import { AddItemSheet } from './add-item-sheet'
+import { BodyProfileQuiz } from './body-profile-quiz'
 import { OutfitSuggestions } from './outfit-suggestions'
 import { ColourMatches } from './colour-matches'
 import { StyleItemModal } from './style-item-modal'
@@ -43,26 +45,29 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
   const [activeView, setActiveView] = useState<ActiveView>('wardrobe')
   const [outfits, setOutfits] = useState<OutfitCombo[]>([])
   const [styleAnchor, setStyleAnchor] = useState<UserWardrobeItem | null>(null)
+  const [bodyProfile, setBodyProfile] = useState<BodyProfile | undefined>(undefined)
+  const [showBodyQuiz, setShowBodyQuiz] = useState(false)
 
   // Load from localStorage on mount
   useEffect(() => {
     setItems(loadLocalWardrobe())
+    setBodyProfile(loadBodyProfile())
   }, [])
 
   const refresh = useCallback(() => {
     const loaded = loadLocalWardrobe()
     setItems(loaded)
     if (colorAnalysis?.sub_season) {
-      setOutfits(generateOutfits(loaded, colorAnalysis.sub_season))
+      setOutfits(generateOutfits(loaded, colorAnalysis.sub_season, bodyProfile))
     }
-  }, [colorAnalysis?.sub_season])
+  }, [colorAnalysis?.sub_season, bodyProfile])
 
-  // Regenerate outfits whenever items or analysis changes
+  // Regenerate outfits whenever items, analysis, or body profile changes
   useEffect(() => {
     if (colorAnalysis?.sub_season) {
-      setOutfits(generateOutfits(items, colorAnalysis.sub_season))
+      setOutfits(generateOutfits(items, colorAnalysis.sub_season, bodyProfile))
     }
-  }, [items, colorAnalysis?.sub_season])
+  }, [items, colorAnalysis?.sub_season, bodyProfile])
 
   function removeItem(id: string) {
     const updated = items.filter(i => i.id !== id)
@@ -109,8 +114,37 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 
   const hasEnoughForOutfits = items.some(i => i.category === 'top') && items.some(i => i.category === 'bottom')
 
+  // Inline body-profile quiz overlay
+  if (showBodyQuiz) {
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setShowBodyQuiz(false)}
+          className="absolute -top-1 right-0 z-10 p-1.5 rounded-lg text-muted-foreground hover:text-foreground"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <BodyProfileQuiz
+          onComplete={(profile) => {
+            saveBodyProfile(profile)
+            setBodyProfile(profile)
+            setShowBodyQuiz(false)
+          }}
+          onSkip={() => setShowBodyQuiz(false)}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
+
+      {/* ── Fit profile banner ── */}
+      <FitProfileBanner
+        profile={bodyProfile}
+        onEdit={() => setShowBodyQuiz(true)}
+      />
 
       {/* ── Tab bar ── */}
       <div className="flex gap-2 border-b border-border pb-0">
@@ -209,7 +243,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 
       {/* ── Shop My Colours view (real products matched by colour distance) ── */}
       {activeView === 'shop-colours' && (
-        <ColourMatches colorAnalysis={colorAnalysis} onAddToInventory={addCatalogProduct} />
+        <ColourMatches colorAnalysis={colorAnalysis} bodyProfile={bodyProfile} onAddToInventory={addCatalogProduct} />
       )}
 
       <AddItemSheet
@@ -229,6 +263,67 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
         />
       )}
     </div>
+  )
+}
+
+// ─── Fit profile banner ───────────────────────────────────────────────────────
+
+function FitProfileBanner({
+  profile,
+  onEdit,
+}: {
+  profile: BodyProfile | undefined
+  onEdit: () => void
+}) {
+  const [showTips, setShowTips] = useState(false)
+
+  // No profile yet → prompt to set one
+  if (!profile) {
+    return (
+      <Card className="border-primary/30 bg-primary/5">
+        <CardContent className="p-4 flex items-center gap-3">
+          <Ruler className="w-5 h-5 text-primary shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium">Add your fit profile</p>
+            <p className="text-xs text-muted-foreground">
+              4 quick questions so we recommend cuts that flatter your shape, not just your colours.
+            </p>
+          </div>
+          <Button size="sm" onClick={onEdit}>Set it up</Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const tips = fitTipsFor(profile)
+  return (
+    <Card className="border-border/60">
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <Ruler className="w-5 h-5 text-primary shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium capitalize">{bodyProfileSummary(profile)}</p>
+            <button
+              onClick={() => setShowTips(s => !s)}
+              className="text-xs text-primary hover:underline"
+            >
+              {showTips ? 'Hide fit rules' : `Show my ${tips.length} fit rules`}
+            </button>
+          </div>
+          <Button size="sm" variant="outline" onClick={onEdit}>Update</Button>
+        </div>
+        {showTips && (
+          <ul className="space-y-1.5 pt-1 border-t border-border/40">
+            {tips.map((tip, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <Sparkles className="w-3 h-3 text-primary mt-0.5 shrink-0" />
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 

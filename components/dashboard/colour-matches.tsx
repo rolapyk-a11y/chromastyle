@@ -11,7 +11,7 @@
 import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Palette, ExternalLink, Info, Plus, Check } from 'lucide-react'
-import type { ColorAnalysis, Season } from '@/lib/types'
+import type { ColorAnalysis, Season, BodyProfile } from '@/lib/types'
 import { PRODUCT_CATALOG, catalogIsEmpty, type CatalogProduct } from '@/lib/productCatalog'
 import { matchProducts, type ProductMatch } from '@/lib/colorMatch'
 
@@ -34,10 +34,11 @@ function subSeasonToSeason(sub: string): Season {
 
 interface ColourMatchesProps {
   colorAnalysis: ColorAnalysis | undefined
+  bodyProfile?: BodyProfile
   onAddToInventory: (product: CatalogProduct) => void
 }
 
-export function ColourMatches({ colorAnalysis, onAddToInventory }: ColourMatchesProps) {
+export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: ColourMatchesProps) {
   const palette = colorAnalysis?.best_colors ?? []
   const season = colorAnalysis?.sub_season ? subSeasonToSeason(colorAnalysis.sub_season) : undefined
 
@@ -46,10 +47,10 @@ export function ColourMatches({ colorAnalysis, onAddToInventory }: ColourMatches
     return palette
       .map(hex => ({
         hex,
-        matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8, season),
+        matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8, season, bodyProfile),
       }))
       .sort((a, b) => (b.matches[0]?.matchPercent ?? 0) - (a.matches[0]?.matchPercent ?? 0))
-  }, [palette, season])
+  }, [palette, season, bodyProfile])
 
   if (catalogIsEmpty()) {
     return (
@@ -111,8 +112,12 @@ function ProductMatchCard({
   match: ProductMatch<CatalogProduct>
   onAdd: (product: CatalogProduct) => void
 }) {
-  const { product, matchPercent } = match
+  const { product, matchPercent, fitReason } = match
   const [added, setAdded] = useState(false)
+
+  // A positive fit signal: matchPercent (colour+fabric+fit) landed above the
+  // colour-only score, meaning the cut suits the body.
+  const fitsBody = match.matchPercent > match.colourPercent
 
   return (
     <div className="group rounded-xl border border-border/50 overflow-hidden hover:border-primary transition-colors">
@@ -143,11 +148,21 @@ function ProductMatchCard({
               <span className="text-xs font-medium">{product.price} {product.currency}</span>
             )}
           </div>
-          {product.fabric && (
-            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground">
-              {FABRIC_LABEL[product.fabric] ?? product.fabric}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-1 mt-1">
+            {product.fabric && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground">
+                {FABRIC_LABEL[product.fabric] ?? product.fabric}
+              </span>
+            )}
+            {fitsBody && (
+              <span
+                className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400"
+                title={fitReason || 'Suits your proportions'}
+              >
+                ✓ Suits your shape
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-1">
           <button

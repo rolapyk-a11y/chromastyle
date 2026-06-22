@@ -13,6 +13,23 @@ export type ItemCategory = 'top' | 'bottom' | 'shoes' | 'jacket' | 'accessory'
 // 1 = lightest (linen), 6 = heaviest (wool). Used for texture contrast + season fit scoring.
 export type FabricWeight = 'linen' | 'light-cotton' | 'cotton' | 'denim' | 'knit' | 'fleece' | 'wool'
 
+// Garment cut/silhouette — drives body-proportion fit scoring.
+export type GarmentCut = 'slim' | 'tapered' | 'regular' | 'relaxed' | 'wide' | 'oversized'
+
+// ─── Body profile (self-reported proportions) ────────────────────────────────
+export type HeightBand = 'short' | 'average' | 'tall'
+export type ShoulderBuild = 'narrow' | 'average' | 'broad'
+export type BodyProportion = 'long-torso' | 'balanced' | 'long-legs'
+export type BuildType = 'slim' | 'average' | 'athletic' | 'fuller'
+
+export interface BodyProfile {
+  height: HeightBand
+  shoulders: ShoulderBuild
+  proportion: BodyProportion
+  build: BuildType
+  created_at: string
+}
+
 export interface UserWardrobeItem {
   id: string
   user_id?: string           // undefined for guest (localStorage) items
@@ -21,6 +38,7 @@ export interface UserWardrobeItem {
   color_hex: string          // e.g. "#A8C4DC"
   color_name: string         // e.g. "Powder Blue"
   fabric?: FabricWeight      // optional — unlocks texture scoring when set
+  cut?: GarmentCut           // optional — unlocks body-fit scoring when set
   brand?: string
   image_url?: string
   created_at: string

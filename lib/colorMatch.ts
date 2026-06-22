@@ -7,11 +7,14 @@
  * we compare true colours, not keyword guesses.
  *
  * When a Season is passed, fabric weight is also factored in — a linen shirt
- * rises in summer, a wool coat falls. The final matchPercent reflects both.
+ * rises in summer, a wool coat falls. When a BodyProfile is passed, the garment
+ * cut is scored against the wearer's proportions too. The final matchPercent
+ * reflects colour + fabric + fit.
  */
 
-import type { FabricWeight, Season } from './types'
+import type { FabricWeight, GarmentCut, ItemCategory, Season, BodyProfile } from './types'
 import { fabricSeasonPenalty } from './styleGuide'
+import { cutFitsBody } from './bodyGuide'
 
 export interface Lab {
   L: number
@@ -76,22 +79,27 @@ export function matchPercent(dE: number): number {
 export interface ColouredProduct {
   colorHex: string
   fabric?: FabricWeight
+  cut?: GarmentCut
+  category?: ItemCategory
 }
 
 export interface ProductMatch<T extends ColouredProduct> {
   product: T
   deltaE: number
-  matchPercent: number      // colour + fabric-season combined (0–100)
+  matchPercent: number      // colour + fabric-season + body-fit combined (0–100)
   colourPercent: number     // colour only — for display reference
+  fitReason?: string        // why the cut suits / doesn't suit the body, if known
 }
 
 /**
- * Rank products by how well they match a target colour AND the user's season.
+ * Rank products by how well they match a target colour, the user's season, AND
+ * their body proportions.
  * @param targetHex   the palette colour we want to match
- * @param products    catalog items with colorHex (+ optional fabric)
+ * @param products    catalog items with colorHex (+ optional fabric / cut / category)
  * @param maxDeltaE   discard anything further than this (default 25 — same colour family)
  * @param topN        return at most this many
  * @param season      when provided, fabric weight is penalised if wrong for the season
+ * @param bodyProfile when provided, garment cut is scored against the wearer's shape
  */
 export function matchProducts<T extends ColouredProduct>(
   targetHex: string,
@@ -99,6 +107,7 @@ export function matchProducts<T extends ColouredProduct>(
   maxDeltaE = 25,
   topN = 12,
   season?: Season,
+  bodyProfile?: BodyProfile,
 ): ProductMatch<T>[] {
   const targetLab = hexToLab(targetHex)
 
@@ -112,9 +121,19 @@ export function matchProducts<T extends ColouredProduct>(
       if (season && product.fabric) {
         fabricPenalty = fabricSeasonPenalty(product.fabric, season)
       }
-      const combined = Math.max(0, colourPct - fabricPenalty)
 
-      return { product, deltaE: dE, matchPercent: combined, colourPercent: colourPct }
+      // Apply body-fit delta when body profile + cut + category are all known
+      let fitDelta = 0
+      let fitReason: string | undefined
+      if (bodyProfile && product.cut && product.category) {
+        const fit = cutFitsBody(product.cut, product.category, bodyProfile)
+        fitDelta = fit.delta
+        fitReason = fit.reason || undefined
+      }
+
+      const combined = Math.max(0, Math.min(100, colourPct - fabricPenalty + fitDelta))
+
+      return { product, deltaE: dE, matchPercent: combined, colourPercent: colourPct, fitReason }
     })
     .filter(m => m.deltaE <= maxDeltaE)
     .sort((a, b) => b.matchPercent - a.matchPercent)

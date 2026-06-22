@@ -4,9 +4,18 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X, Check } from 'lucide-react'
-import type { UserWardrobeItem, ItemCategory, ColorAnalysis, FabricWeight } from '@/lib/types'
+import type { UserWardrobeItem, ItemCategory, ColorAnalysis, FabricWeight, GarmentCut } from '@/lib/types'
 import { addLocalWardrobeItem } from '@/lib/outfitEngine'
 import { SEASON_COLOURS, NEUTRAL_COLOURS } from '@/lib/palettes'
+
+const CUTS: { value: GarmentCut; label: string }[] = [
+  { value: 'slim',     label: 'Slim' },
+  { value: 'tapered',  label: 'Tapered' },
+  { value: 'regular',  label: 'Regular' },
+  { value: 'relaxed',  label: 'Relaxed' },
+  { value: 'wide',     label: 'Wide' },
+  { value: 'oversized',label: 'Oversized' },
+]
 
 const CATEGORIES: { value: ItemCategory; label: string; example: string }[] = [
   { value: 'top',       label: 'Top',       example: 'T-shirt, shirt, jumper' },
@@ -36,6 +45,7 @@ interface AddItemSheetProps {
 export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemSheetProps) {
   const [category, setCategory] = useState<ItemCategory>('top')
   const [fabric, setFabric] = useState<FabricWeight | undefined>(undefined)
+  const [cut, setCut] = useState<GarmentCut | undefined>(undefined)
   const [name, setName] = useState('')
   const [selectedColour, setSelectedColour] = useState<{ hex: string; name: string } | null>(null)
   const [customHex, setCustomHex] = useState('#888888')
@@ -52,6 +62,7 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
       color_hex: colour.hex,
       color_name: colour.name,
       ...(fabric ? { fabric } : {}),
+      ...(cut ? { cut } : {}),
       created_at: new Date().toISOString(),
     }
     addLocalWardrobeItem(item)
@@ -59,6 +70,7 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
     // Reset form
     setName('')
     setFabric(undefined)
+    setCut(undefined)
     setSelectedColour(null)
     onClose()
   }
@@ -126,6 +138,28 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
                 >
                   <span className="font-medium leading-tight">{fab.label}</span>
                   <span className="leading-tight opacity-70 mt-0.5 text-[10px]">{fab.example}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Cut / fit */}
+          <div>
+            <p className="text-sm font-medium mb-2">
+              Cut <span className="text-muted-foreground font-normal">(optional — matched to your fit profile)</span>
+            </p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {CUTS.map(c => (
+                <button
+                  key={c.value}
+                  onClick={() => setCut(prev => prev === c.value ? undefined : c.value)}
+                  className={`rounded-xl border p-2 text-xs transition-colors ${
+                    cut === c.value
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border text-muted-foreground hover:border-border/80'
+                  }`}
+                >
+                  {c.label}
                 </button>
               ))}
             </div>

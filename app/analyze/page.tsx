@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation'
 import { CameraCapture } from '@/components/dashboard/camera-capture'
 import { AnalysisResults } from '@/components/dashboard/analysis-results'
 import { EssenceQuiz } from '@/components/dashboard/essence-quiz'
+import { BodyProfileQuiz } from '@/components/dashboard/body-profile-quiz'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Sparkles, LogIn, ArrowRight } from 'lucide-react'
 import type { ColorAnalysis } from '@/lib/types'
-import type { EssenceResult } from '@/lib/essenceData'
+import { saveBodyProfile } from '@/lib/bodyGuide'
 import { analyzeColorsInBrowser, FaceNotDetectedError } from '@/lib/clientColorAnalysis'
 
-type PageStep = 'undertone-question' | 'capture' | 'results' | 'essence-quiz'
+type PageStep = 'undertone-question' | 'capture' | 'results' | 'essence-quiz' | 'body-quiz'
 type Undertone = 'warm' | 'cool'
 
 // ─── Wrist vein illustrations ─────────────────────────────────────────────────
@@ -164,12 +165,25 @@ export default function AnalyzePage() {
     )
   }
 
-  // ── Essence quiz ─────────────────────────────────────────────────────────────
+  // ── Essence quiz → chains into the fit profile ───────────────────────────────
   if (step === 'essence-quiz') {
     return (
       <EssenceQuiz
         onComplete={(result) => {
           localStorage.setItem('chromastyle_essence', JSON.stringify(result))
+          setStep('body-quiz')
+        }}
+        onSkip={() => setStep('body-quiz')}
+      />
+    )
+  }
+
+  // ── Body / fit profile quiz ──────────────────────────────────────────────────
+  if (step === 'body-quiz') {
+    return (
+      <BodyProfileQuiz
+        onComplete={(profile) => {
+          saveBodyProfile(profile)
           router.push('/wardrobe')
         }}
         onSkip={() => router.push('/wardrobe')}
@@ -200,6 +214,7 @@ export default function AnalyzePage() {
           onReset={handleReset}
           onContinue={() => router.push('/wardrobe')}
           onEssenceQuiz={() => setStep('essence-quiz')}
+          onBodyQuiz={() => setStep('body-quiz')}
         />
       </div>
     )
