@@ -107,6 +107,14 @@ export const PROVEN_PAIRS: StylePair[] = [
   { name: 'Olive + Navy',     families: ['olive',    'navy'],    bonus: 10, tip: 'Olive + navy — military meets nautical. Strong and versatile across seasons.' },
   { name: 'Tan + Black',      families: ['tan',      'black'],   bonus: 11, tip: 'Tan + black — light warm tone on the darkest anchor. Sharp, wearable, always sharp.' },
   { name: 'Khaki + Navy',     families: ['khaki',    'navy'],    bonus: 10, tip: 'Khaki + navy — a military-nautical classic. The most reliable two-tone casual formula for warm seasons.' },
+  // ── Light Spring capsule staples (from additional reference images) ──
+  { name: 'Sage + Cream',     families: ['sage',     'cream'],   bonus: 11, tip: 'Sage + cream — the softest spring pairing. Both tones share warmth and lightness, enhancing rather than competing.' },
+  { name: 'Sand + White',     families: ['sand',     'white'],   bonus: 10, tip: 'Warm sand / golden yellow + white — light and warm. Works as a tee under a sandy linen overshirt for spring.' },
+  { name: 'Sand + Beige',     families: ['sand',     'beige'],   bonus: 9,  tip: 'Sand + beige — tonal warm spring dressing. Keep both pieces in linen or light cotton for the best effect.' },
+  { name: 'Warm-red + Cream', families: ['warm-red', 'cream'],   bonus: 10, tip: 'Terracotta / coral + cream — a warm, earthy spring formula. Appears across light spring capsule wardrobes.' },
+  { name: 'Camel + Olive',    families: ['camel',    'olive'],   bonus: 10, tip: 'Camel + olive — warm earth meets botanical green. A spring capsule staple that works across occasions.' },
+  { name: 'Peach + Sand',     families: ['peach',    'sand'],    bonus: 9,  tip: 'Peach + warm sand — two light spring tones together. Vary textures (linen vs cotton) to keep them distinct.' },
+  { name: 'Mint + Sand',      families: ['mint',     'sand'],    bonus: 10, tip: 'Mint + warm sand — cool green on a warm golden base. A light spring signature; finish with white trainers or tan loafers.' },
 ]
 
 // ─── Colour family detection from hex ────────────────────────────────────────
