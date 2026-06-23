@@ -71,6 +71,24 @@ export const PROVEN_PAIRS: StylePair[] = [
   // ── Greens extended ──
   { name: 'Green + Black',   families: ['green',  'black'],   bonus: 11, tip: 'Dark green + black — nature tone anchored by black. On-trend and effortless.' },
   { name: 'Green + Beige',   families: ['green',  'beige'],   bonus: 10, tip: 'Green + beige — earthy and natural. The overshirt-over-tee formula in its best colours.' },
+  // ── "Old Money" combinations (from reference image set 4) ──
+  // Navy + camel is the single most repeated pairing across all Old Money guides.
+  { name: 'Navy + Camel',     families: ['navy',     'camel'],    bonus: 14, tip: 'Navy + camel — the Old Money staple. Sharp contrast, warm base. Brown leather shoes complete it.' },
+  { name: 'Cream + Navy',     families: ['cream',    'navy'],     bonus: 12, tip: 'Cream + navy — warm-cool contrast at its cleanest. Works in linen for summer or cotton for autumn.' },
+  { name: 'Blue + Camel',     families: ['blue',     'camel'],    bonus: 11, tip: 'Light blue + camel — airy and polished. One of the most copied Old Money combinations.' },
+  { name: 'Burgundy + Beige', families: ['burgundy', 'beige'],   bonus: 10, tip: 'Burgundy + beige — rich accent on a warm neutral base. Strong for autumn and smart-casual.' },
+  { name: 'Burgundy + Camel', families: ['burgundy', 'camel'],   bonus: 9,  tip: 'Maroon + camel — warm, earthy, sophisticated. A deeper take on burgundy styling.' },
+  { name: 'Camel + Beige',    families: ['camel',    'beige'],   bonus: 8,  tip: 'Camel + beige — tonal warm dressing. Vary textures (knit vs woven) to avoid looking flat.' },
+  // ── Brown outfit combinations (from Alarna Hope + multiple guides) ──
+  { name: 'Charcoal + Brown', families: ['charcoal', 'brown'],   bonus: 10, tip: 'Charcoal + brown (mocha) — deep and warm. The dark anchor + warm tone formula at its best.' },
+  { name: 'Brown + Grey',     families: ['brown',    'grey'],    bonus: 9,  tip: 'Brown + grey — warm meets cool neutral. Understated and easy to build on.' },
+  { name: 'Brown + Blue',     families: ['brown',    'blue'],    bonus: 10, tip: 'Chocolate brown + blue — unexpected but consistently recommended. Rich contrast that works year-round.' },
+  { name: 'Sage + Brown',     families: ['sage',     'brown'],   bonus: 10, tip: 'Sage green + brown — nature pairing. The earthy tone of brown meets the botanical lift of sage.' },
+  // ── Shirt & trouser pairings + neutral outfit guide ──
+  { name: 'White + Olive',    families: ['white',    'olive'],   bonus: 11, tip: 'White + olive — crisp base with a nature tone. One of the cleanest casual combinations.' },
+  { name: 'Olive + Navy',     families: ['olive',    'navy'],    bonus: 10, tip: 'Olive + navy — military meets nautical. Strong and versatile across seasons.' },
+  { name: 'Tan + Black',      families: ['tan',      'black'],   bonus: 11, tip: 'Tan + black — light warm tone on the darkest anchor. Sharp, wearable, always sharp.' },
+  { name: 'Khaki + Navy',     families: ['khaki',    'navy'],    bonus: 10, tip: 'Khaki + navy — a military-nautical classic. The most reliable two-tone casual formula for warm seasons.' },
 ]
 
 // ─── Colour family detection from hex ────────────────────────────────────────
