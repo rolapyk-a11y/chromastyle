@@ -14,6 +14,7 @@ import { loadBodyProfile, saveBodyProfile, fitTipsFor, bodyProfileSummary } from
 import { AddItemSheet } from './add-item-sheet'
 import { BodyProfileQuiz } from './body-profile-quiz'
 import { OutfitSuggestions } from './outfit-suggestions'
+import { OutfitBuilder } from './outfit-builder'
 import { ColourMatches } from './colour-matches'
 import { StyleItemModal } from './style-item-modal'
 import { shopLinksFor } from '@/lib/shopLinks'
@@ -47,6 +48,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
   const [styleAnchor, setStyleAnchor] = useState<UserWardrobeItem | null>(null)
   const [bodyProfile, setBodyProfile] = useState<BodyProfile | undefined>(undefined)
   const [showBodyQuiz, setShowBodyQuiz] = useState(false)
+  const [outfitMode, setOutfitMode] = useState<'suggested' | 'build'>('suggested')
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -233,12 +235,40 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
 
       {/* ── Outfits view ── */}
       {activeView === 'outfits' && (
-        <OutfitSuggestions
-          outfits={outfits}
-          subSeason={colorAnalysis?.sub_season}
-          onAddItem={() => { setAddOpen(true); setActiveView('wardrobe') }}
-          hasItems={items.length > 0}
-        />
+        <div className="space-y-4">
+          {/* Suggested vs Build-your-own toggle */}
+          <div className="inline-flex rounded-lg border border-border p-0.5 bg-secondary/30">
+            {(['suggested', 'build'] as const).map(mode => (
+              <button
+                key={mode}
+                onClick={() => setOutfitMode(mode)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  outfitMode === mode
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {mode === 'suggested' ? 'Suggested for you' : 'Build your own'}
+              </button>
+            ))}
+          </div>
+
+          {outfitMode === 'suggested' ? (
+            <OutfitSuggestions
+              outfits={outfits}
+              subSeason={colorAnalysis?.sub_season}
+              onAddItem={() => { setAddOpen(true); setActiveView('wardrobe') }}
+              hasItems={items.length > 0}
+            />
+          ) : (
+            <OutfitBuilder
+              items={items}
+              subSeason={colorAnalysis?.sub_season}
+              bodyProfile={bodyProfile}
+              onAddItem={() => { setAddOpen(true); setActiveView('wardrobe') }}
+            />
+          )}
+        </div>
       )}
 
       {/* ── Shop My Colours view (real products matched by colour distance) ── */}

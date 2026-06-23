@@ -154,6 +154,23 @@ function scoreLabel(score: number): OutfitCombo['scoreLabel'] {
   return 'Clash'
 }
 
+// Average body-fit delta across an outfit's items that have a known cut.
+function bodyFit(
+  outfitItems: UserWardrobeItem[],
+  bodyProfile?: BodyProfile,
+): { delta: number; reason: string } {
+  if (!bodyProfile) return { delta: 0, reason: '' }
+  const scored = outfitItems
+    .filter(i => i.cut)
+    .map(i => cutFitsBody(i.cut!, i.category, bodyProfile))
+  if (scored.length === 0) return { delta: 0, reason: '' }
+  const delta = Math.round(scored.reduce((s, x) => s + x.delta, 0) / scored.length)
+  // Surface the most negative reason (the thing to fix), else the most positive
+  const sorted = [...scored].sort((a, b) => a.delta - b.delta)
+  const pick = delta < 0 ? sorted[0] : sorted[sorted.length - 1]
+  return { delta, reason: pick.reason }
+}
+
 // ─── Main: generate ranked outfit combos ─────────────────────────────────────
 
 export function generateOutfits(
@@ -167,20 +184,6 @@ export function generateOutfits(
   const shoes   = items.filter(i => i.category === 'shoes')
 
   if (tops.length === 0 || bottoms.length === 0) return []
-
-  // Average body-fit delta across an outfit's items that have a known cut.
-  function bodyFit(outfitItems: UserWardrobeItem[]): { delta: number; reason: string } {
-    if (!bodyProfile) return { delta: 0, reason: '' }
-    const scored = outfitItems
-      .filter(i => i.cut)
-      .map(i => cutFitsBody(i.cut!, i.category, bodyProfile))
-    if (scored.length === 0) return { delta: 0, reason: '' }
-    const delta = Math.round(scored.reduce((s, x) => s + x.delta, 0) / scored.length)
-    // Surface the most negative reason (the thing to fix), else the most positive
-    const sorted = [...scored].sort((a, b) => a.delta - b.delta)
-    const pick = delta < 0 ? sorted[0] : sorted[sorted.length - 1]
-    return { delta, reason: pick.reason }
-  }
 
   const combos: OutfitCombo[] = []
 
@@ -210,7 +213,7 @@ export function generateOutfits(
       const colourScore = base * 0.7 + (bestJacketScore > 0 ? bestJacketScore * 0.15 : base * 0.15) + (bestShoesScore > 0 ? bestShoesScore * 0.15 : base * 0.15)
 
       // Body-fit adjustment: nudge the score by how well the cuts suit the wearer
-      const fit = bodyFit(outfitItems)
+      const fit = bodyFit(outfitItems, bodyProfile)
       const finalScore = Math.max(0, Math.min(100, Math.round(colourScore + fit.delta)))
       const finalTip = fit.reason
         ? `${tip} ${fit.delta >= 0 ? 'The cuts suit your shape — ' : 'Heads up: '}${fit.reason}.`
@@ -229,6 +232,58 @@ export function generateOutfits(
   return combos
     .sort((a, b) => b.score - a.score)
     .slice(0, 8)
+}
+
+// ─── Score a hand-picked outfit (interactive builder) ─────────────────────────
+
+/**
+ * Score an arbitrary set of items the user has manually combined.
+ * Every pair of items is scored and averaged, then nudged by body-fit.
+ * Used by the "Build your own" outfit builder so the score and tip update
+ * live as the user adds or removes pieces.
+ */
+export function scoreOutfit(
+  outfitItems: UserWardrobeItem[],
+  subSeason: SubSeason,
+  bodyProfile?: BodyProfile,
+): OutfitCombo {
+  if (outfitItems.length < 2) {
+    return {
+      items: outfitItems,
+      score: 0,
+      scoreLabel: 'Okay',
+      tip: 'Add at least two pieces to see how well they work together.',
+    }
+  }
+
+  // Score every pair of items, track the average and the weakest link
+  const pairScores: number[] = []
+  let worstPair: { score: number; tip: string } | null = null
+  for (let i = 0; i < outfitItems.length; i++) {
+    for (let j = i + 1; j < outfitItems.length; j++) {
+      const ps = pairScore(outfitItems[i], outfitItems[j], subSeason)
+      pairScores.push(ps.score)
+      if (!worstPair || ps.score < worstPair.score) worstPair = ps
+    }
+  }
+  const colourScore = pairScores.reduce((s, x) => s + x, 0) / pairScores.length
+
+  // Body-fit adjustment
+  const fit = bodyFit(outfitItems, bodyProfile)
+  const finalScore = Math.max(0, Math.min(100, Math.round(colourScore + fit.delta)))
+
+  // Tip: lead with the weakest pair (what to improve), append the fit note
+  const baseTip = worstPair?.tip ?? ''
+  const tip = fit.reason
+    ? `${baseTip} ${fit.delta >= 0 ? 'The cuts suit your shape — ' : 'Heads up: '}${fit.reason}.`
+    : baseTip
+
+  return {
+    items: outfitItems,
+    score: finalScore,
+    scoreLabel: scoreLabel(finalScore),
+    tip,
+  }
 }
 
 // ─── "What goes with this?" — style one anchor item ───────────────────────────
