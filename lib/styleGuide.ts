@@ -26,8 +26,9 @@ export type ColourFamily =
   | 'navy' | 'blue'
   | 'brown' | 'camel' | 'tan'
   | 'olive' | 'khaki'
-  | 'sage' | 'green'
+  | 'sage' | 'green' | 'mint'
   | 'burgundy' | 'warm-red'
+  | 'peach' | 'lavender' | 'dusty-pink'
 
 export const PROVEN_PAIRS: StylePair[] = [
   // ── Neutral anchors ──
@@ -71,6 +72,23 @@ export const PROVEN_PAIRS: StylePair[] = [
   // ── Greens extended ──
   { name: 'Green + Black',   families: ['green',  'black'],   bonus: 11, tip: 'Dark green + black — nature tone anchored by black. On-trend and effortless.' },
   { name: 'Green + Beige',   families: ['green',  'beige'],   bonus: 10, tip: 'Green + beige — earthy and natural. The overshirt-over-tee formula in its best colours.' },
+  // ── Light Spring combinations (mint, peach, lavender, dusty-pink) ──
+  // Light Spring = very light, medium bright, neutral warm. Best paired with warm neutrals.
+  { name: 'Mint + White',       families: ['mint',       'white'],    bonus: 13, tip: 'Mint + white — the definitive light spring combination. Fresh, clean, and immediately seasonal.' },
+  { name: 'Mint + Cream',       families: ['mint',       'cream'],    bonus: 12, tip: 'Mint + cream — soft and warm. A linen mint shirt over cream trousers is a perfect spring formula.' },
+  { name: 'Mint + Beige',       families: ['mint',       'beige'],    bonus: 11, tip: 'Mint + beige — fresh nature tone on a warm neutral. Works especially well in linen.' },
+  { name: 'Mint + Blue',        families: ['mint',       'blue'],     bonus: 10, tip: 'Mint + sky blue — light spring\'s signature two-tone pairing. Soft and airy, best in light fabrics.' },
+  { name: 'Peach + Beige',      families: ['peach',      'beige'],    bonus: 12, tip: 'Peach + beige — warm and flattering. A natural spring pairing that suits light-warm colouring.' },
+  { name: 'Peach + Cream',      families: ['peach',      'cream'],    bonus: 11, tip: 'Peach + cream — tonal warmth. Keep one piece textured (linen) and one smooth.' },
+  { name: 'Peach + White',      families: ['peach',      'white'],    bonus: 10, tip: 'Peach / coral + white — warm accent on a clean base. Great for spring and summer occasions.' },
+  { name: 'Lavender + Cream',   families: ['lavender',   'cream'],    bonus: 11, tip: 'Lavender + cream — soft and distinctive. An effortlessly polished light spring combination.' },
+  { name: 'Lavender + White',   families: ['lavender',   'white'],    bonus: 10, tip: 'Lavender + white — clean and light. Easy to wear and refreshing for spring.' },
+  { name: 'Dusty-pink + Grey',  families: ['dusty-pink', 'grey'],     bonus: 9,  tip: 'Dusty rose + grey — soft and modern. The muted tones balance each other for a refined spring look.' },
+  { name: 'Sage + White',       families: ['sage',       'white'],    bonus: 12, tip: 'Sage + off white — probably the most-seen light spring menswear combination. Clean and natural.' },
+  { name: 'Olive + Blue',       families: ['olive',      'blue'],     bonus: 10, tip: 'Olive + sky blue — earthy meets airy. A versatile spring pairing that avoids the obvious navy route.' },
+  { name: 'Blue + Sand',        families: ['blue',       'sand'],     bonus: 10, tip: 'Sky blue + sand — airy and seaside-ready. A capsule wardrobe staple for light spring colouring.' },
+  { name: 'Cream + Camel',      families: ['cream',      'camel'],    bonus: 10, tip: 'Cream + camel — warm tonal neutrals. The overshirt-over-tee formula at its softest.' },
+  { name: 'Brown + Khaki',      families: ['brown',      'khaki'],    bonus: 9,  tip: 'Brown + khaki — earthy tonal dressing. Vary the textures (leather shoes, cotton trousers) for separation.' },
   // ── "Old Money" combinations (from reference image set 4) ──
   // Navy + camel is the single most repeated pairing across all Old Money guides.
   { name: 'Navy + Camel',     families: ['navy',     'camel'],    bonus: 14, tip: 'Navy + camel — the Old Money staple. Sharp contrast, warm base. Brown leather shoes complete it.' },
@@ -125,6 +143,16 @@ export function colourFamily(hex: string): ColourFamily {
   // Low-saturation warm light tones — beige/cream/sand
   if (s < 30 && l > 65 && h < 60) return 'cream'
   if (s < 35 && l > 50 && h < 60) return 'beige'
+
+  // ── Light / pastel tones (checked before general hue routing) ──
+  // peach: warm peachy / salmon / coral-light (hue 10–28°, medium-high sat, light)
+  if (h >= 10 && h < 28 && s >= 28 && l > 62) return 'peach'
+  // mint: cool-green / mint (hue 140–178°, any saturation, high lightness)
+  if (h >= 140 && h < 178 && l > 64) return 'mint'
+  // dusty-pink: soft rose / mauve (high hue, low-medium saturation, light)
+  if (h >= 325 && s < 55 && l > 55) return 'dusty-pink'
+  // lavender: blue-purple, low-medium sat, light (distinguishes from navy which is dark)
+  if (h >= 245 && h < 295 && s < 60 && l > 50) return 'lavender'
 
   // Hue-based
   if (h < 20 || h >= 345) return 'warm-red'
