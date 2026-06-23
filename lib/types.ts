@@ -16,6 +16,11 @@ export type FabricWeight = 'linen' | 'light-cotton' | 'cotton' | 'denim' | 'knit
 // Garment cut/silhouette — drives body-proportion fit scoring.
 export type GarmentCut = 'slim' | 'tapered' | 'regular' | 'relaxed' | 'wide' | 'oversized'
 
+// Fine-grained garment type — used to filter "Shop My Colours" (finer than ItemCategory).
+export type GarmentType =
+  | 'tshirt' | 'shirt' | 'sweater' | 'trousers' | 'shorts'
+  | 'jacket' | 'shoes' | 'socks' | 'accessory'
+
 // ─── Body profile (self-reported proportions) ────────────────────────────────
 export type HeightBand = 'short' | 'average' | 'tall'
 export type ShoulderBuild = 'narrow' | 'average' | 'broad'

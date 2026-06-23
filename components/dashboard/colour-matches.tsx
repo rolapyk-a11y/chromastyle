@@ -11,7 +11,7 @@
 import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Palette, ExternalLink, Info, Plus, Check } from 'lucide-react'
-import type { ColorAnalysis, Season, BodyProfile } from '@/lib/types'
+import type { ColorAnalysis, Season, BodyProfile, GarmentType } from '@/lib/types'
 import { PRODUCT_CATALOG, catalogIsEmpty, type CatalogProduct } from '@/lib/productCatalog'
 import { matchProducts, type ProductMatch } from '@/lib/colorMatch'
 
@@ -24,6 +24,22 @@ const FABRIC_LABEL: Record<string, string> = {
   'fleece': 'Fleece',
   'wool': 'Wool',
 }
+
+// Filter chips, shown in this order when present in the catalog.
+const GARMENT_TYPE_LABELS: Record<GarmentType, string> = {
+  shirt:     'Shirts',
+  tshirt:    'T-shirts',
+  sweater:   'Sweaters',
+  trousers:  'Trousers',
+  shorts:    'Shorts',
+  jacket:    'Jackets',
+  shoes:     'Shoes',
+  socks:     'Socks',
+  accessory: 'Accessories',
+}
+const GARMENT_TYPE_ORDER: GarmentType[] = [
+  'shirt', 'tshirt', 'sweater', 'trousers', 'shorts', 'jacket', 'shoes', 'socks', 'accessory',
+]
 
 function subSeasonToSeason(sub: string): Season {
   if (sub.includes('spring')) return 'spring'
@@ -41,16 +57,30 @@ interface ColourMatchesProps {
 export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: ColourMatchesProps) {
   const palette = colorAnalysis?.best_colors ?? []
   const season = colorAnalysis?.sub_season ? subSeasonToSeason(colorAnalysis.sub_season) : undefined
+  const [typeFilter, setTypeFilter] = useState<GarmentType | 'all'>('all')
+
+  // Which garment-type chips to show: only those actually present in the catalog.
+  const availableTypes = useMemo(() => {
+    const present = new Set(PRODUCT_CATALOG.map(p => p.garmentType).filter(Boolean) as GarmentType[])
+    return GARMENT_TYPE_ORDER.filter(t => present.has(t))
+  }, [])
+
+  const filteredCatalog = useMemo(
+    () => typeFilter === 'all'
+      ? PRODUCT_CATALOG
+      : PRODUCT_CATALOG.filter(p => p.garmentType === typeFilter),
+    [typeFilter],
+  )
 
   const matchesByColour = useMemo(() => {
     if (catalogIsEmpty()) return []
     return palette
       .map(hex => ({
         hex,
-        matches: matchProducts(hex, PRODUCT_CATALOG, 25, 8, season, bodyProfile),
+        matches: matchProducts(hex, filteredCatalog, 25, 8, season, bodyProfile),
       }))
       .sort((a, b) => (b.matches[0]?.matchPercent ?? 0) - (a.matches[0]?.matchPercent ?? 0))
-  }, [palette, season, bodyProfile])
+  }, [palette, season, bodyProfile, filteredCatalog])
 
   if (catalogIsEmpty()) {
     return (
@@ -73,6 +103,8 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
     )
   }
 
+  const noResults = matchesByColour.every(({ matches }) => matches.length === 0)
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -80,7 +112,43 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
         <span>Real products matched to your exact palette colours, closest first.</span>
       </div>
 
-      {matchesByColour.map(({ hex, matches }) => (
+      {/* ── Garment-type filter chips ── */}
+      {availableTypes.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => setTypeFilter('all')}
+            className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
+              typeFilter === 'all'
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-border/60 text-muted-foreground hover:border-border'
+            }`}
+          >
+            All
+          </button>
+          {availableTypes.map(t => (
+            <button
+              key={t}
+              onClick={() => setTypeFilter(t)}
+              className={`px-3 py-1 text-xs font-medium rounded-full border transition-colors ${
+                typeFilter === t
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border/60 text-muted-foreground hover:border-border'
+              }`}
+            >
+              {GARMENT_TYPE_LABELS[t]}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {noResults && (
+        <p className="text-sm text-muted-foreground text-center py-8">
+          No {typeFilter === 'all' ? 'products' : GARMENT_TYPE_LABELS[typeFilter].toLowerCase()} close to your palette yet.
+          {typeFilter !== 'all' && ' Try another category.'}
+        </p>
+      )}
+
+      {matchesByColour.filter(({ matches }) => matches.length > 0).map(({ hex, matches }) => (
         <div key={hex} className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-md border border-border/40" style={{ backgroundColor: hex }} />
