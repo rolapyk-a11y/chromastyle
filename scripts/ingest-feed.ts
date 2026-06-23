@@ -207,6 +207,12 @@ function getImageUrl(row: FeedRow): string {
   )
 }
 
+function getColourField(row: FeedRow): string {
+  // Some feeds (e.g. liiteGuard) have a dedicated <color> tag — use it
+  // before falling back to parsing the full product name.
+  return col(row, 'color', 'colour', 'farve')
+}
+
 function getName(row: FeedRow): string {
   return col(
     row,
@@ -437,7 +443,11 @@ async function main() {
     let hex = await dominantColour(image_url)
     let colourSource = 'image'
     if (!hex) {
-      const fromName = inferColourFromName(name)
+      // Try the dedicated <color>/<colour>/<farve> field first (more reliable),
+      // then fall back to parsing the full product name.
+      const colourField = getColourField(row)
+      const fromField = colourField ? inferColourFromName(colourField) : null
+      const fromName = fromField ?? inferColourFromName(name)
       if (fromName) {
         hex = fromName.hex
         colourSource = `name:"${fromName.name}"`
