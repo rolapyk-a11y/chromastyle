@@ -8,7 +8,7 @@
 
 import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory, Season, BodyProfile } from './types'
 import { paletteFor, type PaletteColour } from './palettes'
-import { provenPairBonus, SCORE_TIPS, fabricSeasonPenalty, texturePairBonus } from './styleGuide'
+import { provenPairBonus, SCORE_TIPS, fabricSeasonPenalty, texturePairBonus, drapePairBonus } from './styleGuide'
 import { cutFitsBody } from './bodyGuide'
 
 // ─── Colour utilities ─────────────────────────────────────────────────────────
@@ -109,6 +109,9 @@ function pairScore(
   if (a.fabric && b.fabric) {
     const tb = texturePairBonus(a.fabric, b.fabric)
     if (tb) { textureDelta += tb.bonus; textureTip = ' ' + tb.tip }
+    // Drape contrast scores on top of weight contrast — tip overrides when more specific
+    const db = drapePairBonus(a.fabric, b.fabric)
+    if (db) { textureDelta += db.bonus; textureTip = ' ' + db.tip }
   }
 
   function finalise(rawColourScore: number, tip: string) {
