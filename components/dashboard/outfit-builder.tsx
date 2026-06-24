@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Sparkles, Plus, Check, RotateCcw, Shirt, ShoppingBag, Footprints, Layers, Star } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, SubSeason, OutfitCombo, BodyProfile } from '@/lib/types'
 import { scoreOutfit } from '@/lib/outfitEngine'
+import { MannequinViewer } from './mannequin-viewer'
 
 const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
   top:       <Shirt className="w-4 h-4" />,
@@ -26,10 +27,6 @@ const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
 
 const CATEGORY_LABELS: Record<ItemCategory, string> = {
   top: 'Tops', bottom: 'Bottoms', jacket: 'Jackets', shoes: 'Shoes', accessory: 'Accessories',
-}
-
-const CATEGORY_SINGULAR: Record<ItemCategory, string> = {
-  top: 'Top', bottom: 'Bottom', jacket: 'Jacket', shoes: 'Shoes', accessory: 'Accessory',
 }
 
 const CATEGORY_ORDER: ItemCategory[] = ['top', 'bottom', 'jacket', 'shoes', 'accessory']
@@ -106,33 +103,39 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
             )}
           </div>
 
-          {selectedItems.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-3 text-center">
-              Nothing selected yet — tap items below to add them.
-            </p>
-          ) : (
-            <div className="flex items-center gap-2 flex-wrap">
-              {selectedItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => toggle(item.id)}
-                  className="flex flex-col items-center gap-1 group/swatch"
-                  title={`Remove ${item.name}`}
-                >
-                  <div className="relative">
-                    <div
-                      className="w-12 h-12 rounded-xl border border-border/40 shadow-sm"
+          {/* ── Mannequin + item list ── */}
+          <div className="flex items-start gap-3">
+            <MannequinViewer items={selectedItems} className="w-20 h-auto shrink-0" />
+            <div className="flex-1 flex flex-col justify-center gap-1.5 py-1 min-h-[80px]">
+              {selectedItems.length === 0 ? (
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Tap items below to start building your outfit.
+                </p>
+              ) : (
+                selectedItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggle(item.id)}
+                    className="flex items-center gap-2 group/row text-left transition-colors text-muted-foreground hover:text-foreground"
+                  >
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0 border border-border/30"
                       style={{ backgroundColor: item.color_hex }}
                     />
-                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground opacity-0 group-hover/swatch:opacity-100 transition-opacity text-[10px]">
+                    <span className="text-xs flex-1 truncate">{item.name}</span>
+                    <span className="opacity-0 group-hover/row:opacity-100 text-[10px] shrink-0 transition-opacity mr-0.5">
                       ×
                     </span>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">{CATEGORY_SINGULAR[item.category]}</span>
-                </button>
-              ))}
+                  </button>
+                ))
+              )}
+              {selectedItems.length === 1 && (
+                <p className="text-xs text-muted-foreground/60 mt-0.5">
+                  Add one more piece for a score.
+                </p>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Tip */}
           {hasOutfit && outfit && (
@@ -141,12 +144,6 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
               <p className="text-xs text-muted-foreground leading-relaxed">{outfit.tip}</p>
             </div>
           )}
-          {selectedItems.length === 1 && (
-            <p className="text-xs text-muted-foreground">
-              Add one more piece to see a compatibility score.
-            </p>
-          )}
-
           {selectedItems.length > 0 && (
             <button
               onClick={() => setSelectedIds([])}
