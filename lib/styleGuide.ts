@@ -282,6 +282,51 @@ export function texturePairBonus(
   return null
 }
 
+// ─── Fabric drape / structure ─────────────────────────────────────────────────
+// Separate from weight: how stiff or fluid a fabric is and how it falls on the body.
+//   structured = holds its own shape (linen woven, denim) — crisp, defined silhouette
+//   semi       = has some body but moves with the wearer (cotton, wool)
+//   drapey     = falls with gravity, no shape of its own (knit, fleece)
+
+export type FabricDrape = 'structured' | 'semi' | 'drapey'
+
+export const FABRIC_DRAPE: Record<FabricWeight, FabricDrape> = {
+  'linen':        'structured',  // crisp woven — light but holds its shape
+  'light-cotton': 'semi',        // soft but has enough body to sit cleanly
+  'cotton':       'semi',        // breathable, slight structure from weave
+  'denim':        'structured',  // rigid — the strongest shape-holder
+  'knit':         'drapey',      // stretches and falls naturally with gravity
+  'fleece':       'drapey',      // soft, formless, no defined silhouette
+  'wool':         'semi',        // has structure but moves; sits between woven and knit
+}
+
+// Returns a bonus (or penalty) when two drape levels are paired.
+// Structured + drapey is the single most repeated contrast in all style references.
+export function drapePairBonus(
+  fabA: FabricWeight,
+  fabB: FabricWeight,
+): { bonus: number; tip: string } | null {
+  const dA = FABRIC_DRAPE[fabA]
+  const dB = FABRIC_DRAPE[fabB]
+
+  if (dA === dB) {
+    if (dA === 'structured') return null // two structured pieces is fine — no tip needed
+    if (dA === 'semi')       return null // two semi pieces is fine
+    // two drapey pieces → looks shapeless
+    return { bonus: -6, tip: 'Two soft, drapey pieces together can look shapeless. Add a structured layer — a woven overshirt, a denim jacket, or a blazer — to anchor the outfit.' }
+  }
+
+  if ((dA === 'structured' && dB === 'drapey') || (dA === 'drapey' && dB === 'structured')) {
+    return { bonus: 8, tip: 'Structured meets drapey — one piece holds its shape while the other falls naturally. This is the contrast that makes an outfit look considered rather than accidental.' }
+  }
+
+  // structured + semi, or semi + drapey
+  if (dA === 'structured' || dB === 'structured') {
+    return { bonus: 4, tip: 'A structured piece anchors a softer one — the outfit has a clean shape without looking rigid.' }
+  }
+  return { bonus: 3, tip: 'A hint of structure paired with a softer fabric — easy and wearable without looking too casual.' }
+}
+
 // Fabric styling rules extracted from all reference image sets (35+ images)
 export const FABRIC_RULES = [
   'Linen is the summer staple — one linen piece makes any outfit feel seasonal and intentional.',
@@ -291,6 +336,12 @@ export const FABRIC_RULES = [
   'Never two heavy-weight pieces at once unless the outer layer stays open.',
   'Denim + cotton tee is the most reliable casual formula across all seasons.',
   'A structured (woven) piece paired with something relaxed (knit, tee) creates the right balance.',
+  // ── Drape rules ──
+  'Structured + drapey is the best fabric contrast: one piece holds its shape, the other falls freely.',
+  'Two drapey pieces together (knit top + fleece bottom) look shapeless — always anchor with one structured piece.',
+  'Denim is the most structured fabric: even a light denim jacket instantly defines a soft knit outfit.',
+  'Linen looks crisp when ironed, drapey when worn — it is the most versatile drape piece for warm weather.',
+  'A knit sweater over a woven shirt: the woven collar and cuffs add structure that stops the knit from looking too casual.',
 ]
 
 // ─── Tips by outfit score ─────────────────────────────────────────────────────
