@@ -67,6 +67,8 @@ export default function RootLayout({
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
       >
+        {/* Impact.com affiliate site verification — React 19 hoists this <meta> into <head> */}
+        <meta name="impact-site-verification" value="45949e16-0ebd-47c6-b8de-3fc3201726b1" />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
