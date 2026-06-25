@@ -27,9 +27,11 @@ import path from 'path'
 // ─── Configure which categories to pull ───────────────────────────────────────
 // Each entry is a full "products?..." Request URL copied from the browser.
 const CATEGORY_URLS: string[] = [
-  // Men (the one you captured)
+  // Men — Tops
   'https://www.uniqlo.com/dk/api/commerce/v5/en/products?path=37609%2C84995%2C%2C&genderId=37609&offset=0&limit=36&imageRatio=3x4&rankingGender=men&rankingClassId=84995&httpFailure=true',
-  // ↓ paste more category URLs here, e.g. women's tops, men's bottoms, etc.
+  // Men — Jeans, Trousers & Shorts
+  'https://www.uniqlo.com/dk/api/commerce/v5/en/products?path=37609%2C84996%2C%2C&genderId=37609&offset=0&limit=36&imageRatio=3x4&rankingGender=men&rankingClassId=84996&httpFailure=true',
+  // ↓ paste more category URLs here, e.g. women's tops, shoes, etc.
 ]
 
 const PAGE_SIZE = 100                       // Uniqlo accepts up to ~100 per page
