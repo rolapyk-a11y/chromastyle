@@ -34,7 +34,9 @@ const CATEGORY_URLS: string[] = [
   // ↓ paste more category URLs here, e.g. women's tops, shoes, etc.
 ]
 
-const PAGE_SIZE = 100                       // Uniqlo accepts up to ~100 per page
+const PAGE_SIZE = 36                         // match the website's own page size — large pages can trip bot-protection
+const REQUEST_DELAY_MS = 600                 // pause between page requests so we don't hammer the API
+const MAX_RETRIES = 4                        // retry a failed page with backoff before giving up
 const OUTPUT = path.join(__dirname, 'uniqlo-feed.csv')
 const BASE_PRODUCT_URL = 'https://www.uniqlo.com/dk/en/products'
 
@@ -44,7 +46,11 @@ const HEADERS: Record<string, string> = {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
   Accept: 'application/json',
   'Accept-Language': 'en',
+  Referer: 'https://www.uniqlo.com/dk/en/',
+  Origin: 'https://www.uniqlo.com',
 }
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -98,12 +104,27 @@ async function fetchCategory(seedUrl: string, dumpFirst: boolean): Promise<RawIt
 
   while (offset < total) {
     const url = setParam(setParam(seedUrl, 'limit', String(PAGE_SIZE)), 'offset', String(offset))
-    const res = await fetch(url, { headers: HEADERS })
-    if (!res.ok) {
-      console.error(`  ✗ HTTP ${res.status} at offset ${offset} — stopping this category`)
+
+    // Fetch this page, retrying with exponential backoff if the API throttles us.
+    let json: any = null
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const res = await fetch(url, { headers: HEADERS })
+        if (res.ok) { json = await res.json(); break }
+        const wait = REQUEST_DELAY_MS * 2 ** attempt
+        console.error(`  ⚠ HTTP ${res.status} at offset ${offset} (attempt ${attempt}/${MAX_RETRIES}) — waiting ${wait}ms`)
+        await sleep(wait)
+      } catch (e) {
+        const wait = REQUEST_DELAY_MS * 2 ** attempt
+        console.error(`  ⚠ network error at offset ${offset} (attempt ${attempt}/${MAX_RETRIES}) — waiting ${wait}ms`)
+        await sleep(wait)
+      }
+    }
+    if (!json) {
+      console.error(`  ✗ giving up at offset ${offset} after ${MAX_RETRIES} attempts`)
       break
     }
-    const json: any = await res.json()
+
     const items: RawItem[] = json?.result?.items ?? []
     total = json?.result?.pagination?.total ?? json?.result?.total ?? items.length
 
@@ -117,6 +138,7 @@ async function fetchCategory(seedUrl: string, dumpFirst: boolean): Promise<RawIt
     all.push(...items)
     process.stdout.write(`  fetched ${all.length}/${total}\r`)
     offset += PAGE_SIZE
+    await sleep(REQUEST_DELAY_MS)   // be polite — avoid tripping bot-protection
   }
   process.stdout.write('\n')
   return all
