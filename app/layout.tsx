@@ -67,8 +67,10 @@ export default function RootLayout({
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
       >
-        {/* Impact.com affiliate site verification — React 19 hoists this <meta> into <head> */}
-        <meta name="impact-site-verification" value="45949e16-0ebd-47c6-b8de-3fc3201726b1" />
+        {/* Impact.com affiliate site verification — React 19 hoists this <meta> into <head>.
+            Impact requires the `value` attribute (not the standard `content`); the spread
+            keeps TypeScript happy since React's <meta> type doesn't declare `value`. */}
+        <meta {...({ name: 'impact-site-verification', value: '45949e16-0ebd-47c6-b8de-3fc3201726b1' } as Record<string, string>)} />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
