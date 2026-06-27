@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Sparkles, LogIn, ArrowRight } from 'lucide-react'
 import type { ColorAnalysis } from '@/lib/types'
 import { saveBodyProfile } from '@/lib/bodyGuide'
-import { analyzeColorsInBrowser, FaceNotDetectedError } from '@/lib/clientColorAnalysis'
+import { analyzeColorsInBrowser, FaceNotDetectedError, PoorLightingError, lightingGuidance } from '@/lib/clientColorAnalysis'
 
 type PageStep = 'undertone-question' | 'capture' | 'results' | 'essence-quiz' | 'body-quiz'
 type Undertone = 'warm' | 'cool'
@@ -90,6 +90,8 @@ export default function AnalyzePage() {
     } catch (err) {
       if (err instanceof FaceNotDetectedError) {
         setError('No face detected. Please try again: face the camera directly, make sure your face is well-lit, and keep your whole face in frame.')
+      } else if (err instanceof PoorLightingError) {
+        setError(lightingGuidance(err.reason))
       } else {
         setError(err instanceof Error ? err.message : 'Could not analyse your photo. Please try again.')
       }
