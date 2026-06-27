@@ -347,25 +347,27 @@ export const FABRIC_RULES = [
 // ─── Tips by outfit score ─────────────────────────────────────────────────────
 // Used to supplement the engine tip with style-guide-sourced advice.
 
+// Coach voice: warm, second-person, encouraging — like a personal stylist
+// talking to you, not a reference manual. One clear, doable suggestion each.
 export const SCORE_TIPS: Record<'great' | 'good' | 'okay' | 'clash', string[]> = {
   great: [
-    'Finish with white sneakers or clean brown leather shoes.',
-    'This combination appears in nearly every minimal menswear guide.',
-    'Add an open overshirt in a neutral tone to layer without breaking the palette.',
+    "You've nailed this one — slip on white sneakers or clean brown leather and you're out the door.",
+    'This is a combination you can reach for any day and trust completely.',
+    "Throw an open overshirt in a neutral tone over the top — it'll make the whole look feel considered.",
   ],
   good: [
-    'A white tee as a base layer ties the palette together.',
-    'White sneakers will sharpen this combination.',
-    'Try tucking the top slightly — it adds intention to the look.',
+    'Almost there — a plain white tee underneath would tie it together beautifully.',
+    "Add white sneakers and you'll sharpen the whole thing right up.",
+    'Tuck the top in just a little — it gives the look a bit of intention.',
   ],
   okay: [
-    'Add a neutral third piece (beige overshirt, grey jacket) to bridge the colours.',
-    'One piece closer to white or cream will lift this combination.',
-    'This works better with one fitted and one relaxed piece.',
+    'Bring in a neutral third piece — a beige overshirt or grey jacket — to bridge the two colours.',
+    'One piece a touch closer to cream or white would lift this nicely.',
+    'Play with proportion here: keep one piece fitted and one relaxed.',
   ],
   clash: [
-    'Try replacing one piece with a neutral — black, white, beige, or grey.',
-    'Keep one colour and replace the other with a proven partner.',
-    'Monochrome (shades of the same colour) would work better here.',
+    'These two are fighting each other a little — try swapping one for a neutral like beige, grey, or navy.',
+    'Keep the colour you love and pair it with one of its proven partners instead.',
+    'Go tonal — shades of the same colour would feel much calmer than this pairing.',
   ],
 }
