@@ -36,7 +36,9 @@ import { parse as parseCsv } from 'csv-parse/sync'
 import { Jimp, intToRGBA } from 'jimp'
 import type { ItemCategory, FabricWeight, GarmentCut } from '../lib/types'
 
-const OUTPUT_PATH = path.join(__dirname, '..', 'lib', 'product-catalog.json')
+const FEED_OUTPUT_PATH = path.join(__dirname, '..', 'lib', 'product-catalog.json')
+// --local writes to the gitignored, dev-only catalog instead (for scraped/experimental data)
+const LOCAL_OUTPUT_PATH = path.join(__dirname, '..', 'lib', 'product-catalog.local.json')
 
 // ─── Category normalisation ───────────────────────────────────────────────────
 
@@ -373,9 +375,11 @@ async function main() {
   const feedPath = args[0]
   const brandArgIdx = args.indexOf('--brand')
   const brandArg = brandArgIdx !== -1 ? args[brandArgIdx + 1] : undefined
+  const isLocal = args.includes('--local')
+  const OUTPUT_PATH = isLocal ? LOCAL_OUTPUT_PATH : FEED_OUTPUT_PATH
 
   if (!feedPath) {
-    console.error('Usage: npm run ingest-feed -- path/to/feed.csv [--brand hm|zalando|adtraction]')
+    console.error('Usage: npm run ingest-feed -- path/to/feed.csv [--brand hm|zalando|adtraction] [--local]')
     process.exit(1)
   }
   if (!fs.existsSync(feedPath)) {
@@ -386,6 +390,7 @@ async function main() {
   console.log('ChromaStyle — Product Feed Ingestion')
   console.log('====================================\n')
   if (brandArg) console.log(`Brand override: ${brandArg}\n`)
+  if (isLocal) console.log('Mode: --local → writing to product-catalog.local.json (dev-only, gitignored)\n')
 
   // Read as binary then decode — handles both UTF-8 and ISO-8859-1 (common in Danish feeds)
   const buf = fs.readFileSync(feedPath)
@@ -475,6 +480,7 @@ async function main() {
       image_url,
       product_url,
       colorHex: hex,
+      source: isLocal ? 'local' : 'feed',
     }
     if (fabric) entry.fabric = fabric
     if (cut) entry.cut = cut
