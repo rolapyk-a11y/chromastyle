@@ -86,6 +86,73 @@ function medianRgb(pixels: Array<[number, number, number]>): [number, number, nu
   ]
 }
 
+// ─── White balance via the sclera (von Kries) ────────────────────────────────
+// The white of the eye is a near-neutral surface attached to the face under the
+// SAME light as the skin. We measure its colour cast and divide it out of every
+// sampled colour before classification — so the warm/cool decision reflects the
+// person, not the room's lighting. This is what stops "4 different seasons from
+// the same face": the most common cause is an uncorrected lighting colour cast.
+
+const clamp255 = (v: number) => Math.max(0, Math.min(255, v))
+
+// A realistic sclera under neutral daylight: very light, faintly warm.
+const SCLERA_REF: [number, number, number] = [240, 237, 233]
+
+function collectScleraPixels(
+  ctx: CanvasRenderingContext2D,
+  eyePoints: Array<{ x: number; y: number }>,
+): Array<[number, number, number]> {
+  if (eyePoints.length === 0) return []
+  const xs = eyePoints.map(p => p.x), ys = eyePoints.map(p => p.y)
+  const x0 = Math.max(0, Math.floor(Math.min(...xs)) - 2)
+  const y0 = Math.max(0, Math.floor(Math.min(...ys)) - 2)
+  const w = Math.ceil(Math.max(...xs) - Math.min(...xs)) + 4
+  const h = Math.ceil(Math.max(...ys) - Math.min(...ys)) + 4
+  if (w < 2 || h < 2) return []
+
+  const { data } = ctx.getImageData(x0, y0, w, h)
+  const whites: Array<[number, number, number]> = []
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3]
+    if (a < 200) continue
+    const brightness = (r + g + b) / 3
+    if (brightness < 120) continue        // iris, pupil, lashes, eye shadow
+    if (brightness > 250) continue        // blown-out catch-light glint
+    const lab = rgbToLab(r, g, b)
+    const chroma = Math.sqrt(lab[1] ** 2 + lab[2] ** 2)
+    if (chroma > 22) continue             // skin / pink eye-corner — keep near-neutral only
+    whites.push([r, g, b])
+  }
+  return whites
+}
+
+// Per-channel gains mapping the measured sclera onto the reference white, plus a
+// castStrength (1.0 = neutral light, higher = stronger colour cast). Gains are
+// normalised around green so we correct COLOUR, not exposure, and clamped so a
+// misdetected sclera can't wreck the result.
+function whiteBalanceGains(sclera: [number, number, number]): {
+  gains: [number, number, number]
+  castStrength: number
+} {
+  const raw: [number, number, number] = [
+    SCLERA_REF[0] / Math.max(1, sclera[0]),
+    SCLERA_REF[1] / Math.max(1, sclera[1]),
+    SCLERA_REF[2] / Math.max(1, sclera[2]),
+  ]
+  const norm = raw[1] || 1
+  const g: [number, number, number] = [raw[0] / norm, 1, raw[2] / norm]
+  const castStrength = Math.max(g[0], g[2]) / Math.max(0.0001, Math.min(g[0], g[2]))
+  const clampG = (v: number) => Math.max(0.78, Math.min(1.3, v))
+  return { gains: [clampG(g[0]), 1, clampG(g[2])], castStrength }
+}
+
+function applyGains(
+  rgb: [number, number, number],
+  gains: [number, number, number],
+): [number, number, number] {
+  return [clamp255(rgb[0] * gains[0]), clamp255(rgb[1] * gains[1]), clamp255(rgb[2] * gains[2])]
+}
+
 function collectHairPixels(
   ctx: CanvasRenderingContext2D,
   x: number, y: number, w: number, h: number
@@ -128,11 +195,23 @@ async function loadFaceApi() {
   return faceapi
 }
 
+interface LightingInfo {
+  skinBrightness: number      // 0–255, AFTER white balance
+  rawSkinBrightness: number   // 0–255, BEFORE white balance (for the exposure gate)
+  castStrength: number        // 1.0 = neutral light; >1 = colour cast
+  whiteBalanced: boolean      // did sclera-based correction actually run?
+}
+
 interface SampledColors {
   skin: [number, number, number]
   hair: [number, number, number]
   eye: [number, number, number]
   faceDetected: boolean
+  lighting: LightingInfo
+}
+
+const NEUTRAL_LIGHTING: LightingInfo = {
+  skinBrightness: 0, rawSkinBrightness: 0, castStrength: 1, whiteBalanced: false,
 }
 
 async function sampleColorsFromImage(imageEl: HTMLImageElement): Promise<SampledColors> {
@@ -195,7 +274,35 @@ async function sampleColorsFromImage(imageEl: HTMLImageElement): Promise<Sampled
       }
       const eye = medianRgb(rawEyePixels.length > 0 ? rawEyePixels : eyePixels)
 
-      return { skin, hair, eye, faceDetected: true }
+      // ── White-balance the samples using the sclera as a neutral reference ──
+      const eyeOutline = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47].map(i => lm[i])
+      const scleraPixels = collectScleraPixels(ctx, eyeOutline)
+      let gains: [number, number, number] = [1, 1, 1]
+      let castStrength = 1
+      let whiteBalanced = false
+      if (scleraPixels.length >= 12) {
+        const wb = whiteBalanceGains(medianRgb(scleraPixels))
+        gains = wb.gains
+        castStrength = wb.castStrength
+        whiteBalanced = true
+      }
+
+      const skinC = applyGains(skin, gains)
+      const hairC = applyGains(hair, gains)
+      const eyeC = applyGains(eye, gains)
+
+      return {
+        skin: skinC,
+        hair: hairC,
+        eye: eyeC,
+        faceDetected: true,
+        lighting: {
+          rawSkinBrightness: (skin[0] + skin[1] + skin[2]) / 3,
+          skinBrightness: (skinC[0] + skinC[1] + skinC[2]) / 3,
+          castStrength,
+          whiteBalanced,
+        },
+      }
     }
   } catch {
     // face-api failed — fall through
@@ -207,6 +314,7 @@ async function sampleColorsFromImage(imageEl: HTMLImageElement): Promise<Sampled
     hair: [0, 0, 0],
     eye: [0, 0, 0],
     faceDetected: false,
+    lighting: NEUTRAL_LIGHTING,
   }
 }
 
@@ -800,6 +908,30 @@ export class FaceNotDetectedError extends Error {
   }
 }
 
+export type LightingReason = 'too_dark' | 'overexposed' | 'strong_cast'
+
+// Thrown when the photo's lighting is too poor to give a reliable result.
+// Rejecting bad input is how we stay consistent — a forced retake beats a wrong season.
+export class PoorLightingError extends Error {
+  reason: LightingReason
+  constructor(reason: LightingReason) {
+    super(`poor_lighting:${reason}`)
+    this.name = 'PoorLightingError'
+    this.reason = reason
+  }
+}
+
+export function lightingGuidance(reason: LightingReason): string {
+  switch (reason) {
+    case 'too_dark':
+      return 'Your photo is too dark to read your colours accurately. Stand facing a window in daylight and try again.'
+    case 'overexposed':
+      return 'Your photo is too bright and washed out. Step out of direct sun or strong backlight, then retake.'
+    case 'strong_cast':
+      return 'The lighting has a strong colour tint (often yellow indoor bulbs). Use natural daylight near a window for a reliable result.'
+  }
+}
+
 export async function analyzeColorsInBrowser(
   imageData: string,
   knownUndertone?: 'warm' | 'cool'
@@ -817,8 +949,24 @@ export async function analyzeColorsInBrowser(
     throw new FaceNotDetectedError()
   }
 
+  // ── (B) Lighting-quality gate — reject input we can't read reliably ──
+  const lite = colors.lighting
+  if (lite.rawSkinBrightness > 0 && lite.rawSkinBrightness < 55) throw new PoorLightingError('too_dark')
+  if (lite.rawSkinBrightness > 242) throw new PoorLightingError('overexposed')
+  if (lite.castStrength > 2.0) throw new PoorLightingError('strong_cast')
+
   const { subSeason, season, undertone, skinLab, hairLab } = classifySeason(colors, knownUndertone)
   const palette = SEASON_PALETTES[subSeason]
+
+  // ── (C) Real confidence score — from lighting quality + undertone clarity ──
+  let confidence = 88
+  if (!lite.whiteBalanced) confidence -= 12                                   // couldn't colour-correct
+  confidence -= Math.min(22, Math.max(0, lite.castStrength - 1.15) * 40)      // residual cast uncertainty
+  if (lite.skinBrightness < 75 || lite.skinBrightness > 220) confidence -= 8  // dim / bright
+  const skinBStar = skinLab[2]
+  if (skinBStar >= 9 && skinBStar <= 14) confidence -= 10                     // ambiguous warm/cool band
+  if (knownUndertone) confidence += 8                                         // user confirmed the axis
+  confidence = Math.round(Math.max(45, Math.min(95, confidence)))
 
   const skinDesc = `Lab L=${Math.round(skinLab[0])}, b=${Math.round(skinLab[2])} — ${undertone} undertone`
 
@@ -833,7 +981,7 @@ export async function analyzeColorsInBrowser(
     avoid_colors: palette.avoid,
     eye_enhancing_colors: palette.eyeEnhancing,
     analysis_details: {
-      season_confidence: 68,
+      season_confidence: confidence,
       skin_analysis: `${palette.skinAnalysis} (${skinDesc})`,
       eye_analysis: palette.eyeAnalysis,
       hair_analysis: `${palette.hairAnalysis} Detected: ${describeHairColor(hairLab)}.`,
