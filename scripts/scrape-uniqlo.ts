@@ -6,7 +6,7 @@
  * understands. You then run:
  *
  *     npx tsx scripts/scrape-uniqlo.ts            # -> scripts/uniqlo-feed.csv
- *     npm run ingest-feed -- scripts/uniqlo-feed.csv
+ *     npm run ingest-feed -- scripts/uniqlo-feed.csv --local
  *
  * The ingester downloads each image, extracts the real garment colour, and
  * tags fabric/cut/category — so this script only needs name/price/image/url.
@@ -173,7 +173,7 @@ async function main() {
   fs.writeFileSync(OUTPUT, lines.join('\n'))
 
   console.log(`\nDone. ${rows.length} unique products → ${OUTPUT}`)
-  console.log(`Next:  npm run ingest-feed -- scripts/uniqlo-feed.csv`)
+  console.log(`Next:  npm run ingest-feed -- scripts/uniqlo-feed.csv --local`)
 }
 
 main().catch(err => {
