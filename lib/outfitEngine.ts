@@ -128,24 +128,24 @@ function pairScore(
 
   // One or both are neutral → always works, just needs enough contrast
   if (aNeutral || bNeutral) {
-    if (valueDiff > 30) return finalise(Math.max(0, 92 - seasonPenalty), 'Neutral base with clear value contrast — very wearable. ' + SCORE_TIPS.great[0])
-    if (valueDiff > 15) return finalise(Math.max(0, 78 - seasonPenalty), 'Neutral pairing. A slightly bigger difference in depth would sharpen it. ' + SCORE_TIPS.good[0])
-    return finalise(Math.max(0, 60 - seasonPenalty), 'Both pieces are similar in depth — try one light, one dark. ' + SCORE_TIPS.okay[0])
+    if (valueDiff > 30) return finalise(Math.max(0, 92 - seasonPenalty), "A neutral base with clear contrast in depth — you really can't go wrong with this. " + SCORE_TIPS.great[0])
+    if (valueDiff > 15) return finalise(Math.max(0, 78 - seasonPenalty), 'A solid neutral pairing — a slightly bigger gap in depth would sharpen it. ' + SCORE_TIPS.good[0])
+    return finalise(Math.max(0, 60 - seasonPenalty), 'Your two pieces sit at a similar depth — try one lighter and one darker. ' + SCORE_TIPS.okay[0])
   }
 
   // Both in same family (warm+warm or cool+cool)
   if (aWarm === bWarm) {
-    if (valueDiff > 35) return finalise(Math.max(0, 88 - seasonPenalty), 'Same colour family, strong value contrast — cohesive and intentional. ' + SCORE_TIPS.great[1])
-    if (valueDiff > 20) return finalise(Math.max(0, 73 - seasonPenalty), 'Same family, decent contrast. One piece a shade lighter or darker would perfect it.')
-    return finalise(Math.max(0, 45 - seasonPenalty), 'Similar depth and temperature. ' + SCORE_TIPS.okay[2])
+    if (valueDiff > 35) return finalise(Math.max(0, 88 - seasonPenalty), 'Same colour family with strong contrast — this looks cohesive and intentional on you. ' + SCORE_TIPS.great[1])
+    if (valueDiff > 20) return finalise(Math.max(0, 73 - seasonPenalty), 'Same family with decent contrast — nudge one piece a shade lighter or darker to perfect it.')
+    return finalise(Math.max(0, 45 - seasonPenalty), 'These sit at a similar depth and temperature. ' + SCORE_TIPS.okay[2])
   }
 
   // Mixed warm + cool
   if (bNeutral || aNeutral) {
-    return finalise(Math.max(0, 83 - seasonPenalty), 'Statement colour on a neutral base — the most reliable formula. ' + SCORE_TIPS.good[1])
+    return finalise(Math.max(0, 83 - seasonPenalty), "A statement colour on a neutral base — honestly the most reliable formula there is. " + SCORE_TIPS.good[1])
   }
   if (valueDiff > 30) {
-    return finalise(Math.max(0, 68 - seasonPenalty), 'Mixed warm/cool with good contrast. Keep shoes and accessories in one family.')
+    return finalise(Math.max(0, 68 - seasonPenalty), 'A warm/cool mix with good contrast — keep your shoes and accessories in one family to anchor it.')
   }
   return finalise(Math.max(0, 50 - seasonPenalty), SCORE_TIPS.clash[0])
 }
