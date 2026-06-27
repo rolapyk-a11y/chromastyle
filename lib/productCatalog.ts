@@ -12,6 +12,9 @@
 import type { ItemCategory, FabricWeight, GarmentCut, GarmentType } from './types'
 import { inferCutFromName } from './bodyGuide'
 import catalogData from './product-catalog.json'
+// Local-only catalog: scraped/experimental products. Gitignored, so it's empty
+// ([]) on Vercel and in fresh clones — see scripts/ensure-local-catalog.js.
+import localCatalogData from './product-catalog.local.json'
 
 export interface CatalogProduct {
   id: string
@@ -27,6 +30,7 @@ export interface CatalogProduct {
   fabric?: FabricWeight     // fabric weight — used for season-fit scoring
   cut?: GarmentCut          // silhouette — used for body-fit scoring
   garmentType?: GarmentType // fine-grained type — used for "Shop My Colours" filtering
+  source?: 'feed' | 'local' // 'local' = scraped/experimental, dev-only
 }
 
 // Infer a fine-grained garment type from the product name (and broad category as
@@ -48,9 +52,19 @@ export function inferGarmentType(name: string, category: ItemCategory): GarmentT
   return 'accessory'
 }
 
+// The public site builds from the committed feed catalog only. Local-only
+// (scraped/experimental) products are merged in development so you can preview
+// them on localhost — but they NEVER appear on the production deploy.
+const feedCatalog = catalogData as CatalogProduct[]
+const localCatalog = (localCatalogData as CatalogProduct[])
+const combinedCatalog: CatalogProduct[] =
+  process.env.NODE_ENV === 'production'
+    ? feedCatalog
+    : [...feedCatalog, ...localCatalog]
+
 // Attach a garment cut + garment type to every product (from the JSON if present,
 // otherwise inferred from the product name).
-export const PRODUCT_CATALOG: CatalogProduct[] = (catalogData as CatalogProduct[]).map(p => ({
+export const PRODUCT_CATALOG: CatalogProduct[] = combinedCatalog.map(p => ({
   ...p,
   cut: p.cut ?? inferCutFromName(p.name),
   garmentType: p.garmentType ?? inferGarmentType(p.name, p.category),
