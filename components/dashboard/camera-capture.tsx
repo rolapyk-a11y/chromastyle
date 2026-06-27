@@ -10,13 +10,35 @@ import { cn } from '@/lib/utils'
 interface CameraCaptureProps {
   onCapture: (imageData: string) => void
   isProcessing?: boolean
+  guideText?: string        // overlay text on the live camera
+  actionLabel?: string      // label on the confirm button
+  processingLabel?: string  // label while processing
+  showFaceGuide?: boolean   // circular face guide overlay (off for garments)
+  tipsTitle?: string
+  tips?: string[]
+  defaultFacingMode?: 'user' | 'environment'
 }
 
-export function CameraCapture({ onCapture, isProcessing }: CameraCaptureProps) {
+export function CameraCapture({
+  onCapture,
+  isProcessing,
+  guideText = 'Position your face in the circle',
+  actionLabel = 'Analyze Colors',
+  processingLabel = 'Analyzing...',
+  showFaceGuide = true,
+  tipsTitle = 'Tips for best results:',
+  tips = [
+    'Use natural lighting (near a window is ideal)',
+    'Avoid direct sunlight or harsh artificial light',
+    'Remove glasses and keep hair away from face',
+    'Face the camera directly with a neutral expression',
+  ],
+  defaultFacingMode = 'user',
+}: CameraCaptureProps) {
   const webcamRef = useRef<Webcam>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>(defaultFacingMode)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [cameraError, setCameraError] = useState<string | null>(null)
 
@@ -106,10 +128,10 @@ export function CameraCapture({ onCapture, isProcessing }: CameraCaptureProps) {
                 />
                 {/* Camera overlay guide */}
                 <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-8 border-2 border-white/30 rounded-full" />
+                  {showFaceGuide && <div className="absolute inset-8 border-2 border-white/30 rounded-full" />}
                   <div className="absolute bottom-4 left-0 right-0 text-center">
                     <p className="text-white/80 text-sm bg-black/40 inline-block px-3 py-1 rounded-full">
-                      Position your face in the circle
+                      {guideText}
                     </p>
                   </div>
                 </div>
@@ -141,12 +163,12 @@ export function CameraCapture({ onCapture, isProcessing }: CameraCaptureProps) {
               {isProcessing ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Analyzing...
+                  {processingLabel}
                 </>
               ) : (
                 <>
                   <Camera className="mr-2 h-5 w-5" />
-                  Analyze Colors
+                  {actionLabel}
                 </>
               )}
             </Button>
@@ -195,12 +217,9 @@ export function CameraCapture({ onCapture, isProcessing }: CameraCaptureProps) {
 
       {/* Tips */}
       <div className="bg-secondary/50 rounded-lg p-4">
-        <h4 className="font-medium mb-2">Tips for best results:</h4>
+        <h4 className="font-medium mb-2">{tipsTitle}</h4>
         <ul className="text-sm text-muted-foreground space-y-1">
-          <li>Use natural lighting (near a window is ideal)</li>
-          <li>Avoid direct sunlight or harsh artificial light</li>
-          <li>Remove glasses and keep hair away from face</li>
-          <li>Face the camera directly with a neutral expression</li>
+          {tips.map((t, i) => <li key={i}>{t}</li>)}
         </ul>
       </div>
     </div>
