@@ -1,6 +1,6 @@
 'use client'
 
-import type { UserWardrobeItem, ItemCategory } from '@/lib/types'
+import type { UserWardrobeItem, ItemCategory, BodyProfile } from '@/lib/types'
 
 const SKIN  = '#e8d5c4'
 const EMPTY = '#e2e0de'
@@ -17,67 +17,130 @@ function firstColor(items: UserWardrobeItem[], categories: ItemCategory[]): stri
   return null
 }
 
+// ── Build silhouette geometry from the user's self-reported body profile ──
+// Defaults (no profile) give an average build. Each axis nudges real coordinates
+// so the figure actually resembles the wearer instead of a generic dummy.
+function geometry(body?: BodyProfile) {
+  const shoulders = body?.shoulders ?? 'average'
+  const build     = body?.build ?? 'average'
+  const proportion = body?.proportion ?? 'balanced'
+  const height    = body?.height ?? 'average'
+
+  const shoulderMul = ({ narrow: 0.82, average: 1, broad: 1.2 } as const)[shoulders]
+  const buildShoulder = ({ slim: 0.92, average: 1, athletic: 1.1, fuller: 1.12 } as const)[build]
+  const buildWaist = ({ slim: 0.78, average: 0.95, athletic: 0.78, fuller: 1.32 } as const)[build]
+  const buildHip = ({ slim: 0.85, average: 1, athletic: 0.9, fuller: 1.28 } as const)[build]
+
+  const CX = 50
+  const shoulderHalf = 22 * shoulderMul * buildShoulder
+  const waistHalf = 15 * buildWaist
+  const hipHalf = 19 * buildHip
+
+  const shoulderY = 36
+  const waistY = ({ 'long-torso': 132, balanced: 120, 'long-legs': 109 } as const)[proportion]
+  const legBottomY = ({ short: 192, average: 202, tall: 215 } as const)[height]
+
+  const neckHalf = 4.5
+  const crotchY = waistY + (legBottomY - waistY) * 0.42
+  const legInner = 3.5
+  const footW = Math.max(9, hipHalf * 0.6)
+
+  return { CX, shoulderHalf, waistHalf, hipHalf, shoulderY, waistY, legBottomY, neckHalf, crotchY, legInner, footW }
+}
+
 interface MannequinViewerProps {
   items: UserWardrobeItem[]
+  bodyProfile?: BodyProfile
   className?: string
 }
 
-export function MannequinViewer({ items, className = 'w-20 h-auto' }: MannequinViewerProps) {
+export function MannequinViewer({ items, bodyProfile, className = 'w-20 h-auto' }: MannequinViewerProps) {
   const torsoColor = firstColor(items, TORSO_CATS) ?? EMPTY
   const lowerColor = firstColor(items, LOWER_CATS) ?? EMPTY
   const feetColor  = firstColor(items, FEET_CATS)  ?? EMPTY
 
   const jacket = items.find(i => i.category === 'jacket')
   const top    = items.find(i => i.category === 'top')
-  // Show top colour as collar/cuffs when both jacket and top are selected
   const collarColor = (jacket && top) ? top.color_hex : null
+
+  const g = geometry(bodyProfile)
+  const { CX, shoulderHalf, waistHalf, hipHalf, shoulderY, waistY, legBottomY, neckHalf, crotchY, legInner, footW } = g
+
+  // Path strings (reused for fill + outline)
+  const torsoPath =
+    `M ${CX - neckHalf},${shoulderY} ` +
+    `L ${CX - shoulderHalf},${shoulderY + 3} ` +
+    `L ${CX - waistHalf},${waistY} ` +
+    `L ${CX + waistHalf},${waistY} ` +
+    `L ${CX + shoulderHalf},${shoulderY + 3} ` +
+    `L ${CX + neckHalf},${shoulderY} Z`
+
+  const leftArm =
+    `M ${CX - shoulderHalf},${shoulderY + 3} ` +
+    `L ${CX - shoulderHalf - 4},${shoulderY + 8} ` +
+    `L ${CX - waistHalf - 2},${waistY - 4} ` +
+    `L ${CX - waistHalf + 2},${waistY - 8} Z`
+  const rightArm =
+    `M ${CX + shoulderHalf},${shoulderY + 3} ` +
+    `L ${CX + shoulderHalf + 4},${shoulderY + 8} ` +
+    `L ${CX + waistHalf + 2},${waistY - 4} ` +
+    `L ${CX + waistHalf - 2},${waistY - 8} Z`
+
+  const lowerPath =
+    `M ${CX - hipHalf},${waistY} ` +
+    `L ${CX + hipHalf},${waistY} ` +
+    `L ${CX + hipHalf - 1},${legBottomY} ` +
+    `L ${CX + legInner},${legBottomY} ` +
+    `L ${CX},${crotchY} ` +
+    `L ${CX - legInner},${legBottomY} ` +
+    `L ${CX - hipHalf + 1},${legBottomY} Z`
+
+  const leftFoot = { cx: CX - (hipHalf + legInner) / 2 + 1, cy: legBottomY + 3, rx: footW * 0.5, ry: 4 }
+  const rightFoot = { cx: CX + (hipHalf + legInner) / 2 - 1, cy: legBottomY + 3, rx: footW * 0.5, ry: 4 }
 
   return (
     <svg
-      viewBox="0 0 100 218"
+      viewBox="0 0 100 230"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="Outfit mannequin preview"
+      aria-label="Outfit on a figure matched to your body type"
       role="img"
     >
-      {/* ── Lower body (drawn first — behind torso overlap at waist) ── */}
-      <path
-        d="M 18,124 L 82,124 L 78,196 L 65,197 L 58,158 L 42,158 L 35,197 L 22,196 Z"
-        fill={lowerColor}
-      />
+      {/* Lower body (behind torso) */}
+      <path d={lowerPath} fill={lowerColor} />
 
-      {/* ── Shoes ── */}
-      <ellipse cx="30" cy="204" rx="12" ry="5" fill={feetColor} />
-      <ellipse cx="70" cy="204" rx="12" ry="5" fill={feetColor} />
+      {/* Shoes */}
+      <ellipse cx={leftFoot.cx} cy={leftFoot.cy} rx={leftFoot.rx} ry={leftFoot.ry} fill={feetColor} />
+      <ellipse cx={rightFoot.cx} cy={rightFoot.cy} rx={rightFoot.rx} ry={rightFoot.ry} fill={feetColor} />
 
-      {/* ── Torso with sleeves (top or jacket) ── */}
-      <path
-        d="M 50,34 L 26,41 L 14,44 L 10,90 L 18,92 L 18,124 L 82,124 L 82,92 L 90,90 L 86,44 L 74,41 Z"
-        fill={torsoColor}
-      />
+      {/* Arms (same fabric as torso) */}
+      <path d={leftArm} fill={torsoColor} />
+      <path d={rightArm} fill={torsoColor} />
 
-      {/* ── Collar: shows top colour peeking out from open jacket ── */}
+      {/* Torso */}
+      <path d={torsoPath} fill={torsoColor} />
+
+      {/* Collar: top colour peeking from an open jacket */}
       {collarColor && (
         <path
-          d="M 44,34 L 50,45 L 56,34 L 53,47 L 50,51 L 47,47 Z"
+          d={`M ${CX - 6},${shoulderY} L ${CX},${shoulderY + 11} L ${CX + 6},${shoulderY} L ${CX + 3},${shoulderY + 13} L ${CX},${shoulderY + 17} L ${CX - 3},${shoulderY + 13} Z`}
           fill={collarColor}
         />
       )}
 
-      {/* ── Neck (always skin-toned) ── */}
-      <rect x="46" y="25" width="8" height="9" rx="2" fill={SKIN} />
+      {/* Neck + head (skin) */}
+      <rect x={CX - neckHalf} y={25} width={neckHalf * 2} height={shoulderY - 25} rx={2} fill={SKIN} />
+      <circle cx={CX} cy={14} r={11} fill={SKIN} />
 
-      {/* ── Head ── */}
-      <circle cx="50" cy="13" r="12" fill={SKIN} />
-
-      {/* ── Subtle outline overlay so the shape reads even with light colours ── */}
+      {/* Outline so the shape reads even with pale colours */}
       <g fill="none" stroke="black" strokeWidth="0.7" opacity="0.13">
-        <circle cx="50" cy="13" r="12" />
-        <rect x="46" y="25" width="8" height="9" rx="2" />
-        <path d="M 50,34 L 26,41 L 14,44 L 10,90 L 18,92 L 18,124 L 82,124 L 82,92 L 90,90 L 86,44 L 74,41 Z" />
-        <path d="M 18,124 L 82,124 L 78,196 L 65,197 L 58,158 L 42,158 L 35,197 L 22,196 Z" />
-        <ellipse cx="30" cy="204" rx="12" ry="5" />
-        <ellipse cx="70" cy="204" rx="12" ry="5" />
+        <circle cx={CX} cy={14} r={11} />
+        <path d={torsoPath} />
+        <path d={leftArm} />
+        <path d={rightArm} />
+        <path d={lowerPath} />
+        <ellipse cx={leftFoot.cx} cy={leftFoot.cy} rx={leftFoot.rx} ry={leftFoot.ry} />
+        <ellipse cx={rightFoot.cx} cy={rightFoot.cy} rx={rightFoot.rx} ry={rightFoot.ry} />
       </g>
     </svg>
   )
