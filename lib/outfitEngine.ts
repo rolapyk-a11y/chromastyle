@@ -174,6 +174,46 @@ function bodyFit(
   return { delta, reason: pick.reason }
 }
 
+// ─── Texture / material summary for a hand-picked outfit ──────────────────────
+
+export interface TextureSummary {
+  level: 'good' | 'flat' | 'mixed' | 'unknown'
+  note: string
+}
+
+/**
+ * Judge how the FABRICS of an outfit work together — separate from colour.
+ * Uses weight contrast (texturePairBonus) and drape contrast (drapePairBonus).
+ * Returns 'unknown' until at least two pieces have a fabric set, so we can nudge
+ * the user to tag their items.
+ */
+export function outfitTextureSummary(items: UserWardrobeItem[]): TextureSummary {
+  const fabrics = items.filter(i => i.fabric).map(i => i.fabric!)
+  if (fabrics.length < 2) {
+    return { level: 'unknown', note: 'Tag the fabric on your pieces to see how their textures work together.' }
+  }
+
+  let total = 0
+  let bestTip = ''
+  let worstTip = ''
+  let worst = Infinity
+  for (let i = 0; i < fabrics.length; i++) {
+    for (let j = i + 1; j < fabrics.length; j++) {
+      const t = texturePairBonus(fabrics[i], fabrics[j])
+      const d = drapePairBonus(fabrics[i], fabrics[j])
+      const pair = (t?.bonus ?? 0) + (d?.bonus ?? 0)
+      const tip = d?.tip || t?.tip || ''
+      total += pair
+      if (tip && pair < worst) { worst = pair; worstTip = tip }
+      if (tip && pair > 0 && !bestTip) bestTip = tip
+    }
+  }
+
+  if (total <= -4) return { level: 'mixed', note: worstTip || 'These fabrics fight each other — vary the weights more.' }
+  if (total >= 6)  return { level: 'good',  note: bestTip || 'Lovely texture contrast — the materials play off each other.' }
+  return { level: 'flat', note: 'The textures are fine but a little samey — mix a smooth piece with a more textured one.' }
+}
+
 // ─── Main: generate ranked outfit combos ─────────────────────────────────────
 
 export function generateOutfits(
