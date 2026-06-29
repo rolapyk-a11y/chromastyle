@@ -25,6 +25,18 @@ export function clearBodyPhoto(): void {
   try { localStorage.removeItem(BODY_PHOTO_KEY) } catch { /* noop */ }
 }
 
+// ── Access code (locks the paid try-on to the owner) ──
+const ACCESS_CODE_KEY = 'chromastyle_tryon_code'
+
+export function getAccessCode(): string {
+  if (typeof window === 'undefined') return ''
+  try { return localStorage.getItem(ACCESS_CODE_KEY) ?? '' } catch { return '' }
+}
+
+export function saveAccessCode(code: string): void {
+  try { localStorage.setItem(ACCESS_CODE_KEY, code) } catch { /* noop */ }
+}
+
 export type FashnCategory = 'tops' | 'bottoms'
 
 // Map our category to FASHN's. Returns null for items try-on can't handle (shoes, accessories).
@@ -38,6 +50,7 @@ export interface TryOnResponse {
   resultImage?: string
   error?: string
   needsApiKey?: boolean
+  locked?: boolean
 }
 
 export async function runRealisticTryOn(params: {
@@ -53,10 +66,11 @@ export async function runRealisticTryOn(params: {
         modelImage: params.modelImage,
         garmentImage: params.garmentImage,
         category: params.category,
+        accessCode: getAccessCode(),
       }),
     })
     const data = await res.json().catch(() => ({}))
-    if (!res.ok) return { error: data.error || 'Try-on failed', needsApiKey: data.needsApiKey }
+    if (!res.ok) return { error: data.error || 'Try-on failed', needsApiKey: data.needsApiKey, locked: data.locked }
     return { resultImage: data.resultImage }
   } catch {
     return { error: 'Network error during try-on. Please try again.' }
