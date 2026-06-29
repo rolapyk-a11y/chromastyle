@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { X, Check } from 'lucide-react'
+import { X, Check, ImagePlus } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, ColorAnalysis, FabricWeight, GarmentCut } from '@/lib/types'
 import { addLocalWardrobeItem } from '@/lib/outfitEngine'
 import { SEASON_COLOURS, NEUTRAL_COLOURS } from '@/lib/palettes'
@@ -35,6 +35,31 @@ const FABRICS: { value: FabricWeight; label: string; example: string }[] = [
   { value: 'wool',         label: 'Wool',          example: 'Wool coat, heavy knit' },
 ]
 
+// Downscale + re-encode an uploaded photo so it stays small in localStorage.
+function downscaleImage(file: File, max = 640, quality = 0.85): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const img = new Image()
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height, 1))
+        const w = Math.round(img.width * scale)
+        const h = Math.round(img.height * scale)
+        const canvas = document.createElement('canvas')
+        canvas.width = w; canvas.height = h
+        const ctx = canvas.getContext('2d')
+        if (!ctx) { resolve(reader.result as string); return }
+        ctx.drawImage(img, 0, 0, w, h)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = reject
+      img.src = reader.result as string
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 interface AddItemSheetProps {
   open: boolean
   onClose: () => void
@@ -49,6 +74,18 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
   const [name, setName] = useState('')
   const [selectedColour, setSelectedColour] = useState<{ hex: string; name: string } | null>(null)
   const [customHex, setCustomHex] = useState('#888888')
+  const [image, setImage] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      setImage(await downscaleImage(file))
+    } catch {
+      /* ignore unreadable image */
+    }
+  }
 
   const subSeason = colorAnalysis?.sub_season
   const paletteColours = subSeason ? (SEASON_COLOURS[subSeason] ?? []) : []
@@ -63,6 +100,7 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
       color_name: colour.name,
       ...(fabric ? { fabric } : {}),
       ...(cut ? { cut } : {}),
+      ...(image ? { image_url: image } : {}),
       created_at: new Date().toISOString(),
     }
     addLocalWardrobeItem(item)
@@ -72,6 +110,7 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
     setFabric(undefined)
     setCut(undefined)
     setSelectedColour(null)
+    setImage(null)
     onClose()
   }
 
@@ -118,6 +157,44 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
             <p className="text-xs text-muted-foreground mt-1">
               e.g. {CATEGORIES.find(c => c.value === category)?.example}
             </p>
+          </div>
+
+          {/* Photo (optional — enables try-on) */}
+          <div>
+            <p className="text-sm font-medium mb-2">
+              Photo <span className="text-muted-foreground font-normal">(optional — see it on the try-on figure)</span>
+            </p>
+            <div className="flex items-center gap-3">
+              {image ? (
+                <div className="relative">
+                  <img src={image} alt="Item" className="w-16 h-16 rounded-xl object-cover border border-border/40" />
+                  <button
+                    onClick={() => { setImage(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-16 h-16 rounded-xl border border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-border/80 hover:text-foreground transition-colors"
+                >
+                  <ImagePlus className="w-5 h-5" />
+                  <span className="text-[10px]">Add</span>
+                </button>
+              )}
+              <p className="text-xs text-muted-foreground flex-1">
+                A photo of the garment on a plain background works best — the try-on figure removes the background automatically.
+              </p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImage}
+              className="hidden"
+            />
           </div>
 
           {/* Fabric */}
