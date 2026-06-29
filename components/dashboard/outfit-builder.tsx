@@ -14,8 +14,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Plus, Check, RotateCcw, Shirt, ShoppingBag, Footprints, Layers, Star } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, SubSeason, OutfitCombo, BodyProfile } from '@/lib/types'
-import { scoreOutfit } from '@/lib/outfitEngine'
+import { scoreOutfit, outfitTextureSummary, type TextureSummary } from '@/lib/outfitEngine'
 import { MannequinViewer } from './mannequin-viewer'
+
+const TEXTURE_STYLE: Record<TextureSummary['level'], { dot: string; label: string }> = {
+  good:    { dot: 'bg-green-500', label: 'Textures work well' },
+  flat:    { dot: 'bg-amber-500', label: 'Textures a bit samey' },
+  mixed:   { dot: 'bg-red-500',   label: 'Textures clash' },
+  unknown: { dot: 'bg-muted-foreground/40', label: 'Materials' },
+}
 
 const CATEGORY_ICONS: Record<ItemCategory, React.ReactNode> = {
   top:       <Shirt className="w-4 h-4" />,
@@ -59,6 +66,8 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
     () => subSeason ? scoreOutfit(selectedItems, subSeason, bodyProfile) : null,
     [selectedItems, subSeason, bodyProfile],
   )
+
+  const texture = useMemo(() => outfitTextureSummary(selectedItems), [selectedItems])
 
   function toggle(id: string) {
     setSelectedIds(prev =>
@@ -105,7 +114,7 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
 
           {/* ── Mannequin + item list ── */}
           <div className="flex items-start gap-3">
-            <MannequinViewer items={selectedItems} className="w-20 h-auto shrink-0" />
+            <MannequinViewer items={selectedItems} bodyProfile={bodyProfile} className="w-20 h-auto shrink-0" />
             <div className="flex-1 flex flex-col justify-center gap-1.5 py-1 min-h-[80px]">
               {selectedItems.length === 0 ? (
                 <p className="text-xs text-muted-foreground leading-relaxed">
@@ -142,6 +151,17 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
             <div className="flex items-start gap-2 bg-background/60 rounded-lg px-3 py-2">
               <Sparkles className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground leading-relaxed">{outfit.tip}</p>
+            </div>
+          )}
+
+          {/* Material / texture verdict — judges the outfit beyond colour */}
+          {hasOutfit && (
+            <div className="flex items-start gap-2 px-1">
+              <span className={`w-2 h-2 rounded-full shrink-0 mt-1 ${TEXTURE_STYLE[texture.level].dot}`} />
+              <p className="text-xs leading-relaxed">
+                <span className="font-medium">{TEXTURE_STYLE[texture.level].label}.</span>{' '}
+                <span className="text-muted-foreground">{texture.note}</span>
+              </p>
             </div>
           )}
           {selectedItems.length > 0 && (
