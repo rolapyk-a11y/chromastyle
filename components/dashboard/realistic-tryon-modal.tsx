@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Loader2, Upload, RotateCcw, Download, Sparkles, AlertCircle, ImageIcon } from 'lucide-react'
 import {
-  getBodyPhoto, saveBodyPhoto, downscalePhoto, runRealisticTryOn, type FashnCategory,
+  getBodyPhoto, saveBodyPhoto, downscalePhoto, runRealisticTryOn,
+  getAccessCode, saveAccessCode, type FashnCategory,
 } from '@/lib/tryOn'
 
 interface RealisticTryOnModalProps {
@@ -24,7 +25,7 @@ interface RealisticTryOnModalProps {
   category: FashnCategory
 }
 
-type Stage = 'setup' | 'processing' | 'result' | 'error'
+type Stage = 'setup' | 'processing' | 'result' | 'error' | 'locked'
 
 export function RealisticTryOnModal({ open, onClose, garmentImage, garmentName, category }: RealisticTryOnModalProps) {
   const fileRef = useRef<HTMLInputElement>(null)
@@ -33,6 +34,7 @@ export function RealisticTryOnModal({ open, onClose, garmentImage, garmentName, 
   const [result, setResult] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [needsKey, setNeedsKey] = useState(false)
+  const [code, setCode] = useState(() => getAccessCode())
 
   async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -49,6 +51,8 @@ export function RealisticTryOnModal({ open, onClose, garmentImage, garmentName, 
     if (res.resultImage) {
       setResult(res.resultImage)
       setStage('result')
+    } else if (res.locked) {
+      setStage('locked')
     } else {
       setError(res.error ?? 'Try-on failed.')
       setNeedsKey(Boolean(res.needsApiKey))
@@ -101,6 +105,28 @@ export function RealisticTryOnModal({ open, onClose, garmentImage, garmentName, 
               Use a clear, front-facing full-body photo in good light. Your photo stays on your device and is sent only to generate the try-on.
             </p>
             <input ref={fileRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
+          </div>
+        )}
+
+        {stage === 'locked' && (
+          <div className="space-y-3 py-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Realistic try-on is locked. Enter your access code to unlock it on this device.
+            </p>
+            <input
+              type="password"
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              placeholder="Access code"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            />
+            <Button
+              className="w-full"
+              disabled={!code.trim()}
+              onClick={() => { saveAccessCode(code.trim()); generate() }}
+            >
+              <Sparkles className="w-4 h-4 mr-2" /> Unlock & try on
+            </Button>
           </div>
         )}
 
