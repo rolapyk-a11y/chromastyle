@@ -5,7 +5,6 @@ import type { UserWardrobeItem, ItemCategory, BodyProfile } from '@/lib/types'
 const SKIN  = '#e8d5c4'
 const EMPTY = '#e2e0de'
 
-const TORSO_CATS: ItemCategory[] = ['jacket', 'top']
 const LOWER_CATS: ItemCategory[] = ['bottom']
 const FEET_CATS:  ItemCategory[] = ['shoes']
 
@@ -55,13 +54,18 @@ interface MannequinViewerProps {
 }
 
 export function MannequinViewer({ items, bodyProfile, className = 'w-20 h-auto' }: MannequinViewerProps) {
-  const torsoColor = firstColor(items, TORSO_CATS) ?? EMPTY
   const lowerColor = firstColor(items, LOWER_CATS) ?? EMPTY
   const feetColor  = firstColor(items, FEET_CATS)  ?? EMPTY
 
+  // Upper body is layered: the shirt/top is the base. A jacket becomes two OPEN
+  // front panels over the sides, leaving the shirt visible down the centre —
+  // so a jacket no longer paints over the whole torso.
   const jacket = items.find(i => i.category === 'jacket')
   const top    = items.find(i => i.category === 'top')
-  const collarColor = (jacket && top) ? top.color_hex : null
+  const hasOpenJacket = Boolean(jacket && top)
+  const torsoBaseColor = top?.color_hex ?? jacket?.color_hex ?? EMPTY
+  const jacketColor = jacket?.color_hex ?? EMPTY
+  const armColor = jacket?.color_hex ?? top?.color_hex ?? EMPTY
 
   const g = geometry(bodyProfile)
   const { CX, shoulderHalf, waistHalf, hipHalf, shoulderY, waistY, legBottomY, neckHalf, crotchY, legInner, footW } = g
@@ -74,6 +78,21 @@ export function MannequinViewer({ items, bodyProfile, className = 'w-20 h-auto' 
     `L ${CX + waistHalf},${waistY} ` +
     `L ${CX + shoulderHalf},${shoulderY + 3} ` +
     `L ${CX + neckHalf},${shoulderY} Z`
+
+  // Open-jacket front panels: cover the sides, V-opening widening to the waist
+  // so the shirt shows down the centre. (gapTop near the collar, gapWaist lower.)
+  const gapTop = neckHalf + 1
+  const gapWaist = Math.min(waistHalf * 0.62, 11)
+  const leftPanel =
+    `M ${CX - gapTop},${shoulderY + 2} ` +
+    `L ${CX - shoulderHalf},${shoulderY + 3} ` +
+    `L ${CX - waistHalf},${waistY} ` +
+    `L ${CX - gapWaist},${waistY} Z`
+  const rightPanel =
+    `M ${CX + gapTop},${shoulderY + 2} ` +
+    `L ${CX + shoulderHalf},${shoulderY + 3} ` +
+    `L ${CX + waistHalf},${waistY} ` +
+    `L ${CX + gapWaist},${waistY} Z`
 
   const leftArm =
     `M ${CX - shoulderHalf},${shoulderY + 3} ` +
@@ -113,19 +132,19 @@ export function MannequinViewer({ items, bodyProfile, className = 'w-20 h-auto' 
       <ellipse cx={leftFoot.cx} cy={leftFoot.cy} rx={leftFoot.rx} ry={leftFoot.ry} fill={feetColor} />
       <ellipse cx={rightFoot.cx} cy={rightFoot.cy} rx={rightFoot.rx} ry={rightFoot.ry} fill={feetColor} />
 
-      {/* Arms (same fabric as torso) */}
-      <path d={leftArm} fill={torsoColor} />
-      <path d={rightArm} fill={torsoColor} />
+      {/* Arms / sleeves (jacket colour if a jacket is on, else the top) */}
+      <path d={leftArm} fill={armColor} />
+      <path d={rightArm} fill={armColor} />
 
-      {/* Torso */}
-      <path d={torsoPath} fill={torsoColor} />
+      {/* Torso base = the shirt/top (or a closed jacket when no shirt) */}
+      <path d={torsoPath} fill={torsoBaseColor} />
 
-      {/* Collar: top colour peeking from an open jacket */}
-      {collarColor && (
-        <path
-          d={`M ${CX - 6},${shoulderY} L ${CX},${shoulderY + 11} L ${CX + 6},${shoulderY} L ${CX + 3},${shoulderY + 13} L ${CX},${shoulderY + 17} L ${CX - 3},${shoulderY + 13} Z`}
-          fill={collarColor}
-        />
+      {/* Open jacket: two front panels over the sides, shirt visible down the middle */}
+      {hasOpenJacket && (
+        <>
+          <path d={leftPanel} fill={jacketColor} />
+          <path d={rightPanel} fill={jacketColor} />
+        </>
       )}
 
       {/* Neck + head (skin) */}
@@ -136,6 +155,8 @@ export function MannequinViewer({ items, bodyProfile, className = 'w-20 h-auto' 
       <g fill="none" stroke="black" strokeWidth="0.7" opacity="0.13">
         <circle cx={CX} cy={14} r={11} />
         <path d={torsoPath} />
+        {hasOpenJacket && <path d={leftPanel} />}
+        {hasOpenJacket && <path d={rightPanel} />}
         <path d={leftArm} />
         <path d={rightArm} />
         <path d={lowerPath} />
