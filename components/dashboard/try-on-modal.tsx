@@ -23,6 +23,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getAccessCode } from '@/lib/tryOn'
 
 interface TryOnModalProps {
   item: ClothingItem | null
@@ -88,8 +89,9 @@ export function TryOnModal({ item, isOpen, onClose }: TryOnModalProps) {
           modelImage,
           garmentImage: item.image_url,
           clothingItemId: item.id,
-          category: item.category === 'pants' ? 'bottoms' : 
+          category: item.category === 'pants' ? 'bottoms' :
                    item.category === 'outerwear' ? 'tops' : 'auto',
+          accessCode: getAccessCode(),
         }),
       })
 
