@@ -4,12 +4,10 @@ const FASHN_API_KEY = process.env.FASHN_API_KEY
 
 export async function POST(req: Request) {
   try {
+    // Guest-friendly: the app works without sign-in, so try-on does too.
+    // We still grab the user (if any) to optionally save history below.
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
 
     if (!FASHN_API_KEY) {
       return Response.json({ 
@@ -99,8 +97,8 @@ export async function POST(req: Request) {
     // Get the result image (base64 or URL)
     const resultImage = resultData.output[0]
 
-    // Save to history if we have a clothing item ID
-    if (clothingItemId) {
+    // Save to history only for signed-in users with a catalog item
+    if (user && clothingItemId) {
       await supabase
         .from('try_on_history')
         .insert({
