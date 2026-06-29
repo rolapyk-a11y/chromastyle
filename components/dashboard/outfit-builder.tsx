@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Sparkles, Plus, Check, RotateCcw, Shirt, ShoppingBag, Footprints, Layers, Star } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, SubSeason, OutfitCombo, BodyProfile } from '@/lib/types'
 import { scoreOutfit, outfitTextureSummary, type TextureSummary } from '@/lib/outfitEngine'
-import { MannequinViewer } from './mannequin-viewer'
+import { TryOnViewer } from './tryon-viewer'
 
 const TEXTURE_STYLE: Record<TextureSummary['level'], { dot: string; label: string }> = {
   good:    { dot: 'bg-green-500', label: 'Textures work well' },
@@ -114,7 +114,7 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
 
           {/* ── Mannequin + item list ── */}
           <div className="flex items-start gap-3">
-            <MannequinViewer items={selectedItems} bodyProfile={bodyProfile} className="w-20 h-auto shrink-0" />
+            <TryOnViewer items={selectedItems} bodyProfile={bodyProfile} className="w-20 shrink-0" />
             <div className="flex-1 flex flex-col justify-center gap-1.5 py-1 min-h-[80px]">
               {selectedItems.length === 0 ? (
                 <p className="text-xs text-muted-foreground leading-relaxed">
