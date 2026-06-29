@@ -16,6 +16,8 @@ import { Sparkles, Plus, Check, RotateCcw, Shirt, ShoppingBag, Footprints, Layer
 import type { UserWardrobeItem, ItemCategory, SubSeason, OutfitCombo, BodyProfile } from '@/lib/types'
 import { scoreOutfit, outfitTextureSummary, type TextureSummary } from '@/lib/outfitEngine'
 import { TryOnViewer } from './tryon-viewer'
+import { RealisticTryOnModal } from './realistic-tryon-modal'
+import { fashnCategory } from '@/lib/tryOn'
 
 const TEXTURE_STYLE: Record<TextureSummary['level'], { dot: string; label: string }> = {
   good:    { dot: 'bg-green-500', label: 'Textures work well' },
@@ -68,6 +70,14 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
   )
 
   const texture = useMemo(() => outfitTextureSummary(selectedItems), [selectedItems])
+
+  // The garment we can run a realistic AI try-on for: a photographed top/jacket
+  // (preferred) or bottom from the current selection.
+  const tryOnItem = useMemo(() => {
+    const supported = selectedItems.filter(i => i.image_url && fashnCategory(i.category))
+    return supported.find(i => i.category === 'top' || i.category === 'jacket') ?? supported[0]
+  }, [selectedItems])
+  const [tryOnOpen, setTryOnOpen] = useState(false)
 
   function toggle(id: string) {
     setSelectedIds(prev =>
@@ -164,6 +174,13 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
               </p>
             </div>
           )}
+
+          {/* Realistic AI try-on — available when a selected garment has a photo */}
+          {tryOnItem && (
+            <Button variant="outline" size="sm" className="w-full" onClick={() => setTryOnOpen(true)}>
+              <Sparkles className="w-4 h-4 mr-1.5" /> Realistic try-on
+            </Button>
+          )}
           {selectedItems.length > 0 && (
             <button
               onClick={() => setSelectedIds([])}
@@ -223,6 +240,16 @@ export function OutfitBuilder({ items, subSeason, bodyProfile, onAddItem }: Outf
       <Button variant="outline" size="sm" className="w-full" onClick={onAddItem}>
         <Plus className="w-4 h-4 mr-1" /> Add more items to your wardrobe
       </Button>
+
+      {tryOnItem && (
+        <RealisticTryOnModal
+          open={tryOnOpen}
+          onClose={() => setTryOnOpen(false)}
+          garmentImage={tryOnItem.image_url!}
+          garmentName={tryOnItem.name}
+          category={fashnCategory(tryOnItem.category)!}
+        />
+      )}
     </div>
   )
 }
