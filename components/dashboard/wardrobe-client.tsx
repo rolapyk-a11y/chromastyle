@@ -8,14 +8,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ClothingCard } from './clothing-card'
 import { TryOnModal } from './try-on-modal'
-import { 
-  Search, 
-  Filter, 
-  Palette, 
+import { MyWardrobe } from './my-wardrobe'
+import {
+  Search,
+  Filter,
+  Palette,
   Sparkles,
   SlidersHorizontal,
   X,
-  AlertCircle
+  AlertCircle,
+  Shirt,
 } from 'lucide-react'
 import {
   Select,
@@ -63,11 +65,14 @@ function isColorMatch(itemColors: string[], userColors: string[], threshold = 10
   return false
 }
 
-export function WardrobeClient({ 
-  colorAnalysis, 
-  clothingItems, 
-  savedItemIds: initialSavedIds 
+type MainTab = 'shop' | 'my-wardrobe'
+
+export function WardrobeClient({
+  colorAnalysis,
+  clothingItems,
+  savedItemIds: initialSavedIds
 }: WardrobeClientProps) {
+  const [mainTab, setMainTab] = useState<MainTab>('shop')
   const [searchQuery, setSearchQuery] = useState('')
   const [brandFilter, setBrandFilter] = useState<FilterBrand>('all')
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('all')
@@ -190,7 +195,7 @@ export function WardrobeClient({
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Wardrobe</h1>
           <p className="text-muted-foreground mt-1">
-            {colorAnalysis 
+            {colorAnalysis
               ? `Showing clothes that match your ${colorAnalysis.season} palette`
               : 'Browse clothing from our partner stores'
             }
@@ -204,7 +209,7 @@ export function WardrobeClient({
         )}
       </div>
 
-      {/* Style Guide — fit & fabric recommendations */}
+      {/* Style Guide - fit & fabric recommendations */}
       {colorAnalysis?.sub_season && (() => {
         const guide = getStyleGuide(colorAnalysis.sub_season)
         return (
@@ -212,10 +217,9 @@ export function WardrobeClient({
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <h2 className="font-semibold text-sm">Your Style Guide — {colorAnalysis.sub_season.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h2>
+                <h2 className="font-semibold text-sm">Your Style Guide - {colorAnalysis.sub_season.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                {/* Fit */}
                 <div className="space-y-2">
                   <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fits</p>
                   <div className="flex flex-wrap gap-1.5">
@@ -225,7 +229,6 @@ export function WardrobeClient({
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">{guide.fitAdvice}</p>
                 </div>
-                {/* Fabrics */}
                 <div className="space-y-2">
                   <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fabrics</p>
                   <div className="flex flex-wrap gap-1.5">
@@ -235,7 +238,6 @@ export function WardrobeClient({
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">{guide.fabricAdvice}</p>
                 </div>
-                {/* Avoid + formula */}
                 <div className="space-y-2">
                   <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Avoid</p>
                   <div className="flex flex-wrap gap-1.5">
@@ -253,6 +255,36 @@ export function WardrobeClient({
           </Card>
         )
       })()}
+
+      {/* Main tabs: Shop / My Wardrobe */}
+      <div className="flex gap-1 border-b border-border">
+        <button
+          onClick={() => setMainTab('shop')}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            mainTab === 'shop'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Palette className="w-4 h-4" /> Shop
+        </button>
+        <button
+          onClick={() => setMainTab('my-wardrobe')}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            mainTab === 'my-wardrobe'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Shirt className="w-4 h-4" /> My Wardrobe &amp; Outfits
+        </button>
+      </div>
+
+      {mainTab === 'my-wardrobe' && (
+        <MyWardrobe colorAnalysis={colorAnalysis} />
+      )}
+
+      {mainTab === 'shop' && (<>
 
       {/* No analysis warning */}
       {!colorAnalysis && (
@@ -406,6 +438,7 @@ export function WardrobeClient({
               onSaveToggle={handleSaveToggle}
               userColors={userColors}
               userSeason={userSeason}
+              onTryOn={setTryOnItem}
             />
           ))}
         </div>
@@ -420,6 +453,11 @@ export function WardrobeClient({
           </CardContent>
         </Card>
       )}
+
+      {tryOnItem && (
+        <TryOnModal item={tryOnItem} isOpen={!!tryOnItem} onClose={() => setTryOnItem(null)} />
+      )}
+      </>)}
     </div>
   )
 }

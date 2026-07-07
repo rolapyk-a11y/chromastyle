@@ -1,12 +1,33 @@
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter'
 
-export type SubSeason = 
+export type SubSeason =
   | 'light-spring' | 'true-spring' | 'warm-spring'
   | 'light-summer' | 'true-summer' | 'soft-summer'
   | 'soft-autumn' | 'true-autumn' | 'dark-autumn'
   | 'dark-winter' | 'true-winter' | 'clear-winter'
 
 export type SkinUndertone = 'warm' | 'cool' | 'neutral'
+
+export type ItemCategory = 'top' | 'bottom' | 'shoes' | 'jacket' | 'accessory'
+
+export interface UserWardrobeItem {
+  id: string
+  user_id?: string           // undefined for guest (localStorage) items
+  name: string               // e.g. "Blue linen shirt"
+  category: ItemCategory
+  color_hex: string          // e.g. "#A8C4DC"
+  color_name: string         // e.g. "Powder Blue"
+  brand?: string
+  image_url?: string
+  created_at: string
+}
+
+export interface OutfitCombo {
+  items: UserWardrobeItem[]
+  score: number              // 0–100
+  scoreLabel: 'Great' | 'Good' | 'Okay' | 'Clash'
+  tip: string                // one-line explanation
+}
 
 export interface ColorAnalysis {
   id: string

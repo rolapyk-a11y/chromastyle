@@ -892,3 +892,4 @@ export async function analyzeColorsInBrowser(
     },
   }
 }
+
