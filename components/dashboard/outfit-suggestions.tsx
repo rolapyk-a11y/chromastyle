@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Plus, TrendingUp, ShoppingBag } from 'lucide-react'
+import { Camera, Sparkles, Plus, TrendingUp, ShoppingBag } from 'lucide-react'
 import type { OutfitCombo, ItemCategory, SubSeason } from '@/lib/types'
 import { SUB_SEASON_INFO } from '@/lib/types'
 import { shopLinksFor } from '@/lib/shopLinks'
@@ -23,9 +23,10 @@ interface OutfitSuggestionsProps {
   subSeason: SubSeason | undefined
   onAddItem: () => void
   hasItems: boolean
+  onPreviewOutfit?: (outfit: OutfitCombo) => void
 }
 
-export function OutfitSuggestions({ outfits, subSeason, onAddItem, hasItems }: OutfitSuggestionsProps) {
+export function OutfitSuggestions({ outfits, subSeason, onAddItem, hasItems, onPreviewOutfit }: OutfitSuggestionsProps) {
   if (!hasItems) {
     return (
       <div className="text-center py-12 text-muted-foreground space-y-3">
@@ -64,7 +65,7 @@ export function OutfitSuggestions({ outfits, subSeason, onAddItem, hasItems }: O
       </div>
 
       {outfits.map((outfit, i) => (
-        <OutfitCard key={i} outfit={outfit} rank={i + 1} />
+        <OutfitCard key={i} outfit={outfit} rank={i + 1} onPreviewOutfit={onPreviewOutfit} />
       ))}
 
       <Button variant="outline" size="sm" className="w-full" onClick={onAddItem}>
@@ -74,7 +75,15 @@ export function OutfitSuggestions({ outfits, subSeason, onAddItem, hasItems }: O
   )
 }
 
-function OutfitCard({ outfit, rank }: { outfit: OutfitCombo; rank: number }) {
+function OutfitCard({
+  outfit,
+  rank,
+  onPreviewOutfit,
+}: {
+  outfit: OutfitCombo
+  rank: number
+  onPreviewOutfit?: (outfit: OutfitCombo) => void
+}) {
   const labelClass = SCORE_COLOURS[outfit.scoreLabel]
 
   return (
@@ -139,6 +148,13 @@ function OutfitCard({ outfit, rank }: { outfit: OutfitCombo; rank: number }) {
           <Sparkles className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
           <p className="text-xs text-muted-foreground leading-relaxed">{outfit.tip}</p>
         </div>
+
+        {onPreviewOutfit && (
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onPreviewOutfit(outfit)}>
+            <Camera className="w-4 h-4 mr-1" />
+            Preview Outfit
+          </Button>
+        )}
 
       </CardContent>
     </Card>

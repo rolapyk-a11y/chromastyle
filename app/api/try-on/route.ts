@@ -1,6 +1,22 @@
 import { createClient } from '@/lib/supabase/server'
 
 const FASHN_API_KEY = process.env.FASHN_API_KEY
+const FASHN_ALLOWED_EMAILS = (process.env.FASHN_ALLOWED_EMAILS ?? '')
+  .split(',')
+  .map(email => email.trim().toLowerCase())
+  .filter(Boolean)
+const FASHN_ALLOWED_USER_IDS = (process.env.FASHN_ALLOWED_USER_IDS ?? '')
+  .split(',')
+  .map(id => id.trim())
+  .filter(Boolean)
+
+function isFashnAllowed(user: { id: string; email?: string | null }) {
+  const email = user.email?.toLowerCase()
+  return (
+    (email ? FASHN_ALLOWED_EMAILS.includes(email) : false) ||
+    FASHN_ALLOWED_USER_IDS.includes(user.id)
+  )
+}
 
 export async function POST(req: Request) {
   try {
@@ -9,7 +25,14 @@ export async function POST(req: Request) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const { modelImage, garmentImage, clothingItemId, category = 'auto', accessCode } = await req.json()
+    const {
+      modelImage,
+      garmentImage,
+      clothingItemId,
+      category = 'auto',
+      accessCode,
+      paidConfirmed = false,
+    } = await req.json()
 
     // ── Access lock — this calls a PAID API, so restrict it to the owner ──
     // Set TRYON_ACCESS_CODE in the environment; only requests with the matching
@@ -24,6 +47,13 @@ export async function POST(req: Request) {
       return Response.json({ error: 'Try-on is disabled on this site.', locked: true }, { status: 403 })
     }
 
+    if (!user || !isFashnAllowed(user)) {
+      return Response.json({
+        error: 'Paid AI try-on is locked to the app owner.',
+        needsOwnerAccess: true,
+      }, { status: 403 })
+    }
+
     if (!FASHN_API_KEY) {
       return Response.json({
         error: 'FASHN API key not configured. Please add FASHN_API_KEY to environment variables.',
@@ -33,6 +63,13 @@ export async function POST(req: Request) {
 
     if (!modelImage || !garmentImage) {
       return Response.json({ error: 'Model image and garment image are required' }, { status: 400 })
+    }
+
+    if (!paidConfirmed) {
+      return Response.json({
+        error: 'Paid AI try-on requires explicit confirmation.',
+        needsPaidConfirmation: true,
+      }, { status: 402 })
     }
 
     // Step 1: Start the try-on job
@@ -48,7 +85,7 @@ export async function POST(req: Request) {
           model_image: modelImage,
           garment_image: garmentImage,
           category,
-          garment_photo_type: 'flat-lay',
+          garment_photo_type: 'auto',
           mode: 'balanced',
           return_base64: true,
           output_format: 'jpeg',
@@ -140,6 +177,20 @@ export async function GET(req: Request) {
 
   if (!predictionId) {
     return Response.json({ error: 'Prediction ID is required' }, { status: 400 })
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!isFashnAllowed(user)) {
+    return Response.json({
+      error: 'Paid AI try-on status checks are locked to the app owner.',
+      needsOwnerAccess: true,
+    }, { status: 403 })
   }
 
   if (!FASHN_API_KEY) {

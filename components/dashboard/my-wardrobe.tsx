@@ -14,6 +14,7 @@ import { loadBodyProfile, saveBodyProfile, fitTipsFor, bodyProfileSummary } from
 import { AddItemSheet } from './add-item-sheet'
 import { BodyProfileQuiz } from './body-profile-quiz'
 import { OutfitSuggestions } from './outfit-suggestions'
+import { OutfitTryOnModal } from './outfit-try-on-modal'
 import { OutfitBuilder } from './outfit-builder'
 import { ColourMatches } from './colour-matches'
 import { StyleItemModal } from './style-item-modal'
@@ -49,6 +50,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
   const [bodyProfile, setBodyProfile] = useState<BodyProfile | undefined>(undefined)
   const [showBodyQuiz, setShowBodyQuiz] = useState(false)
   const [outfitMode, setOutfitMode] = useState<'suggested' | 'build'>('suggested')
+  const [previewOutfit, setPreviewOutfit] = useState<OutfitCombo | null>(null)
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -259,6 +261,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
               subSeason={colorAnalysis?.sub_season}
               onAddItem={() => { setAddOpen(true); setActiveView('wardrobe') }}
               hasItems={items.length > 0}
+              onPreviewOutfit={setPreviewOutfit}
             />
           ) : (
             <OutfitBuilder
@@ -271,7 +274,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
         </div>
       )}
 
-      {/* ── Shop My Colours view (real products matched by colour distance) ── */}
+      {/* Shop My Colours view (real products matched by colour distance) */}
       {activeView === 'shop-colours' && (
         <ColourMatches colorAnalysis={colorAnalysis} bodyProfile={bodyProfile} onAddToInventory={addCatalogProduct} />
       )}
@@ -292,6 +295,12 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
           onAddColour={addSuggestedColour}
         />
       )}
+
+      <OutfitTryOnModal
+        outfit={previewOutfit}
+        isOpen={!!previewOutfit}
+        onClose={() => setPreviewOutfit(null)}
+      />
     </div>
   )
 }

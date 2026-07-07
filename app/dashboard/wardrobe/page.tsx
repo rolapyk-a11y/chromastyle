@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { WardrobeClient } from '@/components/dashboard/wardrobe-client'
 import { LocalAnalysisSync } from '@/components/dashboard/local-analysis-sync'
 import { fetchProductsForSeason } from '@/lib/products/fetchProducts'
+import { fetchCatalogProductsForSeason } from '@/lib/products/firecrawl'
+import { fetchUniqloProductsForSeason } from '@/lib/products/uniqloCache'
 import { ColorAnalysis, ClothingItem, SubSeason } from '@/lib/types'
 
 export default async function WardrobePage() {
@@ -40,9 +42,16 @@ export default async function WardrobePage() {
 
   // Fetch real Google Shopping products matched to the user's exact sub-season.
   // Results are cached in Supabase — only the first load costs Serper credits.
-  const realProducts = colorAnalysis?.sub_season
+  const uniqloProducts = colorAnalysis?.sub_season
+    ? fetchUniqloProductsForSeason(colorAnalysis.sub_season as SubSeason)
+    : []
+  const scrapedProducts = colorAnalysis?.sub_season
+    ? await fetchCatalogProductsForSeason(colorAnalysis.sub_season as SubSeason)
+    : []
+  const shoppingProducts = colorAnalysis?.sub_season
     ? await fetchProductsForSeason(colorAnalysis.sub_season as SubSeason)
     : []
+  const realProducts = [...uniqloProducts, ...scrapedProducts, ...shoppingProducts]
   const supabaseItems = (clothingItems ?? []) as ClothingItem[]
 
   // Real products take priority (shown first). De-duplicate by product_url.
@@ -72,3 +81,4 @@ export default async function WardrobePage() {
     </>
   )
 }
+

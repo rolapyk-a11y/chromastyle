@@ -17,7 +17,29 @@
       "Bash(npx tsc *)",
       "Bash(node -e ' *)",
       "mcp__Claude_in_Chrome__list_connected_browsers",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "WebFetch(domain:localhost)",
+      "Bash(curl -s \"http://localhost:3000/demo\" --max-time 10)",
+      "Bash(node -e \"require\\('playwright'\\)\")",
+      "Bash(node -e \"require\\('puppeteer'\\)\")",
+      "Bash(npm install *)",
+      "Bash(ls -la \"/c/Users/Mikke/OneDrive/Desktop/Projekt padel og parkinson/Padel og Parkinson/\" 2>/dev/null)",
+      "WebSearch",
+      "Bash(npm ls *)",
+      "Bash(npm root *)",
+      "Bash(node build_padel.js)",
+      "PowerShell($p = @\\(\"C:\\\\Program Files\\\\LibreOffice\\\\program\\\\soffice.exe\",\"C:\\\\Program Files \\(x86\\)\\\\LibreOffice\\\\program\\\\soffice.exe\"\\); $found = $p | Where-Object { Test-Path $_ }; if \\($found\\) { Write-Output \"SOFFICE: $found\" } else { Write-Output \"no soffice\" }; $pp = \\(Get-Command pdftoppm -ErrorAction SilentlyContinue\\); if \\($pp\\) { Write-Output \"PDFTOPPM: $\\($pp.Source\\)\" } else { Write-Output \"no pdftoppm\" }; $mg = \\(Get-Command magick -ErrorAction SilentlyContinue\\); if \\($mg\\) { Write-Output \"MAGICK: $\\($mg.Source\\)\" } else { Write-Output \"no magick\" })",
+      "Bash(python -m markitdown out.pptx)",
+      "Bash(grep -iE \"\\\\bx{3,}\\\\b|lorem|ipsum|\\\\bTODO|\\\\[insert|placeholder\")",
+      "Bash(rm -f out.pptx out.pdf slide-*.jpg)",
+      "Bash(rm -rf \"/c/Users/Mikke/AppData/Local/Temp/padel_slides\")",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.sciencedirect.com)",
+      "WebFetch(domain:pubmed.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.nature.com)",
+      "WebFetch(domain:www.mdpi.com)",
+      "Bash(rm -rf \"/c/Users/Mikke/AppData/Local/Temp/padel_slides\" \"/c/Users/Mikke/AppData/Local/Temp/padel_slides2\" 2>/dev/null; echo \"temp cleaned\")"
     ]
   }
 }
