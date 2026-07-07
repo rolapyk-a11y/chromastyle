@@ -4,21 +4,32 @@ const FASHN_API_KEY = process.env.FASHN_API_KEY
 
 export async function POST(req: Request) {
   try {
+    // Guest-friendly: the app works without sign-in, so try-on does too.
+    // We still grab the user (if any) to optionally save history below.
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const { modelImage, garmentImage, clothingItemId, category = 'auto', accessCode } = await req.json()
+
+    // ── Access lock — this calls a PAID API, so restrict it to the owner ──
+    // Set TRYON_ACCESS_CODE in the environment; only requests with the matching
+    // code may run. On the public site it stays OFF until a code is configured,
+    // so it can never be left accidentally open to every visitor.
+    const ACCESS_CODE = process.env.TRYON_ACCESS_CODE
+    if (ACCESS_CODE) {
+      if (accessCode !== ACCESS_CODE) {
+        return Response.json({ error: 'Try-on is locked. Enter the access code to use it.', locked: true }, { status: 403 })
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      return Response.json({ error: 'Try-on is disabled on this site.', locked: true }, { status: 403 })
     }
 
     if (!FASHN_API_KEY) {
-      return Response.json({ 
+      return Response.json({
         error: 'FASHN API key not configured. Please add FASHN_API_KEY to environment variables.',
         needsApiKey: true
       }, { status: 500 })
     }
-
-    const { modelImage, garmentImage, clothingItemId, category = 'auto' } = await req.json()
 
     if (!modelImage || !garmentImage) {
       return Response.json({ error: 'Model image and garment image are required' }, { status: 400 })
@@ -99,8 +110,8 @@ export async function POST(req: Request) {
     // Get the result image (base64 or URL)
     const resultImage = resultData.output[0]
 
-    // Save to history if we have a clothing item ID
-    if (clothingItemId) {
+    // Save to history only for signed-in users with a catalog item
+    if (user && clothingItemId) {
       await supabase
         .from('try_on_history')
         .insert({

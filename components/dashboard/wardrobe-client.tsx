@@ -28,10 +28,13 @@ import {
 } from '@/components/ui/select'
 import Link from 'next/link'
 
+type MainTab = 'shop' | 'my-wardrobe'
+
 interface WardrobeClientProps {
   colorAnalysis: ColorAnalysis | undefined
   clothingItems: ClothingItem[]
   savedItemIds: string[]
+  initialMainTab?: MainTab
 }
 
 type FilterBrand = 'all' | 'H&M' | 'Zara' | 'Toj Eksperten'
@@ -65,14 +68,13 @@ function isColorMatch(itemColors: string[], userColors: string[], threshold = 10
   return false
 }
 
-type MainTab = 'shop' | 'my-wardrobe'
-
 export function WardrobeClient({
   colorAnalysis,
   clothingItems,
-  savedItemIds: initialSavedIds
+  savedItemIds: initialSavedIds,
+  initialMainTab = 'shop'
 }: WardrobeClientProps) {
-  const [mainTab, setMainTab] = useState<MainTab>('shop')
+  const [mainTab, setMainTab] = useState<MainTab>(initialMainTab)
   const [searchQuery, setSearchQuery] = useState('')
   const [brandFilter, setBrandFilter] = useState<FilterBrand>('all')
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('all')
@@ -196,7 +198,7 @@ export function WardrobeClient({
           <h1 className="text-3xl font-bold tracking-tight">Wardrobe</h1>
           <p className="text-muted-foreground mt-1">
             {colorAnalysis
-              ? `Showing clothes that match your ${colorAnalysis.season} palette`
+              ? `Showing clothes that match your ${colorAnalysis.sub_season?.replace('-', ' ')} palette`
               : 'Browse clothing from our partner stores'
             }
           </p>
@@ -204,7 +206,7 @@ export function WardrobeClient({
         {colorAnalysis && (
           <div className="flex items-center gap-2">
             <div className={`h-8 w-8 rounded-lg bg-gradient-to-r ${SEASON_INFO[colorAnalysis.season].gradient}`} />
-            <span className="text-sm font-medium capitalize">{colorAnalysis.season}</span>
+            <span className="text-sm font-medium capitalize">{colorAnalysis.sub_season?.replace(/-/g, ' ')}</span>
           </div>
         )}
       </div>

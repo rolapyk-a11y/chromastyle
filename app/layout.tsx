@@ -14,26 +14,32 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'ChromaStyle — Colour Analysis',
-  description: 'Discover your seasonal colour palette and find clothing that enhances your natural features. Free AI-powered colour analysis and outfit recommendations.',
-  keywords: ['colour analysis', 'seasonal colours', 'personal colour', 'style guide', 'outfit recommendations', 'fashion'],
+  title: 'Outfitter — Farveanalyse & Outfit-forslag',
+  description: 'Find din farvesæson og få outfit-forslag der passer til dig. Gratis AI-farveanalyse.',
+  keywords: ['farveanalyse', 'farvesæson', 'outfit', 'tøj', 'personlig stil', 'colour analysis'],
+
+  manifest: '/manifest.json',
+
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/apple-touch-icon.png',
+  },
 
   // PWA / home screen settings
   appleWebApp: {
     capable: true,
-    title: 'ChromaStyle',
-    statusBarStyle: 'black-translucent', // lets the app bleed under the iOS status bar
+    title: 'Outfitter',
+    statusBarStyle: 'default',
   },
 
-  // Open Graph (looks good when shared on social/WhatsApp)
+  // Open Graph
   openGraph: {
-    title: 'ChromaStyle — Discover Your Colour Season',
-    description: 'Upload a photo and find out your seasonal colour type in seconds. Free, no sign-up needed.',
+    title: 'Outfitter — Find din farvesæson',
+    description: 'Upload et foto og find din farvesæson på sekunder. Gratis, ingen konto.',
     type: 'website',
-    siteName: 'ChromaStyle',
+    siteName: 'Outfitter',
   },
 
-  // Prevents phone numbers / emails being auto-linked
   formatDetection: {
     telephone: false,
     email: false,
@@ -43,10 +49,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   // Matches the manifest background colour — prevents white flash on launch
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0a0a14' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a14' },
-  ],
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   // Prevents layout breaking if user pinch-zooms
@@ -60,10 +63,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark bg-background">
+    <html lang="en" className="bg-background">
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
       >
+        {/* Impact.com affiliate site verification — React 19 hoists this <meta> into <head>.
+            Impact requires the `value` attribute (not the standard `content`); the spread
+            keeps TypeScript happy since React's <meta> type doesn't declare `value`. */}
+        <meta {...({ name: 'impact-site-verification', value: '45949e16-0ebd-47c6-b8de-3fc3201726b1' } as Record<string, string>)} />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

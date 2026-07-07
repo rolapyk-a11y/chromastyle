@@ -1,0 +1,373 @@
+/**
+ * Style Guide
+ *
+ * Rules and knowledge extracted from analysis of 35+ menswear reference images
+ * covering casual, smart casual, street, resort, and summer styles. Used by the
+ * outfit engine to generate better tips and bonus scoring for proven colour
+ * combinations and fabric/texture pairings.
+ */
+
+import type { FabricWeight, Season } from './types'
+
+// ─── Proven colour pair combinations ─────────────────────────────────────────
+// Each entry describes a combination that appears repeatedly across style guides.
+// bonus: added to pairScore when matched. tip: shown in the outfit card.
+
+export interface StylePair {
+  name: string
+  families: [ColourFamily, ColourFamily]
+  bonus: number
+  tip: string
+}
+
+export type ColourFamily =
+  | 'white' | 'cream' | 'beige' | 'sand'
+  | 'black' | 'charcoal' | 'grey'
+  | 'navy' | 'blue'
+  | 'brown' | 'camel' | 'tan'
+  | 'olive' | 'khaki'
+  | 'sage' | 'green' | 'mint'
+  | 'burgundy' | 'warm-red'
+  | 'peach' | 'lavender' | 'dusty-pink'
+
+export const PROVEN_PAIRS: StylePair[] = [
+  // ── Neutral anchors ──
+  { name: 'White + Navy',    families: ['white',  'navy'],    bonus: 15, tip: 'White + navy — the cleanest classic combination. Effortless and always right.' },
+  { name: 'Black + Beige',   families: ['black',  'beige'],   bonus: 15, tip: 'Black + beige — high contrast with a neutral base. Wear with white sneakers.' },
+  { name: 'Black + Cream',   families: ['black',  'cream'],   bonus: 14, tip: 'Black + cream — softer than black/white but just as sharp. Very wearable.' },
+  { name: 'Grey + White',    families: ['grey',   'white'],   bonus: 12, tip: 'Grey + white — minimal and effortless. Let fit and texture do the talking.' },
+  { name: 'Charcoal + White',families: ['charcoal','white'],  bonus: 12, tip: 'Charcoal + white — strong value contrast. One of the most reliable combos.' },
+  { name: 'Camel + Black',   families: ['camel',  'black'],   bonus: 14, tip: 'Camel + black — premium contrast. Add white sneakers or brown leather shoes.' },
+  { name: 'Camel + White',   families: ['camel',  'white'],   bonus: 12, tip: 'Camel + white — warm and light. Great for spring/autumn.' },
+  // ── Earth tones ──
+  { name: 'Brown + Cream',   families: ['brown',  'cream'],   bonus: 13, tip: 'Brown + cream — warm tones together always look intentional and grounded.' },
+  { name: 'Brown + Beige',   families: ['brown',  'beige'],   bonus: 11, tip: 'Brown + beige — tonal earth dressing. Add a white tee for separation.' },
+  { name: 'Tan + Navy',      families: ['tan',    'navy'],    bonus: 12, tip: 'Tan + navy — warm base, cool top. One of the most wearable mixed combos.' },
+  // ── Greens ──
+  { name: 'Olive + Beige',   families: ['olive',  'beige'],   bonus: 13, tip: 'Olive + beige — earth tones that always pair naturally. Very versatile.' },
+  { name: 'Olive + Khaki',   families: ['olive',  'khaki'],   bonus: 10, tip: 'Olive + khaki — tonal green-earth combination. Keep shoes minimal.' },
+  { name: 'Sage + Black',    families: ['sage',   'black'],   bonus: 12, tip: 'Sage green + black — nature tone on dark base. Very popular for good reason.' },
+  { name: 'Sage + Beige',    families: ['sage',   'beige'],   bonus: 11, tip: 'Sage + beige — soft, nature-inspired. Works especially well for spring.' },
+  // ── Blues ──
+  { name: 'Navy + Grey',     families: ['navy',   'grey'],    bonus: 11, tip: 'Navy + grey — cool tones that complement without competing.' },
+  { name: 'Navy + Beige',    families: ['navy',   'beige'],   bonus: 12, tip: 'Navy + beige — classic preppy combination. Hard to get wrong.' },
+  { name: 'Blue + White',    families: ['blue',   'white'],   bonus: 13, tip: 'Blue + white — the eternal combination. Clean, fresh, works all seasons.' },
+  // ── Accent tones ──
+  { name: 'Burgundy + Black',families: ['burgundy','black'],  bonus: 10, tip: 'Burgundy + black — bold but grounded. Great for autumn/winter.' },
+  { name: 'Burgundy + Grey', families: ['burgundy','grey'],   bonus: 9,  tip: 'Burgundy + grey — rich accent on a neutral base.' },
+  // ── Summer combos (from reference image set 3) ──
+  { name: 'White + Beige',    families: ['white',    'beige'],    bonus: 12, tip: 'White + beige — the most wearable summer formula. Linen versions of both look effortlessly good.' },
+  { name: 'Black + Khaki',   families: ['black',    'khaki'],    bonus: 11, tip: 'Black + khaki — easy to copy, always sharp. White sneakers seal the look.' },
+  { name: 'Green + Navy',    families: ['green',    'navy'],     bonus: 10, tip: 'Green + navy — warm tone meets cool base. Keep one piece solid, one textured.' },
+  { name: 'Blue + Grey',     families: ['blue',     'grey'],     bonus: 10, tip: 'Blue + grey — effortless pairing that rarely goes wrong. Easy casual summer go-to.' },
+  { name: 'Sage + Charcoal', families: ['sage',     'charcoal'], bonus: 11, tip: 'Sage + charcoal — soft nature tone on a strong dark base. Modern and wearable.' },
+  { name: 'Olive + Cream',   families: ['olive',    'cream'],    bonus: 12, tip: 'Olive + cream — the linen summer pairing. Relaxed, natural, works with sandals or white sneakers.' },
+  { name: 'Warm-red + White',families: ['warm-red', 'white'],    bonus: 10, tip: 'Terracotta / rust + white — bold warm accent on a clean base. A strong summer statement.' },
+  // ── Extended neutrals (from reference image set 2) ──
+  { name: 'Charcoal + Beige',families: ['charcoal','beige'],  bonus: 11, tip: 'Charcoal + beige — dark neutral on a warm light base. A sharper take on grey + beige.' },
+  { name: 'Blue + Cream',    families: ['blue',   'cream'],   bonus: 11, tip: 'Blue + cream — the effortless casual pairing. Works from denim and a knit to linen in summer.' },
+  { name: 'Blue + Beige',    families: ['blue',   'beige'],   bonus: 10, tip: 'Light blue + beige (taupe) — airy and easy. Ideal for warm weather and resort looks.' },
+  // ── Earth tones extended ──
+  { name: 'Camel + Brown',   families: ['camel',  'brown'],   bonus: 9,  tip: 'Camel + brown — warm tonal earth dressing. Vary textures (knit vs woven) for separation.' },
+  // ── Greens extended ──
+  { name: 'Green + Black',   families: ['green',  'black'],   bonus: 11, tip: 'Dark green + black — nature tone anchored by black. On-trend and effortless.' },
+  { name: 'Green + Beige',   families: ['green',  'beige'],   bonus: 10, tip: 'Green + beige — earthy and natural. The overshirt-over-tee formula in its best colours.' },
+  // ── Light Spring combinations (mint, peach, lavender, dusty-pink) ──
+  // Light Spring = very light, medium bright, neutral warm. Best paired with warm neutrals.
+  { name: 'Mint + White',       families: ['mint',       'white'],    bonus: 13, tip: 'Mint + white — the definitive light spring combination. Fresh, clean, and immediately seasonal.' },
+  { name: 'Mint + Cream',       families: ['mint',       'cream'],    bonus: 12, tip: 'Mint + cream — soft and warm. A linen mint shirt over cream trousers is a perfect spring formula.' },
+  { name: 'Mint + Beige',       families: ['mint',       'beige'],    bonus: 11, tip: 'Mint + beige — fresh nature tone on a warm neutral. Works especially well in linen.' },
+  { name: 'Mint + Blue',        families: ['mint',       'blue'],     bonus: 10, tip: 'Mint + sky blue — light spring\'s signature two-tone pairing. Soft and airy, best in light fabrics.' },
+  { name: 'Peach + Beige',      families: ['peach',      'beige'],    bonus: 12, tip: 'Peach + beige — warm and flattering. A natural spring pairing that suits light-warm colouring.' },
+  { name: 'Peach + Cream',      families: ['peach',      'cream'],    bonus: 11, tip: 'Peach + cream — tonal warmth. Keep one piece textured (linen) and one smooth.' },
+  { name: 'Peach + White',      families: ['peach',      'white'],    bonus: 10, tip: 'Peach / coral + white — warm accent on a clean base. Great for spring and summer occasions.' },
+  { name: 'Lavender + Cream',   families: ['lavender',   'cream'],    bonus: 11, tip: 'Lavender + cream — soft and distinctive. An effortlessly polished light spring combination.' },
+  { name: 'Lavender + White',   families: ['lavender',   'white'],    bonus: 10, tip: 'Lavender + white — clean and light. Easy to wear and refreshing for spring.' },
+  { name: 'Dusty-pink + Grey',  families: ['dusty-pink', 'grey'],     bonus: 9,  tip: 'Dusty rose + grey — soft and modern. The muted tones balance each other for a refined spring look.' },
+  { name: 'Sage + White',       families: ['sage',       'white'],    bonus: 12, tip: 'Sage + off white — probably the most-seen light spring menswear combination. Clean and natural.' },
+  { name: 'Olive + Blue',       families: ['olive',      'blue'],     bonus: 10, tip: 'Olive + sky blue — earthy meets airy. A versatile spring pairing that avoids the obvious navy route.' },
+  { name: 'Blue + Sand',        families: ['blue',       'sand'],     bonus: 10, tip: 'Sky blue + sand — airy and seaside-ready. A capsule wardrobe staple for light spring colouring.' },
+  { name: 'Cream + Camel',      families: ['cream',      'camel'],    bonus: 10, tip: 'Cream + camel — warm tonal neutrals. The overshirt-over-tee formula at its softest.' },
+  { name: 'Brown + Khaki',      families: ['brown',      'khaki'],    bonus: 9,  tip: 'Brown + khaki — earthy tonal dressing. Vary the textures (leather shoes, cotton trousers) for separation.' },
+  // ── "Old Money" combinations (from reference image set 4) ──
+  // Navy + camel is the single most repeated pairing across all Old Money guides.
+  { name: 'Navy + Camel',     families: ['navy',     'camel'],    bonus: 14, tip: 'Navy + camel — the Old Money staple. Sharp contrast, warm base. Brown leather shoes complete it.' },
+  { name: 'Cream + Navy',     families: ['cream',    'navy'],     bonus: 12, tip: 'Cream + navy — warm-cool contrast at its cleanest. Works in linen for summer or cotton for autumn.' },
+  { name: 'Blue + Camel',     families: ['blue',     'camel'],    bonus: 11, tip: 'Light blue + camel — airy and polished. One of the most copied Old Money combinations.' },
+  { name: 'Burgundy + Beige', families: ['burgundy', 'beige'],   bonus: 10, tip: 'Burgundy + beige — rich accent on a warm neutral base. Strong for autumn and smart-casual.' },
+  { name: 'Burgundy + Camel', families: ['burgundy', 'camel'],   bonus: 9,  tip: 'Maroon + camel — warm, earthy, sophisticated. A deeper take on burgundy styling.' },
+  { name: 'Camel + Beige',    families: ['camel',    'beige'],   bonus: 8,  tip: 'Camel + beige — tonal warm dressing. Vary textures (knit vs woven) to avoid looking flat.' },
+  // ── Brown outfit combinations (from Alarna Hope + multiple guides) ──
+  { name: 'Charcoal + Brown', families: ['charcoal', 'brown'],   bonus: 10, tip: 'Charcoal + brown (mocha) — deep and warm. The dark anchor + warm tone formula at its best.' },
+  { name: 'Brown + Grey',     families: ['brown',    'grey'],    bonus: 9,  tip: 'Brown + grey — warm meets cool neutral. Understated and easy to build on.' },
+  { name: 'Brown + Blue',     families: ['brown',    'blue'],    bonus: 10, tip: 'Chocolate brown + blue — unexpected but consistently recommended. Rich contrast that works year-round.' },
+  { name: 'Sage + Brown',     families: ['sage',     'brown'],   bonus: 10, tip: 'Sage green + brown — nature pairing. The earthy tone of brown meets the botanical lift of sage.' },
+  // ── Shirt & trouser pairings + neutral outfit guide ──
+  { name: 'White + Olive',    families: ['white',    'olive'],   bonus: 11, tip: 'White + olive — crisp base with a nature tone. One of the cleanest casual combinations.' },
+  { name: 'Olive + Navy',     families: ['olive',    'navy'],    bonus: 10, tip: 'Olive + navy — military meets nautical. Strong and versatile across seasons.' },
+  { name: 'Tan + Black',      families: ['tan',      'black'],   bonus: 11, tip: 'Tan + black — light warm tone on the darkest anchor. Sharp, wearable, always sharp.' },
+  { name: 'Khaki + Navy',     families: ['khaki',    'navy'],    bonus: 10, tip: 'Khaki + navy — a military-nautical classic. The most reliable two-tone casual formula for warm seasons.' },
+  // ── Light Spring capsule staples (from additional reference images) ──
+  { name: 'Sage + Cream',     families: ['sage',     'cream'],   bonus: 11, tip: 'Sage + cream — the softest spring pairing. Both tones share warmth and lightness, enhancing rather than competing.' },
+  { name: 'Sand + White',     families: ['sand',     'white'],   bonus: 10, tip: 'Warm sand / golden yellow + white — light and warm. Works as a tee under a sandy linen overshirt for spring.' },
+  { name: 'Sand + Beige',     families: ['sand',     'beige'],   bonus: 9,  tip: 'Sand + beige — tonal warm spring dressing. Keep both pieces in linen or light cotton for the best effect.' },
+  { name: 'Warm-red + Cream', families: ['warm-red', 'cream'],   bonus: 10, tip: 'Terracotta / coral + cream — a warm, earthy spring formula. Appears across light spring capsule wardrobes.' },
+  { name: 'Camel + Olive',    families: ['camel',    'olive'],   bonus: 10, tip: 'Camel + olive — warm earth meets botanical green. A spring capsule staple that works across occasions.' },
+  { name: 'Peach + Sand',     families: ['peach',    'sand'],    bonus: 9,  tip: 'Peach + warm sand — two light spring tones together. Vary textures (linen vs cotton) to keep them distinct.' },
+  { name: 'Mint + Sand',      families: ['mint',     'sand'],    bonus: 10, tip: 'Mint + warm sand — cool green on a warm golden base. A light spring signature; finish with white trainers or tan loafers.' },
+]
+
+// ─── Colour family detection from hex ────────────────────────────────────────
+
+function hexToHsl(hex: string): [number, number, number] {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16) / 255
+  const g = parseInt(h.slice(2, 4), 16) / 255
+  const b = parseInt(h.slice(4, 6), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  if (max === min) return [0, 0, l * 100]
+  const d = max - min
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+  let hue = 0
+  if (max === r) hue = ((g - b) / d + (g < b ? 6 : 0)) / 6
+  else if (max === g) hue = ((b - r) / d + 2) / 6
+  else hue = ((r - g) / d + 4) / 6
+  return [hue * 360, s * 100, l * 100]
+}
+
+export function colourFamily(hex: string): ColourFamily {
+  const [h, s, l] = hexToHsl(hex)
+
+  // Achromatic (near-white, grey, near-black)
+  if (s < 12) {
+    if (l > 88) return 'white'
+    if (l > 72) return 'cream'
+    if (l > 50) return 'grey'
+    if (l > 22) return 'charcoal'
+    return 'black'
+  }
+
+  // Low-saturation warm light tones — beige/cream/sand
+  if (s < 30 && l > 65 && h < 60) return 'cream'
+  if (s < 35 && l > 50 && h < 60) return 'beige'
+
+  // ── Light / pastel tones (checked before general hue routing) ──
+  // peach: warm peachy / salmon / coral-light (hue 10–28°, medium-high sat, light)
+  if (h >= 10 && h < 28 && s >= 28 && l > 62) return 'peach'
+  // mint: cool-green / mint (hue 140–178°, any saturation, high lightness)
+  if (h >= 140 && h < 178 && l > 64) return 'mint'
+  // dusty-pink: soft rose / mauve (high hue, low-medium saturation, light)
+  if (h >= 325 && s < 55 && l > 55) return 'dusty-pink'
+  // lavender: blue-purple, low-medium sat, light (distinguishes from navy which is dark)
+  if (h >= 245 && h < 295 && s < 60 && l > 50) return 'lavender'
+
+  // Hue-based
+  if (h < 20 || h >= 345) return 'warm-red'
+  if (h < 40)  return l > 55 ? 'tan' : l > 38 ? 'brown' : 'brown'
+  if (h < 55)  return l > 55 ? 'sand' : l > 35 ? 'camel' : 'brown'
+  if (h < 75)  return l > 55 ? 'khaki' : 'olive'
+  if (h < 100) return l < 50 ? 'olive' : 'sage'
+  if (h < 160) return 'green'
+  if (h < 170) return 'sage'
+  if (h < 200) return 'blue'
+  if (h < 230) return l < 40 ? 'navy' : 'blue'
+  if (h < 270) return 'navy'
+  if (h < 300) return 'grey'
+  if (h < 330) return 'burgundy'
+  return 'warm-red'
+}
+
+// Returns the proven pair bonus + tip for two hex colours, or null if no match
+export function provenPairBonus(hexA: string, hexB: string): { bonus: number; tip: string } | null {
+  const famA = colourFamily(hexA)
+  const famB = colourFamily(hexB)
+  for (const pair of PROVEN_PAIRS) {
+    const [f1, f2] = pair.families
+    if ((famA === f1 && famB === f2) || (famA === f2 && famB === f1)) {
+      return { bonus: pair.bonus, tip: pair.tip }
+    }
+  }
+  return null
+}
+
+// ─── Style archetypes ─────────────────────────────────────────────────────────
+
+export type StyleArchetype = 'minimal' | 'smart-casual' | 'street' | 'resort'
+
+export const ARCHETYPE_DESCRIPTIONS: Record<StyleArchetype, string> = {
+  'minimal':      'All neutrals, clean cuts, no logos. Less is more.',
+  'smart-casual': 'Elevated basics — trousers over jeans, clean leather shoes, well-fitted.',
+  'street':       'Relaxed/oversized silhouettes, monochrome or bold single colour.',
+  'resort':       'Linen, light colours, relaxed cuts. Built for warmth.',
+}
+
+// ─── Layering formulas ────────────────────────────────────────────────────────
+
+export const LAYERING_FORMULAS = [
+  'Open overshirt over a plain tee — the easiest outfit upgrade.',
+  'Hoodie under a structured jacket — adds warmth and texture.',
+  'Fitted turtleneck under a blazer or coat — smart and clean.',
+  'White tee under a dark overshirt with collar visible — adds depth.',
+]
+
+// ─── Fit contrast rules ───────────────────────────────────────────────────────
+// The single most repeated rule across all 15 reference images:
+// ONE relaxed piece + ONE fitted piece = always balanced.
+
+export const FIT_RULES = [
+  'Relaxed top + tapered trouser — the most reliable silhouette.',
+  'Fitted tee + wide-leg trouser — balanced and modern.',
+  'Never two oversized pieces — always anchor with one fitted item.',
+  'Crop to ankle on trousers — no fabric pooling at the shoe.',
+]
+
+// ─── Shoe pairing rules ───────────────────────────────────────────────────────
+
+export const SHOE_RULES = [
+  'White clean sneakers work with every casual combination.',
+  'Brown leather/loafers elevate any outfit instantly.',
+  'Match shoe depth to trouser: light shoes + light trousers, or dark + dark.',
+  'Avoid coloured trainers unless the rest of the outfit is minimal and neutral.',
+]
+
+// ─── Fabric & texture ─────────────────────────────────────────────────────────
+// Numeric weight 1 (lightest) → 6 (heaviest). Drives season-fit penalties and
+// texture contrast bonuses in the outfit engine.
+
+export const FABRIC_WEIGHT: Record<FabricWeight, number> = {
+  'linen':        1,
+  'light-cotton': 2,
+  'cotton':       3,
+  'denim':        4,
+  'knit':         4,
+  'fleece':       5,
+  'wool':         6,
+}
+
+// Acceptable fabric-weight window [min, max] per season.
+// Sourced from 35+ reference images: linen dominates summer, wool/fleece = winter only.
+export const SEASON_WEIGHT_IDEAL: Record<Season, [number, number]> = {
+  spring: [2, 4],   // light cotton → denim/knit
+  summer: [1, 3],   // linen → cotton
+  autumn: [3, 5],   // cotton → fleece
+  winter: [4, 6],   // denim/knit → wool
+}
+
+// Penalty score for a fabric that's too light or too heavy for the season.
+export function fabricSeasonPenalty(fabric: FabricWeight, season: Season): number {
+  const w = FABRIC_WEIGHT[fabric]
+  const [min, max] = SEASON_WEIGHT_IDEAL[season]
+  if (w < min) return (min - w) * 8   // too light — e.g. linen in winter
+  if (w > max) return (w - max) * 10  // too heavy — e.g. wool coat in summer
+  return 0
+}
+
+// Texture-contrast bonus when two fabrics pair well together.
+// Smooth + textured is the dominant pattern across all reference images.
+export function texturePairBonus(
+  fabA: FabricWeight,
+  fabB: FabricWeight,
+): { bonus: number; tip: string } | null {
+  const wA = FABRIC_WEIGHT[fabA]
+  const wB = FABRIC_WEIGHT[fabB]
+  const diff = Math.abs(wA - wB)
+  // Matching linen: resort set formula — works when colours are tonal
+  if (fabA === 'linen' && fabB === 'linen') {
+    return { bonus: 4, tip: 'Two linen pieces — the resort formula. Keep colours tonal or contrast light + colour.' }
+  }
+  if (diff >= 3) return { bonus: 10, tip: 'Strong texture contrast — the weight difference between these fabrics adds depth and makes the combo feel considered.' }
+  if (diff === 2) return { bonus: 6,  tip: 'Smooth meets textured — this is what makes the pairing feel intentional rather than accidental.' }
+  if (diff === 1) return { bonus: 3,  tip: 'Subtle texture variation adds quiet depth without drawing attention.' }
+  return null
+}
+
+// ─── Fabric drape / structure ─────────────────────────────────────────────────
+// Separate from weight: how stiff or fluid a fabric is and how it falls on the body.
+//   structured = holds its own shape (linen woven, denim) — crisp, defined silhouette
+//   semi       = has some body but moves with the wearer (cotton, wool)
+//   drapey     = falls with gravity, no shape of its own (knit, fleece)
+
+export type FabricDrape = 'structured' | 'semi' | 'drapey'
+
+export const FABRIC_DRAPE: Record<FabricWeight, FabricDrape> = {
+  'linen':        'structured',  // crisp woven — light but holds its shape
+  'light-cotton': 'semi',        // soft but has enough body to sit cleanly
+  'cotton':       'semi',        // breathable, slight structure from weave
+  'denim':        'structured',  // rigid — the strongest shape-holder
+  'knit':         'drapey',      // stretches and falls naturally with gravity
+  'fleece':       'drapey',      // soft, formless, no defined silhouette
+  'wool':         'semi',        // has structure but moves; sits between woven and knit
+}
+
+// Returns a bonus (or penalty) when two drape levels are paired.
+// Structured + drapey is the single most repeated contrast in all style references.
+export function drapePairBonus(
+  fabA: FabricWeight,
+  fabB: FabricWeight,
+): { bonus: number; tip: string } | null {
+  const dA = FABRIC_DRAPE[fabA]
+  const dB = FABRIC_DRAPE[fabB]
+
+  if (dA === dB) {
+    if (dA === 'structured') return null // two structured pieces is fine — no tip needed
+    if (dA === 'semi')       return null // two semi pieces is fine
+    // two drapey pieces → looks shapeless
+    return { bonus: -6, tip: 'Two soft, drapey pieces together can look shapeless. Add a structured layer — a woven overshirt, a denim jacket, or a blazer — to anchor the outfit.' }
+  }
+
+  if ((dA === 'structured' && dB === 'drapey') || (dA === 'drapey' && dB === 'structured')) {
+    return { bonus: 8, tip: 'Structured meets drapey — one piece holds its shape while the other falls naturally. This is the contrast that makes an outfit look considered rather than accidental.' }
+  }
+
+  // structured + semi, or semi + drapey
+  if (dA === 'structured' || dB === 'structured') {
+    return { bonus: 4, tip: 'A structured piece anchors a softer one — the outfit has a clean shape without looking rigid.' }
+  }
+  return { bonus: 3, tip: 'A hint of structure paired with a softer fabric — easy and wearable without looking too casual.' }
+}
+
+// Fabric styling rules extracted from all reference image sets (35+ images)
+export const FABRIC_RULES = [
+  'Linen is the summer staple — one linen piece makes any outfit feel seasonal and intentional.',
+  'Open woven overshirt over a plain tee: the texture contrast is what makes layering look intentional.',
+  'Ribbed knit + smooth chino — the texture difference makes both pieces look better.',
+  'Matching linen top + bottom in tonal colours = resort dressing. A classic summer move.',
+  'Never two heavy-weight pieces at once unless the outer layer stays open.',
+  'Denim + cotton tee is the most reliable casual formula across all seasons.',
+  'A structured (woven) piece paired with something relaxed (knit, tee) creates the right balance.',
+  // ── Drape rules ──
+  'Structured + drapey is the best fabric contrast: one piece holds its shape, the other falls freely.',
+  'Two drapey pieces together (knit top + fleece bottom) look shapeless — always anchor with one structured piece.',
+  'Denim is the most structured fabric: even a light denim jacket instantly defines a soft knit outfit.',
+  'Linen looks crisp when ironed, drapey when worn — it is the most versatile drape piece for warm weather.',
+  'A knit sweater over a woven shirt: the woven collar and cuffs add structure that stops the knit from looking too casual.',
+]
+
+// ─── Tips by outfit score ─────────────────────────────────────────────────────
+// Used to supplement the engine tip with style-guide-sourced advice.
+
+// Coach voice: warm, second-person, encouraging — like a personal stylist
+// talking to you, not a reference manual. One clear, doable suggestion each.
+export const SCORE_TIPS: Record<'great' | 'good' | 'okay' | 'clash', string[]> = {
+  great: [
+    "You've nailed this one — slip on white sneakers or clean brown leather and you're out the door.",
+    'This is a combination you can reach for any day and trust completely.',
+    "Throw an open overshirt in a neutral tone over the top — it'll make the whole look feel considered.",
+  ],
+  good: [
+    'Almost there — a plain white tee underneath would tie it together beautifully.',
+    "Add white sneakers and you'll sharpen the whole thing right up.",
+    'Tuck the top in just a little — it gives the look a bit of intention.',
+  ],
+  okay: [
+    'Bring in a neutral third piece — a beige overshirt or grey jacket — to bridge the two colours.',
+    'One piece a touch closer to cream or white would lift this nicely.',
+    'Play with proportion here: keep one piece fitted and one relaxed.',
+  ],
+  clash: [
+    'These two are fighting each other a little — try swapping one for a neutral like beige, grey, or navy.',
+    'Keep the colour you love and pair it with one of its proven partners instead.',
+    'Go tonal — shades of the same colour would feel much calmer than this pairing.',
+  ],
+}

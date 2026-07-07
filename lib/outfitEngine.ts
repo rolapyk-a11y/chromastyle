@@ -6,7 +6,10 @@
  * season-specific palette compatibility.
  */
 
-import type { UserWardrobeItem, OutfitCombo, SubSeason } from './types'
+import type { UserWardrobeItem, OutfitCombo, SubSeason, ItemCategory, Season, BodyProfile } from './types'
+import { paletteFor, type PaletteColour } from './palettes'
+import { provenPairBonus, SCORE_TIPS, fabricSeasonPenalty, texturePairBonus, drapePairBonus } from './styleGuide'
+import { cutFitsBody } from './bodyGuide'
 
 // ─── Colour utilities ─────────────────────────────────────────────────────────
 
@@ -72,6 +75,13 @@ function colourFitsSeasonAvoid(hex: string, subSeason: SubSeason): boolean {
 
 // ─── Pair two items and return a score + tip ──────────────────────────────────
 
+function subSeasonToSeason(sub: SubSeason): Season {
+  if (sub.includes('spring')) return 'spring'
+  if (sub.includes('summer')) return 'summer'
+  if (sub.includes('autumn')) return 'autumn'
+  return 'winter'
+}
+
 function pairScore(
   a: UserWardrobeItem,
   b: UserWardrobeItem,
@@ -90,28 +100,54 @@ function pairScore(
   const bFits = colourFitsSeasonAvoid(b.color_hex, subSeason)
   const seasonPenalty = (!aFits ? 20 : 0) + (!bFits ? 20 : 0)
 
+  // ── Texture modifier (fabric weight vs season + texture contrast) ──────────
+  const season = subSeasonToSeason(subSeason)
+  let textureDelta = 0
+  let textureTip = ''
+  if (a.fabric) textureDelta -= fabricSeasonPenalty(a.fabric, season)
+  if (b.fabric) textureDelta -= fabricSeasonPenalty(b.fabric, season)
+  if (a.fabric && b.fabric) {
+    const tb = texturePairBonus(a.fabric, b.fabric)
+    if (tb) { textureDelta += tb.bonus; textureTip = ' ' + tb.tip }
+    // Drape contrast scores on top of weight contrast — tip overrides when more specific
+    const db = drapePairBonus(a.fabric, b.fabric)
+    if (db) { textureDelta += db.bonus; textureTip = ' ' + db.tip }
+  }
+
+  function finalise(rawColourScore: number, tip: string) {
+    const combined = Math.max(0, Math.min(100, rawColourScore + textureDelta))
+    return { score: combined, tip: tip + textureTip }
+  }
+
+  // Check proven style-guide pairs first — gets a bonus + specific tip
+  const proven = provenPairBonus(a.color_hex, b.color_hex)
+  if (proven) {
+    const raw = Math.min(100, 80 + proven.bonus - seasonPenalty)
+    return finalise(Math.max(0, raw), proven.tip)
+  }
+
   // One or both are neutral → always works, just needs enough contrast
   if (aNeutral || bNeutral) {
-    if (valueDiff > 30) return { score: Math.max(0, 95 - seasonPenalty), tip: 'Neutral base with clear value contrast — very wearable.' }
-    if (valueDiff > 15) return { score: Math.max(0, 80 - seasonPenalty), tip: 'Neutral pairing. A slightly bigger difference in depth would sharpen it.' }
-    return { score: Math.max(0, 60 - seasonPenalty), tip: 'Both pieces are similar in depth — try one light, one dark.' }
+    if (valueDiff > 30) return finalise(Math.max(0, 92 - seasonPenalty), "A neutral base with clear contrast in depth — you really can't go wrong with this. " + SCORE_TIPS.great[0])
+    if (valueDiff > 15) return finalise(Math.max(0, 78 - seasonPenalty), 'A solid neutral pairing — a slightly bigger gap in depth would sharpen it. ' + SCORE_TIPS.good[0])
+    return finalise(Math.max(0, 60 - seasonPenalty), 'Your two pieces sit at a similar depth — try one lighter and one darker. ' + SCORE_TIPS.okay[0])
   }
 
   // Both in same family (warm+warm or cool+cool)
   if (aWarm === bWarm) {
-    if (valueDiff > 35) return { score: Math.max(0, 90 - seasonPenalty), tip: 'Same colour family with strong value contrast — cohesive and intentional.' }
-    if (valueDiff > 20) return { score: Math.max(0, 75 - seasonPenalty), tip: 'Same family, decent contrast. One piece could go a shade lighter or darker.' }
-    return { score: Math.max(0, 45 - seasonPenalty), tip: 'Similar depth and temperature — try pairing with a neutral bottom instead.' }
+    if (valueDiff > 35) return finalise(Math.max(0, 88 - seasonPenalty), 'Same colour family with strong contrast — this looks cohesive and intentional on you. ' + SCORE_TIPS.great[1])
+    if (valueDiff > 20) return finalise(Math.max(0, 73 - seasonPenalty), 'Same family with decent contrast — nudge one piece a shade lighter or darker to perfect it.')
+    return finalise(Math.max(0, 45 - seasonPenalty), 'These sit at a similar depth and temperature. ' + SCORE_TIPS.okay[2])
   }
 
   // Mixed warm + cool
   if (bNeutral || aNeutral) {
-    return { score: Math.max(0, 85 - seasonPenalty), tip: 'Statement colour on top, neutral base — the most reliable formula.' }
+    return finalise(Math.max(0, 83 - seasonPenalty), "A statement colour on a neutral base — honestly the most reliable formula there is. " + SCORE_TIPS.good[1])
   }
   if (valueDiff > 30) {
-    return { score: Math.max(0, 70 - seasonPenalty), tip: 'Mixed warm/cool with good contrast. Keep other accessories in one family.' }
+    return finalise(Math.max(0, 68 - seasonPenalty), 'A warm/cool mix with good contrast — keep your shoes and accessories in one family to anchor it.')
   }
-  return { score: Math.max(0, 50 - seasonPenalty), tip: 'Mixed warm and cool — works if one piece is clearly the statement and one steps back.' }
+  return finalise(Math.max(0, 50 - seasonPenalty), SCORE_TIPS.clash[0])
 }
 
 function scoreLabel(score: number): OutfitCombo['scoreLabel'] {
@@ -121,11 +157,69 @@ function scoreLabel(score: number): OutfitCombo['scoreLabel'] {
   return 'Clash'
 }
 
+// Average body-fit delta across an outfit's items that have a known cut.
+function bodyFit(
+  outfitItems: UserWardrobeItem[],
+  bodyProfile?: BodyProfile,
+): { delta: number; reason: string } {
+  if (!bodyProfile) return { delta: 0, reason: '' }
+  const scored = outfitItems
+    .filter(i => i.cut)
+    .map(i => cutFitsBody(i.cut!, i.category, bodyProfile))
+  if (scored.length === 0) return { delta: 0, reason: '' }
+  const delta = Math.round(scored.reduce((s, x) => s + x.delta, 0) / scored.length)
+  // Surface the most negative reason (the thing to fix), else the most positive
+  const sorted = [...scored].sort((a, b) => a.delta - b.delta)
+  const pick = delta < 0 ? sorted[0] : sorted[sorted.length - 1]
+  return { delta, reason: pick.reason }
+}
+
+// ─── Texture / material summary for a hand-picked outfit ──────────────────────
+
+export interface TextureSummary {
+  level: 'good' | 'flat' | 'mixed' | 'unknown'
+  note: string
+}
+
+/**
+ * Judge how the FABRICS of an outfit work together — separate from colour.
+ * Uses weight contrast (texturePairBonus) and drape contrast (drapePairBonus).
+ * Returns 'unknown' until at least two pieces have a fabric set, so we can nudge
+ * the user to tag their items.
+ */
+export function outfitTextureSummary(items: UserWardrobeItem[]): TextureSummary {
+  const fabrics = items.filter(i => i.fabric).map(i => i.fabric!)
+  if (fabrics.length < 2) {
+    return { level: 'unknown', note: 'Tag the fabric on your pieces to see how their textures work together.' }
+  }
+
+  let total = 0
+  let bestTip = ''
+  let worstTip = ''
+  let worst = Infinity
+  for (let i = 0; i < fabrics.length; i++) {
+    for (let j = i + 1; j < fabrics.length; j++) {
+      const t = texturePairBonus(fabrics[i], fabrics[j])
+      const d = drapePairBonus(fabrics[i], fabrics[j])
+      const pair = (t?.bonus ?? 0) + (d?.bonus ?? 0)
+      const tip = d?.tip || t?.tip || ''
+      total += pair
+      if (tip && pair < worst) { worst = pair; worstTip = tip }
+      if (tip && pair > 0 && !bestTip) bestTip = tip
+    }
+  }
+
+  if (total <= -4) return { level: 'mixed', note: worstTip || 'These fabrics fight each other — vary the weights more.' }
+  if (total >= 6)  return { level: 'good',  note: bestTip || 'Lovely texture contrast — the materials play off each other.' }
+  return { level: 'flat', note: 'The textures are fine but a little samey — mix a smooth piece with a more textured one.' }
+}
+
 // ─── Main: generate ranked outfit combos ─────────────────────────────────────
 
 export function generateOutfits(
   items: UserWardrobeItem[],
   subSeason: SubSeason,
+  bodyProfile?: BodyProfile,
 ): OutfitCombo[] {
   const tops    = items.filter(i => i.category === 'top')
   const bottoms = items.filter(i => i.category === 'bottom')
@@ -159,13 +253,20 @@ export function generateOutfits(
       }
       if (bestShoes && bestShoesScore > 60) outfitItems.push(bestShoes)
 
-      const finalScore = Math.round(base * 0.7 + (bestJacketScore > 0 ? bestJacketScore * 0.15 : base * 0.15) + (bestShoesScore > 0 ? bestShoesScore * 0.15 : base * 0.15))
+      const colourScore = base * 0.7 + (bestJacketScore > 0 ? bestJacketScore * 0.15 : base * 0.15) + (bestShoesScore > 0 ? bestShoesScore * 0.15 : base * 0.15)
+
+      // Body-fit adjustment: nudge the score by how well the cuts suit the wearer
+      const fit = bodyFit(outfitItems, bodyProfile)
+      const finalScore = Math.max(0, Math.min(100, Math.round(colourScore + fit.delta)))
+      const finalTip = fit.reason
+        ? `${tip} ${fit.delta >= 0 ? 'The cuts suit your shape — ' : 'Heads up: '}${fit.reason}.`
+        : tip
 
       combos.push({
         items: outfitItems,
-        score: Math.min(100, finalScore),
+        score: finalScore,
         scoreLabel: scoreLabel(finalScore),
-        tip,
+        tip: finalTip,
       })
     }
   }
@@ -174,6 +275,122 @@ export function generateOutfits(
   return combos
     .sort((a, b) => b.score - a.score)
     .slice(0, 8)
+}
+
+// ─── Score a hand-picked outfit (interactive builder) ─────────────────────────
+
+/**
+ * Score an arbitrary set of items the user has manually combined.
+ * Every pair of items is scored and averaged, then nudged by body-fit.
+ * Used by the "Build your own" outfit builder so the score and tip update
+ * live as the user adds or removes pieces.
+ */
+export function scoreOutfit(
+  outfitItems: UserWardrobeItem[],
+  subSeason: SubSeason,
+  bodyProfile?: BodyProfile,
+): OutfitCombo {
+  if (outfitItems.length < 2) {
+    return {
+      items: outfitItems,
+      score: 0,
+      scoreLabel: 'Okay',
+      tip: 'Add at least two pieces to see how well they work together.',
+    }
+  }
+
+  // Score every pair of items, track the average and the weakest link
+  const pairScores: number[] = []
+  let worstPair: { score: number; tip: string } | null = null
+  for (let i = 0; i < outfitItems.length; i++) {
+    for (let j = i + 1; j < outfitItems.length; j++) {
+      const ps = pairScore(outfitItems[i], outfitItems[j], subSeason)
+      pairScores.push(ps.score)
+      if (!worstPair || ps.score < worstPair.score) worstPair = ps
+    }
+  }
+  const colourScore = pairScores.reduce((s, x) => s + x, 0) / pairScores.length
+
+  // Body-fit adjustment
+  const fit = bodyFit(outfitItems, bodyProfile)
+  const finalScore = Math.max(0, Math.min(100, Math.round(colourScore + fit.delta)))
+
+  // Tip: lead with the weakest pair (what to improve), append the fit note
+  const baseTip = worstPair?.tip ?? ''
+  const tip = fit.reason
+    ? `${baseTip} ${fit.delta >= 0 ? 'The cuts suit your shape — ' : 'Heads up: '}${fit.reason}.`
+    : baseTip
+
+  return {
+    items: outfitItems,
+    score: finalScore,
+    scoreLabel: scoreLabel(finalScore),
+    tip,
+  }
+}
+
+// ─── "What goes with this?" — style one anchor item ───────────────────────────
+
+// Which categories complete an outfit around a given anchor category
+const COMPLEMENT_CATEGORIES: Record<ItemCategory, ItemCategory[]> = {
+  top:       ['bottom', 'jacket', 'shoes'],
+  bottom:    ['top', 'jacket', 'shoes'],
+  jacket:    ['top', 'bottom', 'shoes'],
+  shoes:     ['top', 'bottom'],
+  accessory: ['top', 'bottom'],
+}
+
+// Score an anchor item against a bare palette colour (reuses pairScore)
+function pairColourScore(anchor: UserWardrobeItem, hex: string, subSeason: SubSeason): number {
+  const pseudo = { color_hex: hex } as UserWardrobeItem
+  return pairScore(anchor, pseudo, subSeason).score
+}
+
+export interface ColourSuggestion {
+  colour: PaletteColour
+  score: number
+}
+
+export interface AnchorStyleResult {
+  partners: Partial<Record<ItemCategory, UserWardrobeItem[]>>            // best matches you already own
+  suggestions: Partial<Record<ItemCategory, ColourSuggestion[]>>        // season-correct colours to add
+}
+
+/**
+ * Build a season-correct outfit around one item the user owns.
+ * For each complementary category it returns:
+ *  - partners: items already in the wardrobe, ranked by how well they pair
+ *  - suggestions: palette colours (season + neutrals) that pair best, so the
+ *    user knows exactly which colour to buy if they don't own a match.
+ * All suggestions come from the user's palette — never random colours.
+ */
+export function styleAnchorItem(
+  anchor: UserWardrobeItem,
+  items: UserWardrobeItem[],
+  subSeason: SubSeason,
+): AnchorStyleResult {
+  const targets = COMPLEMENT_CATEGORIES[anchor.category]
+  const palette = paletteFor(subSeason)
+
+  const partners: AnchorStyleResult['partners'] = {}
+  const suggestions: AnchorStyleResult['suggestions'] = {}
+
+  for (const cat of targets) {
+    // Best partners from the user's own wardrobe
+    const owned = items
+      .filter(i => i.category === cat && i.id !== anchor.id)
+      .map(i => ({ item: i, score: pairScore(anchor, i, subSeason).score }))
+      .sort((a, b) => b.score - a.score)
+    if (owned.length > 0) partners[cat] = owned.map(o => o.item)
+
+    // Season-correct colours to add for this category
+    suggestions[cat] = palette
+      .map(colour => ({ colour, score: pairColourScore(anchor, colour.hex, subSeason) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+  }
+
+  return { partners, suggestions }
 }
 
 // ─── localStorage helpers (guest users) ──────────────────────────────────────

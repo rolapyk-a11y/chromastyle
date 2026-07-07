@@ -284,7 +284,23 @@ export async function runWardrobePopulation(options: {
       ...seasonData.neutrals.slice(0, 2),
     ].map(c => ({ hex: c.hex, name: c.name }))
 
-    const items = await searchClothingForSeason(client, subSeason, topColours, verbose)
+    // Retry with exponential backoff for rate limit errors
+    let items: WardrobeClothingItem[] = []
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        items = await searchClothingForSeason(client, subSeason, topColours, verbose)
+        break
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err)
+        if (msg.includes('429') && attempt < 3) {
+          const waitSec = [60, 120, 180][attempt]
+          if (verbose) console.log(`  Rate limited — waiting ${waitSec}s before retry ${attempt + 2}/4...`)
+          await new Promise(r => setTimeout(r, waitSec * 1000))
+        } else {
+          throw err
+        }
+      }
+    }
     if (verbose) console.log(`  Found ${items.length} items for ${subSeason}`)
 
     output.items.push(...items)
@@ -294,8 +310,9 @@ export async function runWardrobePopulation(options: {
     fs.mkdirSync(path.dirname(WARDROBE_OUTPUT_PATH), { recursive: true })
     fs.writeFileSync(WARDROBE_OUTPUT_PATH, JSON.stringify(output, null, 2))
 
-    // Rate limit between sub-seasons
-    await new Promise(r => setTimeout(r, 2000))
+    // 90s gap between sub-seasons to stay under Tier 1 rate limit (50K tokens/min)
+    if (verbose) console.log(`  Waiting 90s before next sub-season...`)
+    await new Promise(r => setTimeout(r, 90000))
   }
 
   // Write the TypeScript seed file

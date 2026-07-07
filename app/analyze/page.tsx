@@ -5,15 +5,16 @@ import { useRouter } from 'next/navigation'
 import { CameraCapture } from '@/components/dashboard/camera-capture'
 import { AnalysisResults } from '@/components/dashboard/analysis-results'
 import { EssenceQuiz } from '@/components/dashboard/essence-quiz'
+import { BodyProfileQuiz } from '@/components/dashboard/body-profile-quiz'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Sparkles, LogIn, ArrowRight } from 'lucide-react'
 import type { ColorAnalysis } from '@/lib/types'
-import type { EssenceResult } from '@/lib/essenceData'
-import { analyzeColorsInBrowser, FaceNotDetectedError } from '@/lib/clientColorAnalysis'
 import { saveColorAnalysis } from './actions'
+import { saveBodyProfile } from '@/lib/bodyGuide'
+import { analyzeColorsInBrowser, FaceNotDetectedError, PoorLightingError, lightingGuidance } from '@/lib/clientColorAnalysis'
 
-type PageStep = 'undertone-question' | 'capture' | 'results' | 'essence-quiz'
+type PageStep = 'undertone-question' | 'capture' | 'results' | 'essence-quiz' | 'body-quiz'
 type Undertone = 'warm' | 'cool'
 
 // ─── Wrist vein illustrations ─────────────────────────────────────────────────
@@ -95,6 +96,8 @@ export default function AnalyzePage() {
     } catch (err) {
       if (err instanceof FaceNotDetectedError) {
         setError('No face detected. Please try again: face the camera directly, make sure your face is well-lit, and keep your whole face in frame.')
+      } else if (err instanceof PoorLightingError) {
+        setError(lightingGuidance(err.reason))
       } else {
         setError(err instanceof Error ? err.message : 'Could not analyse your photo. Please try again.')
       }
@@ -170,15 +173,28 @@ export default function AnalyzePage() {
     )
   }
 
-  // ── Essence quiz ─────────────────────────────────────────────────────────────
+  // ── Essence quiz → chains into the fit profile ───────────────────────────────
   if (step === 'essence-quiz') {
     return (
       <EssenceQuiz
         onComplete={(result) => {
           localStorage.setItem('chromastyle_essence', JSON.stringify(result))
-          router.push('/dashboard/wardrobe')
+          setStep('body-quiz')
         }}
-        onSkip={() => router.push('/dashboard/wardrobe')}
+        onSkip={() => setStep('body-quiz')}
+      />
+    )
+  }
+
+  // ── Body / fit profile quiz ──────────────────────────────────────────────────
+  if (step === 'body-quiz') {
+    return (
+      <BodyProfileQuiz
+        onComplete={(profile) => {
+          saveBodyProfile(profile)
+          router.push('/wardrobe')
+        }}
+        onSkip={() => router.push('/wardrobe')}
       />
     )
   }
@@ -222,8 +238,9 @@ export default function AnalyzePage() {
         <AnalysisResults
           analysis={analysis}
           onReset={handleReset}
-          onContinue={() => router.push('/dashboard/wardrobe')}
+          onContinue={() => router.push('/wardrobe')}
           onEssenceQuiz={() => setStep('essence-quiz')}
+          onBodyQuiz={() => setStep('body-quiz')}
         />
       </div>
     )

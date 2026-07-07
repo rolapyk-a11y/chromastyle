@@ -3,7 +3,7 @@
 import { ColorAnalysis, SEASON_INFO, SUB_SEASON_INFO } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowRight, RotateCcw, Sparkles, CheckCircle, XCircle } from 'lucide-react'
+import { ArrowRight, RotateCcw, Sparkles, CheckCircle, XCircle, Ruler } from 'lucide-react'
 
 // Plain-English descriptions of each sub-season for men with no colour knowledge
 const SEASON_EXPLAINER: Record<string, {
@@ -171,9 +171,10 @@ interface AnalysisResultsProps {
   onReset: () => void
   onContinue: () => void
   onEssenceQuiz?: () => void
+  onBodyQuiz?: () => void
 }
 
-export function AnalysisResults({ analysis, onReset, onContinue, onEssenceQuiz }: AnalysisResultsProps) {
+export function AnalysisResults({ analysis, onReset, onContinue, onEssenceQuiz, onBodyQuiz }: AnalysisResultsProps) {
   const seasonInfo = SEASON_INFO[analysis.season]
   const subSeasonInfo = SUB_SEASON_INFO[analysis.sub_season]
   const explainer = SEASON_EXPLAINER[analysis.sub_season]
@@ -376,6 +377,24 @@ export function AnalysisResults({ analysis, onReset, onContinue, onEssenceQuiz }
             </p>
             <Button variant="secondary" size="lg" onClick={onEssenceQuiz}>
               Take the Style Quiz
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Body / fit profile CTA ── */}
+      {onBodyQuiz && (
+        <Card className="border-primary/30 bg-primary/5 text-center">
+          <CardContent className="p-6">
+            <Ruler className="w-7 h-7 text-primary mx-auto mb-2" />
+            <h3 className="font-semibold mb-1">Add your fit profile</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              4 quick questions about your proportions — height, shoulders, build.
+              We&apos;ll then recommend the cuts that flatter your shape, not just your colours.
+            </p>
+            <Button variant="secondary" size="lg" onClick={onBodyQuiz}>
+              Set my fit profile
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>
