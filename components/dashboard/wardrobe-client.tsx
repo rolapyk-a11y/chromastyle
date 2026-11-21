@@ -1,20 +1,23 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { ColorAnalysis, ClothingItem, Season, SEASON_INFO } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ClothingCard } from './clothing-card'
 import { TryOnModal } from './try-on-modal'
-import { 
-  Search, 
-  Filter, 
-  Palette, 
+import {
+  Search,
+  Filter,
+  Palette,
   Sparkles,
   SlidersHorizontal,
   X,
-  AlertCircle
+  AlertCircle,
+  Wand2,
+  Loader2,
 } from 'lucide-react'
 import {
   Select,
@@ -31,9 +34,20 @@ interface WardrobeClientProps {
   savedItemIds: string[]
 }
 
-type FilterBrand = 'all' | 'H&M' | 'Zara' | 'Toj Eksperten'
+type FilterBrand = string
 type FilterCategory = 'all' | 'tops' | 'shirts' | 'outerwear' | 'pants'
 type SortOption = 'recommended' | 'price-low' | 'price-high' | 'trending'
+type StylePreference = 'all' | 'relaxed' | 'business' | 'baggy' | 'smart-casual' | 'outdoor' | 'elegant'
+
+const STYLE_OPTIONS: { id: StylePreference; label: string; emoji: string; tags: string[] }[] = [
+  { id: 'all',          label: 'All Styles',   emoji: '✦',  tags: [] },
+  { id: 'relaxed',      label: 'Relaxed',       emoji: '🌿', tags: ['casual', 'comfort', 'weekend', 'fresh'] },
+  { id: 'business',     label: 'Business',      emoji: '💼', tags: ['office', 'formal', 'smart', 'elegant'] },
+  { id: 'baggy',        label: 'Baggy',         emoji: '🛹', tags: ['streetwear', 'baggy', 'oversized', 'bold'] },
+  { id: 'smart-casual', label: 'Smart Casual',  emoji: '✨', tags: ['smart-casual', 'versatile', 'classic'] },
+  { id: 'outdoor',      label: 'Outdoor',       emoji: '🏔️', tags: ['outdoor', 'layering', 'casual'] },
+  { id: 'elegant',      label: 'Elegant',       emoji: '🎩', tags: ['elegant', 'luxury', 'formal', 'timeless'] },
+]
 
 // Helper to calculate color similarity
 function colorDistance(hex1: string, hex2: string): number {
@@ -75,7 +89,12 @@ export function WardrobeClient({
   const [savedItemIds, setSavedItemIds] = useState<string[]>(initialSavedIds)
   const [showFilters, setShowFilters] = useState(false)
   const [tryOnItem, setTryOnItem] = useState<ClothingItem | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generateMessage, setGenerateMessage] = useState<string | null>(null)
+  const [stylePreference, setStylePreference] = useState<StylePreference>('all')
+  const router = useRouter()
 
+  const uniqueBrands = Array.from(new Set(clothingItems.map(i => i.brand))).sort()
   const userSeason = colorAnalysis?.season
   const userColors = colorAnalysis?.best_colors || []
 
@@ -102,6 +121,14 @@ export function WardrobeClient({
     // Category filter
     if (categoryFilter !== 'all') {
       items = items.filter(item => item.category === categoryFilter)
+    }
+
+    // Style filter
+    if (stylePreference !== 'all') {
+      const styleTags = STYLE_OPTIONS.find(s => s.id === stylePreference)?.tags ?? []
+      items = items.filter(item =>
+        item.style_tags.some(tag => styleTags.includes(tag))
+      )
     }
 
     // Color matching filter
@@ -144,7 +171,7 @@ export function WardrobeClient({
     }
 
     return items
-  }, [clothingItems, searchQuery, brandFilter, categoryFilter, showOnlyMatching, sortBy, userColors, userSeason])
+  }, [clothingItems, searchQuery, brandFilter, categoryFilter, showOnlyMatching, sortBy, userColors, userSeason, stylePreference])
 
   const handleSaveToggle = async (itemId: string) => {
     const isSaved = savedItemIds.includes(itemId)
@@ -182,6 +209,30 @@ export function WardrobeClient({
     }
   }
 
+  const handleGenerate = async () => {
+    setIsGenerating(true)
+    setGenerateMessage(null)
+    try {
+      const res = await fetch('/api/wardrobe/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ style: stylePreference === 'all' ? null : stylePreference }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setGenerateMessage(data.error ?? 'Something went wrong')
+      } else {
+        const styleLabel = STYLE_OPTIONS.find(s => s.id === data.style)?.label ?? ''
+        setGenerateMessage(`Added ${data.count} ${styleLabel ? styleLabel + ' ' : ''}items for your ${data.sub_season} palette!`)
+        router.refresh()
+      }
+    } catch {
+      setGenerateMessage('Failed to generate wardrobe')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -189,18 +240,58 @@ export function WardrobeClient({
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Wardrobe</h1>
           <p className="text-muted-foreground mt-1">
-            {colorAnalysis 
+            {colorAnalysis
               ? `Showing clothes that match your ${colorAnalysis.season} palette`
               : 'Browse clothing from our partner stores'
             }
           </p>
         </div>
-        {colorAnalysis && (
-          <div className="flex items-center gap-2">
-            <div className={`h-8 w-8 rounded-lg bg-gradient-to-r ${SEASON_INFO[colorAnalysis.season].gradient}`} />
-            <span className="text-sm font-medium capitalize">{colorAnalysis.season}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {colorAnalysis && (
+            <>
+              <div className={`h-8 w-8 rounded-lg bg-gradient-to-r ${SEASON_INFO[colorAnalysis.season].gradient}`} />
+              <span className="text-sm font-medium capitalize">{colorAnalysis.season}</span>
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="gap-2"
+              >
+                {isGenerating ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
+                ) : (
+                  <><Wand2 className="h-4 w-4" />Generate for my palette</>
+                )}
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {generateMessage && (
+        <Card className="border-primary/50 bg-primary/5">
+          <CardContent className="p-3 text-sm">{generateMessage}</CardContent>
+        </Card>
+      )}
+
+      {/* Style picker */}
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-muted-foreground">Style</p>
+        <div className="flex flex-wrap gap-2">
+          {STYLE_OPTIONS.map((style) => (
+            <button
+              key={style.id}
+              onClick={() => setStylePreference(style.id)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                stylePreference === style.id
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background border-border hover:border-primary/50 text-foreground'
+              }`}
+            >
+              <span>{style.emoji}</span>
+              {style.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* No analysis warning */}
@@ -270,9 +361,9 @@ export function WardrobeClient({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Brands</SelectItem>
-                      <SelectItem value="H&M">H&M</SelectItem>
-                      <SelectItem value="Zara">Zara</SelectItem>
-                      <SelectItem value="Toj Eksperten">Toj Eksperten</SelectItem>
+                      {uniqueBrands.map(brand => (
+                        <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -358,6 +449,23 @@ export function WardrobeClient({
             />
           ))}
         </div>
+      ) : clothingItems.length === 0 && colorAnalysis ? (
+        <Card className="border-border/50">
+          <CardContent className="p-12 text-center">
+            <Wand2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Your wardrobe is empty</h3>
+            <p className="text-muted-foreground mb-6">
+              Let the AI generate clothing recommendations tailored to your {colorAnalysis.sub_season} palette.
+            </p>
+            <Button onClick={handleGenerate} disabled={isGenerating} size="lg" className="gap-2">
+              {isGenerating ? (
+                <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
+              ) : (
+                <><Wand2 className="h-4 w-4" />Generate my wardrobe</>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <Card className="border-border/50">
           <CardContent className="p-12 text-center">

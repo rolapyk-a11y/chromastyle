@@ -17,7 +17,21 @@ interface ClothingCardProps {
   onTryOn?: (item: ClothingItem) => void
 }
 
-export function ClothingCard({ 
+function getSearchUrl(brand: string, name: string): string {
+  const q = encodeURIComponent(name)
+  switch (brand) {
+    case 'H&M':
+      return `https://www2.hm.com/da_dk/search-results.html?q=${q}`
+    case 'Zara':
+      return `https://www.zara.com/dk/da/search?searchTerm=${q}`
+    case 'Toj Eksperten':
+      return `https://www.tojeksperten.dk/search?q=${q}`
+    default:
+      return `https://www.google.com/search?q=${encodeURIComponent(brand + ' ' + name)}`
+  }
+}
+
+export function ClothingCard({
   item, 
   isSaved, 
   onSaveToggle, 
@@ -112,19 +126,17 @@ export function ClothingCard({
                 Try On
               </Button>
             )}
-            {item.product_url && (
-              <Button 
-                size="sm" 
-                variant="secondary"
-                className="flex-1 text-xs"
-                asChild
-              >
-                <a href={item.product_url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-3 h-3 mr-1" />
-                  View
-                </a>
-              </Button>
-            )}
+            <Button
+              size="sm"
+              variant="secondary"
+              className="flex-1 text-xs"
+              asChild
+            >
+              <a href={getSearchUrl(item.brand, item.name)} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="w-3 h-3 mr-1" />
+                View
+              </a>
+            </Button>
           </div>
         </div>
       </div>

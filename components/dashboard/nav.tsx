@@ -13,15 +13,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/app/auth/actions'
 import { cn } from '@/lib/utils'
-import { 
-  Sparkles, 
-  Camera, 
-  Shirt, 
-  Heart, 
-  TrendingUp, 
+import {
+  Sparkles,
+  Camera,
+  Shirt,
+  Heart,
+  TrendingUp,
   User as UserIcon,
   LogOut,
-  Menu
+  Menu,
+  Dna,
+  DoorClosed,
+  Layers
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -32,6 +35,9 @@ interface DashboardNavProps {
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: Sparkles },
   { href: '/dashboard/analyze', label: 'Analyze', icon: Camera },
+  { href: '/dashboard/essence', label: 'Essence', icon: Dna },
+  { href: '/dashboard/closet', label: 'Closet', icon: DoorClosed },
+  { href: '/dashboard/outfits', label: 'Outfits', icon: Layers },
   { href: '/dashboard/wardrobe', label: 'Wardrobe', icon: Shirt },
   { href: '/dashboard/saved', label: 'Saved', icon: Heart },
   { href: '/dashboard/trends', label: 'Trends', icon: TrendingUp },
