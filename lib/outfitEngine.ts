@@ -220,6 +220,8 @@ export function generateOutfits(
   items: UserWardrobeItem[],
   subSeason: SubSeason,
   bodyProfile?: BodyProfile,
+  /** Optional veto (e.g. the user's own rules). Rejected jackets are skipped, rejected outfits dropped. */
+  accept?: (items: UserWardrobeItem[]) => boolean,
 ): OutfitCombo[] {
   const tops    = items.filter(i => i.category === 'top')
   const bottoms = items.filter(i => i.category === 'bottom')
@@ -235,14 +237,18 @@ export function generateOutfits(
       const { score: base, tip } = pairScore(top, bottom, subSeason)
       const outfitItems: UserWardrobeItem[] = [top, bottom]
 
-      // Optionally add best-scoring jacket
-      let bestJacket: UserWardrobeItem | undefined
+      // Optionally add the best-scoring jacket that the veto allows
       let bestJacketScore = -1
-      for (const jacket of jackets) {
-        const { score: js } = pairScore(top, jacket, subSeason)
-        if (js > bestJacketScore) { bestJacket = jacket; bestJacketScore = js }
+      const rankedJackets = jackets
+        .map(jacket => ({ jacket, score: pairScore(top, jacket, subSeason).score }))
+        .sort((a, b) => b.score - a.score)
+      for (const { jacket, score: js } of rankedJackets) {
+        if (js <= 60) break
+        if (accept && !accept([top, bottom, jacket])) continue
+        outfitItems.push(jacket)
+        bestJacketScore = js
+        break
       }
-      if (bestJacket && bestJacketScore > 60) outfitItems.push(bestJacket)
 
       // Optionally add best-scoring shoes
       let bestShoes: UserWardrobeItem | undefined
@@ -252,6 +258,7 @@ export function generateOutfits(
         if (ss > bestShoesScore) { bestShoes = shoe; bestShoesScore = ss }
       }
       if (bestShoes && bestShoesScore > 60) outfitItems.push(bestShoes)
+      if (accept && !accept(outfitItems)) continue
 
       const colourScore = base * 0.7 + (bestJacketScore > 0 ? bestJacketScore * 0.15 : base * 0.15) + (bestShoesScore > 0 ? bestShoesScore * 0.15 : base * 0.15)
 

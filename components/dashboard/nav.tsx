@@ -22,7 +22,9 @@ import {
   User as UserIcon,
   LogOut,
   Menu,
-  ScanLine
+  ScanLine,
+  DoorClosed,
+  Layers
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -34,6 +36,8 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: Sparkles },
   { href: '/analyze', label: 'Analyze', icon: Camera },
   { href: '/colour-check', label: 'Colour Check', icon: ScanLine },
+  { href: '/dashboard/closet', label: 'Closet', icon: DoorClosed },
+  { href: '/dashboard/outfits', label: 'Outfits', icon: Layers },
   { href: '/dashboard/wardrobe', label: 'Wardrobe', icon: Shirt },
   { href: '/dashboard/saved', label: 'Saved', icon: Heart },
   { href: '/dashboard/trends', label: 'Trends', icon: TrendingUp },

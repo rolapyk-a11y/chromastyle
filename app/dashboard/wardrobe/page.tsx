@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { WardrobeClient } from '@/components/dashboard/wardrobe-client'
 import { LocalAnalysisSync } from '@/components/dashboard/local-analysis-sync'

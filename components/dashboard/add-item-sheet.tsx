@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { X, Check, ImagePlus } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, ColorAnalysis, FabricWeight, GarmentCut } from '@/lib/types'
-import { addLocalWardrobeItem } from '@/lib/outfitEngine'
+import { addWardrobeItem } from '@/lib/closet/wardrobe-store'
 import { SEASON_COLOURS, NEUTRAL_COLOURS } from '@/lib/palettes'
 
 const CUTS: { value: GarmentCut; label: string }[] = [
@@ -90,7 +90,10 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
   const subSeason = colorAnalysis?.sub_season
   const paletteColours = subSeason ? (SEASON_COLOURS[subSeason] ?? []) : []
 
-  function handleSave() {
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  async function handleSave() {
     const colour = selectedColour ?? { hex: customHex, name: 'Custom' }
     const item: UserWardrobeItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -103,7 +106,16 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
       ...(image ? { image_url: image } : {}),
       created_at: new Date().toISOString(),
     }
-    addLocalWardrobeItem(item)
+    setSaving(true)
+    setSaveError(null)
+    try {
+      await addWardrobeItem(item)
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Kunne ikke gemme')
+      setSaving(false)
+      return
+    }
+    setSaving(false)
     onAdded()
     // Reset form
     setName('')
@@ -336,10 +348,11 @@ export function AddItemSheet({ open, onClose, colorAnalysis, onAdded }: AddItemS
                 </div>
               </div>
             )}
-            <Button className="flex-1" onClick={handleSave}>
-              Add to wardrobe
+            <Button className="flex-1" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving…' : 'Add to wardrobe'}
             </Button>
           </div>
+          {saveError && <p className="text-sm text-destructive">{saveError}</p>}
 
         </div>
       </div>

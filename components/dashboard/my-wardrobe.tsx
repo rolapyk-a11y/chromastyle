@@ -5,11 +5,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Shirt, ShoppingBag, Footprints, Layers, Star, Sparkles, Ruler, X } from 'lucide-react'
 import type { UserWardrobeItem, ItemCategory, ColorAnalysis, OutfitCombo, BodyProfile } from '@/lib/types'
+import { generateOutfits, saveLocalWardrobe } from '@/lib/outfitEngine'
 import {
-  loadLocalWardrobe,
-  saveLocalWardrobe,
-  generateOutfits,
-} from '@/lib/outfitEngine'
+  addWardrobeItem,
+  loadWardrobe,
+  localItemsToImport,
+  removeWardrobeItem,
+} from '@/lib/closet/wardrobe-store'
+import Link from 'next/link'
+import { rulesVeto, withLayerTee } from '@/lib/closet/engine-rules'
 import { loadBodyProfile, saveBodyProfile, fitTipsFor, bodyProfileSummary } from '@/lib/bodyGuide'
 import { AddItemSheet } from './add-item-sheet'
 import { BodyProfileQuiz } from './body-profile-quiz'
@@ -52,31 +56,68 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
   const [outfitMode, setOutfitMode] = useState<'suggested' | 'build'>('suggested')
   const [previewOutfit, setPreviewOutfit] = useState<OutfitCombo | null>(null)
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    setItems(loadLocalWardrobe())
-    setBodyProfile(loadBodyProfile())
+  const [remote, setRemote] = useState(false)
+  const [toImport, setToImport] = useState<UserWardrobeItem[]>([])
+  const [importing, setImporting] = useState(false)
+  const [storeError, setStoreError] = useState<string | null>(null)
+
+  // Signed in: the shared Supabase closet. Guest: this browser (localStorage).
+  const refresh = useCallback(async () => {
+    const { items: loaded, remote: isRemote } = await loadWardrobe()
+    setItems(loaded)
+    setRemote(isRemote)
+    setToImport(localItemsToImport())
   }, [])
 
-  const refresh = useCallback(() => {
-    const loaded = loadLocalWardrobe()
-    setItems(loaded)
-    if (colorAnalysis?.sub_season) {
-      setOutfits(generateOutfits(loaded, colorAnalysis.sub_season, bodyProfile))
+  useEffect(() => {
+    refresh()
+    setBodyProfile(loadBodyProfile())
+  }, [refresh])
+
+  async function importLocalItems() {
+    setImporting(true)
+    setStoreError(null)
+    try {
+      for (const item of toImport) await addWardrobeItem(item)
+      saveLocalWardrobe([])
+      await refresh()
+    } catch (e) {
+      setStoreError(e instanceof Error ? e.message : 'Kunne ikke flytte tøjet')
+    } finally {
+      setImporting(false)
     }
-  }, [colorAnalysis?.sub_season, bodyProfile])
+  }
 
   // Regenerate outfits whenever items, analysis, or body profile changes
   useEffect(() => {
     if (colorAnalysis?.sub_season) {
-      setOutfits(generateOutfits(items, colorAnalysis.sub_season, bodyProfile))
+      const best = Array.isArray(colorAnalysis.best_colors) ? colorAnalysis.best_colors : []
+      const avoid = Array.isArray(colorAnalysis.avoid_colors) ? colorAnalysis.avoid_colors : []
+      setOutfits(
+        generateOutfits(items, colorAnalysis.sub_season, bodyProfile, rulesVeto(items, best, avoid))
+          .map(o => ({ ...o, items: withLayerTee(o.items, items) })),
+      )
     }
   }, [items, colorAnalysis?.sub_season, bodyProfile])
 
-  function removeItem(id: string) {
-    const updated = items.filter(i => i.id !== id)
-    saveLocalWardrobe(updated)
-    setItems(updated)
+  async function removeItem(id: string) {
+    setStoreError(null)
+    try {
+      await removeWardrobeItem(id)
+      setItems(prev => prev.filter(i => i.id !== id))
+    } catch (e) {
+      setStoreError(e instanceof Error ? e.message : 'Kunne ikke slette tøjet')
+    }
+  }
+
+  async function addItem(item: UserWardrobeItem) {
+    setStoreError(null)
+    try {
+      await addWardrobeItem(item)
+      await refresh()
+    } catch (e) {
+      setStoreError(e instanceof Error ? e.message : 'Kunne ikke gemme tøjet')
+    }
   }
 
   // From "what goes with this?", quickly add a suggested season colour you own
@@ -89,9 +130,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
       color_name: name,
       created_at: new Date().toISOString(),
     }
-    const updated = [...items, item]
-    saveLocalWardrobe(updated)
-    setItems(updated)
+    addItem(item)
   }
 
   // From "Shop My Colours", add a real catalog product to your inventory
@@ -106,9 +145,7 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
       image_url: p.image_url,
       created_at: new Date().toISOString(),
     }
-    const updated = [...items, item]
-    saveLocalWardrobe(updated)
-    setItems(updated)
+    addItem(item)
   }
 
   const byCategory = CATEGORY_ORDER.reduce<Record<ItemCategory, UserWardrobeItem[]>>(
@@ -149,6 +186,18 @@ export function MyWardrobe({ colorAnalysis }: MyWardrobeProps) {
         profile={bodyProfile}
         onEdit={() => setShowBodyQuiz(true)}
       />
+
+      {remote && (
+        <div className="rounded-lg border border-border bg-secondary/40 p-3 text-sm flex flex-wrap items-center justify-between gap-2">
+          <span>Dit skab er gemt på din konto og deles med <Link href="/dashboard/closet" className="underline">Closet</Link> og <Link href="/dashboard/outfits" className="underline">Outfits</Link>.</span>
+          {toImport.length > 0 && (
+            <Button size="sm" variant="outline" disabled={importing} onClick={importLocalItems}>
+              {importing ? 'Flytter…' : `Flyt ${toImport.length} ting fra denne browser til kontoen`}
+            </Button>
+          )}
+        </div>
+      )}
+      {storeError && <p className="text-sm text-destructive">{storeError}</p>}
 
       {/* ── Tab bar ── */}
       <div className="flex gap-2 border-b border-border pb-0">
