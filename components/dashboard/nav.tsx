@@ -22,7 +22,7 @@ import {
   User as UserIcon,
   LogOut,
   Menu,
-  Dna,
+  ScanLine,
   DoorClosed,
   Layers
 } from 'lucide-react'
@@ -34,8 +34,8 @@ interface DashboardNavProps {
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: Sparkles },
-  { href: '/dashboard/analyze', label: 'Analyze', icon: Camera },
-  { href: '/dashboard/essence', label: 'Essence', icon: Dna },
+  { href: '/analyze', label: 'Analyze', icon: Camera },
+  { href: '/colour-check', label: 'Colour Check', icon: ScanLine },
   { href: '/dashboard/closet', label: 'Closet', icon: DoorClosed },
   { href: '/dashboard/outfits', label: 'Outfits', icon: Layers },
   { href: '/dashboard/wardrobe', label: 'Wardrobe', icon: Shirt },

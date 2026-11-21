@@ -1,0 +1,215 @@
+{
+  "generatedAt": "2026-06-18T11:49:14.116Z",
+  "sourceResearchVersion": 1,
+  "items": [
+    {
+      "name": "Regular Fit Light blue Oxford Shirt",
+      "brand": "H&M",
+      "category": "shirts",
+      "subcategory": "oxford-shirt",
+      "price": 200,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/1257417002_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.1257417002.html",
+      "colors": [
+        "#A6B8D2"
+      ],
+      "style_tags": [
+        "casual",
+        "work",
+        "classic"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Bluebell Haze",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Slim Fit Cotton Chinos - Gray",
+      "brand": "H&M",
+      "category": "trousers",
+      "subcategory": "chinos",
+      "price": 199,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/1019838021_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.1019838021.html",
+      "colors": [
+        "#6F96A2"
+      ],
+      "style_tags": [
+        "casual",
+        "versatile",
+        "everyday"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Ocean Slate",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Relaxed Fit Linen-Blend Shirt Jacket - Light blue",
+      "brand": "H&M",
+      "category": "jackets",
+      "subcategory": "shirt-jacket",
+      "price": 399,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/0932505001_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.0932505001.html",
+      "colors": [
+        "#A6B8D2"
+      ],
+      "style_tags": [
+        "summer",
+        "lightweight",
+        "casual"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Bluebell Haze",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Regular Fit Wool-blend Cable-Knit Sweater - Gray",
+      "brand": "H&M",
+      "category": "knitwear",
+      "subcategory": "sweater",
+      "price": 299,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/1187638002_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.1187638002.html",
+      "colors": [
+        "#CED6E0"
+      ],
+      "style_tags": [
+        "casual",
+        "cozy",
+        "winter"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Foggy Sky",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Men's White Regular Fit T-shirt",
+      "brand": "H&M",
+      "category": "t-shirts",
+      "subcategory": "basic-tee",
+      "price": 119,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/0685816001_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.0685816001.html",
+      "colors": [
+        "#F5F5F0"
+      ],
+      "style_tags": [
+        "basics",
+        "essential",
+        "everyday"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Off-White",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Slim Fit Linen Jacket - Sky blue",
+      "brand": "H&M",
+      "category": "jackets",
+      "subcategory": "linen-jacket",
+      "price": 599,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/0783354026_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.0783354026.html",
+      "colors": [
+        "#A6B8D2"
+      ],
+      "style_tags": [
+        "summer",
+        "lightweight",
+        "formal"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Bluebell Haze",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Regular Fit Cable-Knit Sweater - Gray melange",
+      "brand": "H&M",
+      "category": "knitwear",
+      "subcategory": "sweater",
+      "price": 299,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/1172263001_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.1172263001.html",
+      "colors": [
+        "#CED6E0"
+      ],
+      "style_tags": [
+        "cozy",
+        "casual",
+        "versatile"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Foggy Sky",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    },
+    {
+      "name": "Regular Fit Fine-Knit Polo Shirt - Light blue/cream striped",
+      "brand": "H&M",
+      "category": "shirts",
+      "subcategory": "polo-shirt",
+      "price": 229,
+      "currency": "DKK",
+      "image_url": "https://image.hm.com/content/dam/men_product_images/1207911005_1_Display.jpg",
+      "product_url": "https://www2.hm.com/en_us/productpage.1207911005.html",
+      "colors": [
+        "#A6B8D2",
+        "#F2E4D0"
+      ],
+      "style_tags": [
+        "casual",
+        "striped",
+        "comfortable"
+      ],
+      "is_trending": false,
+      "colourMatchName": "Bluebell Haze & Ivory Cream",
+      "seasons": [
+        "summer"
+      ],
+      "subSeasons": [
+        "true-summer"
+      ]
+    }
+  ]
+}

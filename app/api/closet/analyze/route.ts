@@ -14,6 +14,8 @@ const itemSchema = z.object({
   pattern: z.enum(['ensfarvet', 'stribet', 'ternet', 'mønstret', 'print']),
   style_tags: z.array(z.string()).describe('2-4 short English style tags, e.g. casual, smart-casual, formal, streetwear, outdoor'),
   occasions: z.array(z.enum(['everyday', 'work', 'party', 'date', 'outdoor'])).describe('1-3 occasions the item suits'),
+  fabric: z.enum(['linen', 'light-cotton', 'cotton', 'denim', 'knit', 'fleece', 'wool']).describe('Fabric weight family that best matches the garment'),
+  cut: z.enum(['slim', 'tapered', 'regular', 'relaxed', 'wide', 'oversized']).describe('Fit/silhouette of the garment'),
 })
 
 const MOCK: z.infer<typeof itemSchema> = {
@@ -24,6 +26,8 @@ const MOCK: z.infer<typeof itemSchema> = {
   pattern: 'ensfarvet',
   style_tags: ['smart-casual', 'classic'],
   occasions: ['work', 'everyday'],
+  fabric: 'cotton',
+  cut: 'regular',
 }
 
 export async function POST(req: Request) {

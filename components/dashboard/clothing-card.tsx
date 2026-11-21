@@ -44,6 +44,16 @@ export function ClothingCard({
 
   // Check if item matches user's season
   const isSeasonMatch = userSeason && item.seasons.includes(userSeason)
+
+  // Check if item colour is close to user's palette
+  function hexDistance(a: string, b: string) {
+    const parse = (h: string) => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]
+    const [r1,g1,b1] = parse(a); const [r2,g2,b2] = parse(b)
+    return Math.sqrt((r2-r1)**2 + (g2-g1)**2 + (b2-b1)**2)
+  }
+  const isColourMatch = userColors.length > 0 && item.colors.some(ic =>
+    userColors.some(uc => hexDistance(ic, uc) < 90)
+  )
   
   // Format price
   const formattedPrice = new Intl.NumberFormat('da-DK', {
@@ -86,10 +96,10 @@ export function ClothingCard({
               Trending
             </span>
           )}
-          {isSeasonMatch && (
+          {(isSeasonMatch || isColourMatch) && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
               <Sparkles className="w-3 h-3" />
-              Your Season
+              Matches you
             </span>
           )}
         </div>

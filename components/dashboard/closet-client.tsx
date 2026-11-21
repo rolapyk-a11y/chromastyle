@@ -61,6 +61,8 @@ type Draft = {
   style_tags: string[]
   occasions: string[]
   notes: string
+  fabric: string
+  cut: string
 }
 
 const EMPTY_DRAFT: Draft = {
@@ -73,7 +75,27 @@ const EMPTY_DRAFT: Draft = {
   style_tags: [],
   occasions: [],
   notes: '',
+  fabric: '',
+  cut: '',
 }
+
+const FABRICS = [
+  { id: 'linen', label: 'Hør' },
+  { id: 'light-cotton', label: 'Let bomuld' },
+  { id: 'cotton', label: 'Bomuld' },
+  { id: 'denim', label: 'Denim' },
+  { id: 'knit', label: 'Strik' },
+  { id: 'fleece', label: 'Fleece / sweat' },
+  { id: 'wool', label: 'Uld' },
+]
+const CUTS = [
+  { id: 'slim', label: 'Slim' },
+  { id: 'tapered', label: 'Tapered' },
+  { id: 'regular', label: 'Regular' },
+  { id: 'relaxed', label: 'Relaxed' },
+  { id: 'wide', label: 'Wide' },
+  { id: 'oversized', label: 'Oversized' },
+]
 
 const FIT_STYLE: Record<SeasonFit, string> = {
   great: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
@@ -107,6 +129,8 @@ function itemToDraft(item: UserItem): Draft {
     style_tags: item.style_tags ?? [],
     occasions: item.occasions ?? [],
     notes: item.notes ?? '',
+    fabric: item.fabric ?? '',
+    cut: item.cut ?? '',
   }
 }
 
@@ -156,6 +180,8 @@ export function ClosetClient({ colorAnalysis, initialItems, setupMissing }: Clos
           pattern: s.pattern ?? '',
           style_tags: s.style_tags ?? [],
           occasions: s.occasions ?? [],
+          fabric: s.fabric ?? '',
+          cut: s.cut ?? '',
         },
       )
     } catch {
@@ -181,6 +207,8 @@ export function ClosetClient({ colorAnalysis, initialItems, setupMissing }: Clos
       style_tags: draft.style_tags,
       occasions: draft.occasions,
       notes: draft.notes || null,
+      fabric: draft.fabric || null,
+      cut: draft.cut || null,
     }
     try {
       const res = await fetch(draft.id ? `/api/closet/${draft.id}` : '/api/closet', {
@@ -241,7 +269,7 @@ export function ClosetClient({ colorAnalysis, initialItems, setupMissing }: Clos
 
       {setupMissing && (
         <Notice>
-          Databasen til skabet er ikke sat op endnu. Kør <code>supabase/migrations/003_create_closet.sql</code> i
+          Databasen til skabet er ikke sat op endnu. Kør <code>supabase/migrations/005_create_closet.sql</code> i
           Supabase.
         </Notice>
       )}
@@ -411,6 +439,27 @@ export function ClosetClient({ colorAnalysis, initialItems, setupMissing }: Clos
                     onChange={(e) => setDraft({ ...draft, brand: e.target.value })}
                     placeholder="Valgfrit"
                   />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Stof">
+                  <Select value={draft.fabric || 'none'} onValueChange={(v) => setDraft({ ...draft, fabric: v === 'none' ? '' : v })}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Ved ikke</SelectItem>
+                      {FABRICS.map((f) => <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Pasform">
+                  <Select value={draft.cut || 'none'} onValueChange={(v) => setDraft({ ...draft, cut: v === 'none' ? '' : v })}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Ved ikke</SelectItem>
+                      {CUTS.map((c) => <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </Field>
               </div>
 

@@ -208,7 +208,7 @@ export function OutfitsClient({ colorAnalysis, closet, shop, initialOutfits, set
 
       {setupMissing && (
         <Notice>
-          Databasen til outfits er ikke sat op endnu. Kør <code>supabase/migrations/004_create_outfits.sql</code> i Supabase.
+          Databasen til outfits er ikke sat op endnu. Kør <code>supabase/migrations/006_create_outfits.sql</code> i Supabase.
         </Notice>
       )}
       {!setupMissing && closet.length === 0 && (

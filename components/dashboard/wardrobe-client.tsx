@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { ColorAnalysis, ClothingItem, Season, SEASON_INFO } from '@/lib/types'
+import { getStyleGuide } from '@/lib/seasonStyle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ClothingCard } from './clothing-card'
 import { TryOnModal } from './try-on-modal'
+import { MyWardrobe } from './my-wardrobe'
 import {
   Search,
   Filter,
@@ -16,8 +17,7 @@ import {
   SlidersHorizontal,
   X,
   AlertCircle,
-  Wand2,
-  Loader2,
+  Shirt,
 } from 'lucide-react'
 import {
   Select,
@@ -28,26 +28,18 @@ import {
 } from '@/components/ui/select'
 import Link from 'next/link'
 
+type MainTab = 'shop' | 'my-wardrobe'
+
 interface WardrobeClientProps {
   colorAnalysis: ColorAnalysis | undefined
   clothingItems: ClothingItem[]
   savedItemIds: string[]
+  initialMainTab?: MainTab
 }
 
-type FilterBrand = string
+type FilterBrand = 'all' | 'H&M' | 'Zara' | 'Toj Eksperten'
 type FilterCategory = 'all' | 'tops' | 'shirts' | 'outerwear' | 'pants'
 type SortOption = 'recommended' | 'price-low' | 'price-high' | 'trending'
-type StylePreference = 'all' | 'relaxed' | 'business' | 'baggy' | 'smart-casual' | 'outdoor' | 'elegant'
-
-const STYLE_OPTIONS: { id: StylePreference; label: string; emoji: string; tags: string[] }[] = [
-  { id: 'all',          label: 'All Styles',   emoji: '✦',  tags: [] },
-  { id: 'relaxed',      label: 'Relaxed',       emoji: '🌿', tags: ['casual', 'comfort', 'weekend', 'fresh'] },
-  { id: 'business',     label: 'Business',      emoji: '💼', tags: ['office', 'formal', 'smart', 'elegant'] },
-  { id: 'baggy',        label: 'Baggy',         emoji: '🛹', tags: ['streetwear', 'baggy', 'oversized', 'bold'] },
-  { id: 'smart-casual', label: 'Smart Casual',  emoji: '✨', tags: ['smart-casual', 'versatile', 'classic'] },
-  { id: 'outdoor',      label: 'Outdoor',       emoji: '🏔️', tags: ['outdoor', 'layering', 'casual'] },
-  { id: 'elegant',      label: 'Elegant',       emoji: '🎩', tags: ['elegant', 'luxury', 'formal', 'timeless'] },
-]
 
 // Helper to calculate color similarity
 function colorDistance(hex1: string, hex2: string): number {
@@ -76,25 +68,22 @@ function isColorMatch(itemColors: string[], userColors: string[], threshold = 10
   return false
 }
 
-export function WardrobeClient({ 
-  colorAnalysis, 
-  clothingItems, 
-  savedItemIds: initialSavedIds 
+export function WardrobeClient({
+  colorAnalysis,
+  clothingItems,
+  savedItemIds: initialSavedIds,
+  initialMainTab = 'shop'
 }: WardrobeClientProps) {
+  const [mainTab, setMainTab] = useState<MainTab>(initialMainTab)
   const [searchQuery, setSearchQuery] = useState('')
   const [brandFilter, setBrandFilter] = useState<FilterBrand>('all')
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('all')
-  const [showOnlyMatching, setShowOnlyMatching] = useState(false)
+  const [showOnlyMatching, setShowOnlyMatching] = useState(!!colorAnalysis)
   const [sortBy, setSortBy] = useState<SortOption>('recommended')
   const [savedItemIds, setSavedItemIds] = useState<string[]>(initialSavedIds)
   const [showFilters, setShowFilters] = useState(false)
   const [tryOnItem, setTryOnItem] = useState<ClothingItem | null>(null)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generateMessage, setGenerateMessage] = useState<string | null>(null)
-  const [stylePreference, setStylePreference] = useState<StylePreference>('all')
-  const router = useRouter()
 
-  const uniqueBrands = Array.from(new Set(clothingItems.map(i => i.brand))).sort()
   const userSeason = colorAnalysis?.season
   const userColors = colorAnalysis?.best_colors || []
 
@@ -121,14 +110,6 @@ export function WardrobeClient({
     // Category filter
     if (categoryFilter !== 'all') {
       items = items.filter(item => item.category === categoryFilter)
-    }
-
-    // Style filter
-    if (stylePreference !== 'all') {
-      const styleTags = STYLE_OPTIONS.find(s => s.id === stylePreference)?.tags ?? []
-      items = items.filter(item =>
-        item.style_tags.some(tag => styleTags.includes(tag))
-      )
     }
 
     // Color matching filter
@@ -171,7 +152,7 @@ export function WardrobeClient({
     }
 
     return items
-  }, [clothingItems, searchQuery, brandFilter, categoryFilter, showOnlyMatching, sortBy, userColors, userSeason, stylePreference])
+  }, [clothingItems, searchQuery, brandFilter, categoryFilter, showOnlyMatching, sortBy, userColors, userSeason])
 
   const handleSaveToggle = async (itemId: string) => {
     const isSaved = savedItemIds.includes(itemId)
@@ -209,30 +190,6 @@ export function WardrobeClient({
     }
   }
 
-  const handleGenerate = async () => {
-    setIsGenerating(true)
-    setGenerateMessage(null)
-    try {
-      const res = await fetch('/api/wardrobe/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style: stylePreference === 'all' ? null : stylePreference }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setGenerateMessage(data.error ?? 'Something went wrong')
-      } else {
-        const styleLabel = STYLE_OPTIONS.find(s => s.id === data.style)?.label ?? ''
-        setGenerateMessage(`Added ${data.count} ${styleLabel ? styleLabel + ' ' : ''}items for your ${data.sub_season} palette!`)
-        router.refresh()
-      }
-    } catch {
-      setGenerateMessage('Failed to generate wardrobe')
-    } finally {
-      setIsGenerating(false)
-    }
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -241,58 +198,95 @@ export function WardrobeClient({
           <h1 className="text-3xl font-bold tracking-tight">Wardrobe</h1>
           <p className="text-muted-foreground mt-1">
             {colorAnalysis
-              ? `Showing clothes that match your ${colorAnalysis.season} palette`
+              ? `Showing clothes that match your ${colorAnalysis.sub_season?.replace('-', ' ')} palette`
               : 'Browse clothing from our partner stores'
             }
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {colorAnalysis && (
-            <>
-              <div className={`h-8 w-8 rounded-lg bg-gradient-to-r ${SEASON_INFO[colorAnalysis.season].gradient}`} />
-              <span className="text-sm font-medium capitalize">{colorAnalysis.season}</span>
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="gap-2"
-              >
-                {isGenerating ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
-                ) : (
-                  <><Wand2 className="h-4 w-4" />Generate for my palette</>
-                )}
-              </Button>
-            </>
-          )}
-        </div>
+        {colorAnalysis && (
+          <div className="flex items-center gap-2">
+            <div className={`h-8 w-8 rounded-lg bg-gradient-to-r ${SEASON_INFO[colorAnalysis.season].gradient}`} />
+            <span className="text-sm font-medium capitalize">{colorAnalysis.sub_season?.replace(/-/g, ' ')}</span>
+          </div>
+        )}
       </div>
 
-      {generateMessage && (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardContent className="p-3 text-sm">{generateMessage}</CardContent>
-        </Card>
+      {/* Style Guide - fit & fabric recommendations */}
+      {colorAnalysis?.sub_season && (() => {
+        const guide = getStyleGuide(colorAnalysis.sub_season)
+        return (
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <h2 className="font-semibold text-sm">Your Style Guide - {colorAnalysis.sub_season.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="space-y-2">
+                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fits</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.fits.map(f => (
+                      <span key={f} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">{f}</span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{guide.fitAdvice}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fabrics</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.fabrics.map(f => (
+                      <span key={f} className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 text-xs font-medium">{f}</span>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{guide.fabricAdvice}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Avoid</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {guide.avoid.map(f => (
+                      <span key={f} className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-medium">{f}</span>
+                    ))}
+                  </div>
+                  <div className="mt-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
+                    <p className="text-xs font-medium text-primary mb-0.5">Go-to outfit formula</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{guide.outfitFormula}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })()}
+
+      {/* Main tabs: Shop / My Wardrobe */}
+      <div className="flex gap-1 border-b border-border">
+        <button
+          onClick={() => setMainTab('shop')}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            mainTab === 'shop'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Palette className="w-4 h-4" /> Shop
+        </button>
+        <button
+          onClick={() => setMainTab('my-wardrobe')}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            mainTab === 'my-wardrobe'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Shirt className="w-4 h-4" /> My Wardrobe &amp; Outfits
+        </button>
+      </div>
+
+      {mainTab === 'my-wardrobe' && (
+        <MyWardrobe colorAnalysis={colorAnalysis} />
       )}
 
-      {/* Style picker */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-muted-foreground">Style</p>
-        <div className="flex flex-wrap gap-2">
-          {STYLE_OPTIONS.map((style) => (
-            <button
-              key={style.id}
-              onClick={() => setStylePreference(style.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
-                stylePreference === style.id
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-background border-border hover:border-primary/50 text-foreground'
-              }`}
-            >
-              <span>{style.emoji}</span>
-              {style.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      {mainTab === 'shop' && (<>
 
       {/* No analysis warning */}
       {!colorAnalysis && (
@@ -361,9 +355,9 @@ export function WardrobeClient({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Brands</SelectItem>
-                      {uniqueBrands.map(brand => (
-                        <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-                      ))}
+                      <SelectItem value="H&M">H&M</SelectItem>
+                      <SelectItem value="Zara">Zara</SelectItem>
+                      <SelectItem value="Toj Eksperten">Toj Eksperten</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -446,26 +440,10 @@ export function WardrobeClient({
               onSaveToggle={handleSaveToggle}
               userColors={userColors}
               userSeason={userSeason}
+              onTryOn={setTryOnItem}
             />
           ))}
         </div>
-      ) : clothingItems.length === 0 && colorAnalysis ? (
-        <Card className="border-border/50">
-          <CardContent className="p-12 text-center">
-            <Wand2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Your wardrobe is empty</h3>
-            <p className="text-muted-foreground mb-6">
-              Let the AI generate clothing recommendations tailored to your {colorAnalysis.sub_season} palette.
-            </p>
-            <Button onClick={handleGenerate} disabled={isGenerating} size="lg" className="gap-2">
-              {isGenerating ? (
-                <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
-              ) : (
-                <><Wand2 className="h-4 w-4" />Generate my wardrobe</>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
       ) : (
         <Card className="border-border/50">
           <CardContent className="p-12 text-center">
@@ -477,6 +455,11 @@ export function WardrobeClient({
           </CardContent>
         </Card>
       )}
+
+      {tryOnItem && (
+        <TryOnModal item={tryOnItem} isOpen={!!tryOnItem} onClose={() => setTryOnItem(null)} />
+      )}
+      </>)}
     </div>
   )
 }

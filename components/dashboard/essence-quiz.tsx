@@ -1,466 +1,503 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { StyleEssence, ESSENCE_INFO } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import Image from 'next/image'
+import { ArrowLeft, ArrowRight, Check, Sparkles, RefreshCcw } from 'lucide-react'
+import {
+  QUIZ_QUESTIONS,
+  ESSENCE_INFO,
+  calculateEssence,
+  type EssenceType,
+  type EssenceResult,
+} from '@/lib/essenceData'
 
-type EssenceScores = Record<StyleEssence, number>
+// ─── SVG Silhouette Illustrations ───────────────────────────────────────────
+// Each illustration visually encodes the essence archetype as a distinct shape.
 
-interface QuizOption {
-  label: string
-  description: string
-  image: string   // Unsplash URL
-  scores: Partial<EssenceScores>
+function DramaticIllustration() {
+  return (
+    <svg viewBox="0 0 120 160" className="w-full h-full" aria-hidden>
+      {/* Head */}
+      <circle cx="60" cy="18" r="13" fill="white" fillOpacity={0.85} />
+      {/* Long structured coat — tall, sharp trapezoid */}
+      <polygon points="40,32 80,32 88,155 32,155" fill="white" fillOpacity={0.9} />
+      {/* Sharp lapel lines */}
+      <line x1="60" y1="42" x2="38" y2="68" stroke="#1e293b" strokeWidth="2.5" />
+      <line x1="60" y1="42" x2="82" y2="68" stroke="#1e293b" strokeWidth="2.5" />
+      {/* Vertical seam — precise */}
+      <line x1="60" y1="55" x2="60" y2="148" stroke="#1e293b" strokeWidth="1.5" strokeDasharray="5,4" strokeOpacity={0.35} />
+      {/* Shoulder lines */}
+      <line x1="40" y1="38" x2="25" y2="42" stroke="white" strokeWidth="2" strokeOpacity={0.5} />
+      <line x1="80" y1="38" x2="95" y2="42" stroke="white" strokeWidth="2" strokeOpacity={0.5} />
+    </svg>
+  )
 }
 
-interface QuizQuestion {
-  question: string
-  subtitle?: string
-  options: QuizOption[]
+function NaturalIllustration() {
+  return (
+    <svg viewBox="0 0 120 160" className="w-full h-full" aria-hidden>
+      {/* Head */}
+      <circle cx="60" cy="18" r="13" fill="white" fillOpacity={0.85} />
+      {/* Loose oversized top — wide, organic shape */}
+      <ellipse cx="60" cy="72" rx="42" ry="38" fill="white" fillOpacity={0.85} />
+      {/* Relaxed trousers — wide leg */}
+      <rect x="26" y="100" width="30" height="55" rx="6" fill="white" fillOpacity={0.7} />
+      <rect x="64" y="100" width="30" height="55" rx="6" fill="white" fillOpacity={0.7} />
+      {/* Texture hint — horizontal lines */}
+      <line x1="22" y1="65" x2="98" y2="65" stroke="#92400e" strokeWidth="1.5" strokeOpacity={0.3} />
+      <line x1="22" y1="75" x2="98" y2="75" stroke="#92400e" strokeWidth="1.5" strokeOpacity={0.3} />
+      <line x1="22" y1="85" x2="98" y2="85" stroke="#92400e" strokeWidth="1.5" strokeOpacity={0.3} />
+      {/* Drop shoulder suggestion */}
+      <line x1="18" y1="55" x2="35" y2="60" stroke="white" strokeWidth="3" strokeOpacity={0.6} />
+      <line x1="102" y1="55" x2="85" y2="60" stroke="white" strokeWidth="3" strokeOpacity={0.6} />
+    </svg>
+  )
 }
 
-const U = (id: string, crop = 'faces') =>
-  `https://images.unsplash.com/photo-${id}?w=400&h=300&fit=crop&crop=${crop}`
-
-const QUESTIONS: QuizQuestion[] = [
-  {
-    question: 'How would you describe your body frame?',
-    subtitle: 'Think about your natural build, not your weight.',
-    options: [
-      {
-        label: 'Long & angular',
-        description: 'Tall, straight, with sharp shoulders',
-        image: U('1487222477-5f7ac8e5b5b8', 'top'),
-        scores: { dramatic: 3, angelic: 1 },
-      },
-      {
-        label: 'Compact & boyish',
-        description: 'Shorter, trim, with a youthful energy',
-        image: U('1463453091185-61582044d556', 'faces'),
-        scores: { gamine: 3, ingenue: 1 },
-      },
-      {
-        label: 'Athletic & sturdy',
-        description: 'Broad shoulders, strong build',
-        image: U('1534367610401-9f5ed68180aa', 'top'),
-        scores: { natural: 3, classic: 1 },
-      },
-      {
-        label: 'Balanced & proportional',
-        description: 'Even, symmetrical, neither extreme',
-        image: U('1507003211169-0a1dd7228f2d', 'faces'),
-        scores: { classic: 3, romantic: 1 },
-      },
-      {
-        label: 'Slim & delicate',
-        description: 'Lean, fine-boned, lightweight',
-        image: U('1472099645785-5658abf4ff4e', 'top'),
-        scores: { angelic: 3, ingenue: 1 },
-      },
-      {
-        label: 'Soft & rounded',
-        description: 'Fuller features, softer angles',
-        image: U('1500648767791-00dcc994a43e', 'faces'),
-        scores: { romantic: 3, ingenue: 1 },
-      },
-    ],
-  },
-  {
-    question: 'How tall are you?',
-    options: [
-      {
-        label: 'Tall (185cm+)',
-        description: 'Above average height',
-        image: U('1555952517-2e8e729e0960', 'top'),
-        scores: { dramatic: 2, angelic: 2 },
-      },
-      {
-        label: 'Average (170–185cm)',
-        description: 'Middle range',
-        image: U('1570295999919-56ceb5ecca61', 'faces'),
-        scores: { classic: 2, natural: 1, romantic: 1 },
-      },
-      {
-        label: 'Shorter (under 170cm)',
-        description: 'Below average height',
-        image: U('1506794778202-cad84cf45f1d', 'faces'),
-        scores: { gamine: 3, ingenue: 2 },
-      },
-    ],
-  },
-  {
-    question: 'How would you describe your face?',
-    options: [
-      {
-        label: 'Sharp & defined',
-        description: 'Strong jaw, angular features, striking',
-        image: U('1583195764036-6dc248ac07d9', 'faces'),
-        scores: { dramatic: 3, gamine: 1 },
-      },
-      {
-        label: 'Boyish & youthful',
-        description: 'Fresh-faced, energetic, fun',
-        image: U('1463453091185-61582044d556', 'faces'),
-        scores: { gamine: 3, ingenue: 1 },
-      },
-      {
-        label: 'Open & broad',
-        description: 'Wide face, approachable, friendly',
-        image: U('1521119989659-3d20a2e6c7f6', 'faces'),
-        scores: { natural: 3, classic: 1 },
-      },
-      {
-        label: 'Symmetrical & balanced',
-        description: 'Even features, neither hard nor soft',
-        image: U('1507003211169-0a1dd7228f2d', 'faces'),
-        scores: { classic: 3, romantic: 1 },
-      },
-      {
-        label: 'Oval & delicate',
-        description: 'Fine features, almost ethereal quality',
-        image: U('1519058082700-08a9b54f60b7', 'faces'),
-        scores: { angelic: 3, ingenue: 1 },
-      },
-      {
-        label: 'Soft & full',
-        description: 'Rounded features, gentle and warm',
-        image: U('1500648767791-00dcc994a43e', 'faces'),
-        scores: { romantic: 2, ingenue: 2 },
-      },
-    ],
-  },
-  {
-    question: 'What vibe do people naturally pick up from you?',
-    subtitle: 'Think about first impressions.',
-    options: [
-      {
-        label: 'Intense & powerful',
-        description: 'People find you striking or magnetic',
-        image: U('1507680434567-4d82a7d0c88c', 'center'),
-        scores: { dramatic: 3 },
-      },
-      {
-        label: 'Playful & rebellious',
-        description: 'People find you fun and a bit edgy',
-        image: U('1551698618-1dffe2d18f6d', 'center'),
-        scores: { gamine: 3 },
-      },
-      {
-        label: 'Laid-back & outdoorsy',
-        description: 'People find you easy-going and natural',
-        image: U('1476234251399-d1f8e18cd2e9', 'center'),
-        scores: { natural: 3 },
-      },
-      {
-        label: 'Polished & reliable',
-        description: 'People find you put-together and trustworthy',
-        image: U('1593030761757-71fae45fa0e7', 'center'),
-        scores: { classic: 3 },
-      },
-      {
-        label: 'Charismatic & magnetic',
-        description: 'People find you sensual and captivating',
-        image: U('1617127365659-c47fa864d8bc', 'center'),
-        scores: { romantic: 3 },
-      },
-      {
-        label: 'Warm & approachable',
-        description: 'People find you gentle and kind',
-        image: U('1598033129183-c4f50c736f10', 'center'),
-        scores: { ingenue: 3 },
-      },
-      {
-        label: 'Mysterious & artistic',
-        description: 'People find you unique and otherworldly',
-        image: U('1614975059251-992f11792b9f', 'center'),
-        scores: { angelic: 3 },
-      },
-    ],
-  },
-  {
-    question: 'Which style feels most naturally like you?',
-    subtitle: 'Not what you think you should wear — what you actually gravitate towards.',
-    options: [
-      {
-        label: 'Bold & theatrical',
-        description: 'Oversized coats, strong silhouettes, monochrome',
-        image: U('1490481651871-ab68de25d43d', 'center'),
-        scores: { dramatic: 3 },
-      },
-      {
-        label: 'Eclectic & streetwear',
-        description: 'Pattern mixing, cropped fits, unexpected combos',
-        image: U('1548036161-761a9f0d8ed4', 'center'),
-        scores: { gamine: 3 },
-      },
-      {
-        label: 'Relaxed & earthy',
-        description: 'Layers, natural fabrics, outdoor-ready',
-        image: U('1523381210434-271e8be8a52f', 'center'),
-        scores: { natural: 3 },
-      },
-      {
-        label: 'Clean & tailored',
-        description: 'Timeless pieces, quality basics, neutral palette',
-        image: U('1507679799987-c73779587ccf', 'center'),
-        scores: { classic: 3 },
-      },
-      {
-        label: 'Luxurious & fitted',
-        description: 'Rich textures, premium fabrics, close fit',
-        image: U('1583743814966-8d4eb8a38a17', 'center'),
-        scores: { romantic: 3 },
-      },
-      {
-        label: 'Soft & delicate',
-        description: 'Light colours, subtle details, gentle pieces',
-        image: U('1434389677669-e08b4cac3105', 'center'),
-        scores: { ingenue: 3 },
-      },
-      {
-        label: 'Flowing & minimal',
-        description: 'Draped pieces, fine textures, artistic cuts',
-        image: U('1591047139829-d91aecb6caea', 'center'),
-        scores: { angelic: 3 },
-      },
-    ],
-  },
-]
-
-function calculateEssence(answers: number[]): StyleEssence {
-  const scores: EssenceScores = {
-    dramatic: 0, gamine: 0, natural: 0,
-    classic: 0, romantic: 0, ingenue: 0, angelic: 0,
-  }
-  answers.forEach((answerIndex, questionIndex) => {
-    const option = QUESTIONS[questionIndex].options[answerIndex]
-    Object.entries(option.scores).forEach(([essence, score]) => {
-      scores[essence as StyleEssence] += score ?? 0
-    })
-  })
-  return Object.entries(scores).sort(([, a], [, b]) => b - a)[0][0] as StyleEssence
+function RomanticIllustration() {
+  return (
+    <svg viewBox="0 0 120 160" className="w-full h-full" aria-hidden>
+      {/* Head */}
+      <circle cx="60" cy="16" r="13" fill="white" fillOpacity={0.85} />
+      {/* Fitted bodice */}
+      <path d="M38,30 L82,30 L76,78 Q60,88 44,78 Z" fill="white" fillOpacity={0.92} />
+      {/* Waist cinch — the key romantic detail */}
+      <path d="M44,78 Q60,92 76,78" fill="none" stroke="white" strokeWidth="3" strokeOpacity={0.6} />
+      {/* Full flowing skirt */}
+      <path d="M44,78 Q60,92 76,78 L96,155 L24,155 Z" fill="white" fillOpacity={0.85} />
+      {/* Ruffle suggestion on skirt */}
+      <path d="M30,112 Q60,102 90,112" fill="none" stroke="#9f1239" strokeWidth="1.5" strokeOpacity={0.3} />
+      <path d="M26,128 Q60,118 94,128" fill="none" stroke="#9f1239" strokeWidth="1.5" strokeOpacity={0.25} />
+      <path d="M28,144 Q60,134 92,144" fill="none" stroke="#9f1239" strokeWidth="1.5" strokeOpacity={0.2} />
+    </svg>
+  )
 }
+
+function ClassicIllustration() {
+  return (
+    <svg viewBox="0 0 120 160" className="w-full h-full" aria-hidden>
+      {/* Head */}
+      <circle cx="60" cy="18" r="13" fill="white" fillOpacity={0.85} />
+      {/* Symmetrical blazer — moderate proportions */}
+      <rect x="32" y="32" width="56" height="78" rx="4" fill="white" fillOpacity={0.88} />
+      {/* Lapels — perfectly symmetrical */}
+      <path d="M60,46 L42,66" stroke="#1e3a5f" strokeWidth="2.5" fill="none" />
+      <path d="M60,46 L78,66" stroke="#1e3a5f" strokeWidth="2.5" fill="none" />
+      {/* Refined button detail */}
+      <circle cx="60" cy="74" r="2.5" fill="#1e3a5f" fillOpacity={0.5} />
+      <circle cx="60" cy="86" r="2.5" fill="#1e3a5f" fillOpacity={0.5} />
+      <circle cx="60" cy="98" r="2.5" fill="#1e3a5f" fillOpacity={0.5} />
+      {/* Tailored trousers */}
+      <rect x="36" y="108" width="22" height="48" rx="3" fill="white" fillOpacity={0.75} />
+      <rect x="62" y="108" width="22" height="48" rx="3" fill="white" fillOpacity={0.75} />
+      {/* Centre crease */}
+      <line x1="47" y1="110" x2="47" y2="154" stroke="#1e3a5f" strokeWidth="1" strokeOpacity={0.3} />
+      <line x1="73" y1="110" x2="73" y2="154" stroke="#1e3a5f" strokeWidth="1" strokeOpacity={0.3} />
+    </svg>
+  )
+}
+
+function GamineIllustration() {
+  return (
+    <svg viewBox="0 0 120 160" className="w-full h-full" aria-hidden>
+      {/* Head */}
+      <circle cx="60" cy="18" r="13" fill="white" fillOpacity={0.9} />
+      {/* Cropped contrast jacket — top block */}
+      <rect x="28" y="32" width="64" height="58" rx="4" fill="white" fillOpacity={0.92} />
+      {/* Contrast block — left trouser (dark) */}
+      <rect x="22" y="90" width="33" height="65" rx="5" fill="#c4b5fd" fillOpacity={0.85} />
+      {/* Contrast block — right trouser (light) */}
+      <rect x="65" y="90" width="33" height="65" rx="5" fill="white" fillOpacity={0.9} />
+      {/* Collar detail */}
+      <path d="M60,42 L50,56" stroke="#4c1d95" strokeWidth="2.5" fill="none" />
+      <path d="M60,42 L70,56" stroke="#4c1d95" strokeWidth="2.5" fill="none" />
+      {/* Playful pocket square */}
+      <rect x="76" y="42" width="10" height="8" rx="1" fill="#a78bfa" fillOpacity={0.6} />
+    </svg>
+  )
+}
+
+function EtherealIllustration() {
+  return (
+    <svg viewBox="0 0 120 160" className="w-full h-full" aria-hidden>
+      {/* Head */}
+      <circle cx="60" cy="16" r="13" fill="#7c3aed" fillOpacity={0.5} />
+      {/* Flowing gown — multiple transparent layers */}
+      <path d="M42,30 L78,30 L90,155 L30,155 Z" fill="#7c3aed" fillOpacity={0.25} />
+      <path d="M46,30 L74,30 L84,155 L36,155 Z" fill="white" fillOpacity={0.55} />
+      {/* Second flowing layer */}
+      <path d="M50,65 Q60,55 70,65 L80,155 L40,155 Z" fill="white" fillOpacity={0.35} />
+      {/* Delicate top layer */}
+      <path d="M48,50 Q60,38 72,50 L76,155 L44,155 Z" fill="white" fillOpacity={0.2} />
+      {/* Floating sparkle dots */}
+      <circle cx="20" cy="72" r="2.5" fill="#7c3aed" fillOpacity={0.5} />
+      <circle cx="100" cy="60" r="2" fill="#7c3aed" fillOpacity={0.4} />
+      <circle cx="14" cy="120" r="3" fill="#7c3aed" fillOpacity={0.35} />
+      <circle cx="106" cy="110" r="3" fill="#7c3aed" fillOpacity={0.35} />
+      <circle cx="108" cy="80" r="1.5" fill="#7c3aed" fillOpacity={0.3} />
+      <circle cx="12" cy="95" r="1.5" fill="#7c3aed" fillOpacity={0.3} />
+    </svg>
+  )
+}
+
+const ILLUSTRATIONS: Record<string, React.ReactNode> = {
+  dramatic: <DramaticIllustration />,
+  natural: <NaturalIllustration />,
+  romantic: <RomanticIllustration />,
+  classic: <ClassicIllustration />,
+  gamine: <GamineIllustration />,
+  ethereal: <EtherealIllustration />,
+}
+
+const CARD_BG: Record<string, string> = {
+  dramatic: 'bg-gradient-to-b from-slate-900 via-slate-800 to-zinc-800',
+  natural: 'bg-gradient-to-b from-amber-800 via-amber-700 to-orange-700',
+  romantic: 'bg-gradient-to-b from-rose-500 via-pink-400 to-rose-300',
+  classic: 'bg-gradient-to-b from-blue-900 via-blue-800 to-indigo-800',
+  gamine: 'bg-gradient-to-b from-violet-800 via-indigo-700 to-purple-700',
+  ethereal: 'bg-gradient-to-b from-purple-100 via-violet-50 to-pink-50',
+}
+
+const CARD_TEXT: Record<string, string> = {
+  dramatic: 'text-slate-100',
+  natural: 'text-amber-50',
+  romantic: 'text-rose-950',
+  classic: 'text-blue-50',
+  gamine: 'text-violet-50',
+  ethereal: 'text-purple-900',
+}
+
+const CARD_KEYWORD_BG: Record<string, string> = {
+  dramatic: 'bg-white/10 text-white',
+  natural: 'bg-amber-900/30 text-amber-100',
+  romantic: 'bg-rose-900/15 text-rose-900',
+  classic: 'bg-white/10 text-blue-100',
+  gamine: 'bg-white/10 text-violet-100',
+  ethereal: 'bg-purple-200/50 text-purple-800',
+}
+
+// ─── Results Component ──────────────────────────────────────────────────────
+
+function EssenceResults({
+  result,
+  onRetake,
+  onContinue,
+}: {
+  result: EssenceResult
+  onRetake: () => void
+  onContinue: (result: EssenceResult) => void
+}) {
+  const primary = ESSENCE_INFO[result.primary]
+  const secondary = result.secondary ? ESSENCE_INFO[result.secondary] : null
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium">
+          <Sparkles className="w-4 h-4 text-primary" />
+          Your Style Essence
+        </div>
+        <h2 className="text-3xl font-bold tracking-tight">{primary.name}</h2>
+        <p className="text-muted-foreground">{primary.tagline}</p>
+      </div>
+
+      {/* Primary essence card */}
+      <div className={cn('rounded-2xl overflow-hidden', `bg-gradient-to-br ${primary.gradient}`)}>
+        <div className="grid grid-cols-[140px_1fr] min-h-[200px]">
+          <div className="p-4 flex items-center justify-center">
+            {ILLUSTRATIONS[result.primary]}
+          </div>
+          <div className={cn('p-5 flex flex-col justify-center', primary.textColor)}>
+            <p className="text-sm font-semibold uppercase tracking-wider opacity-70 mb-2">
+              Your primary essence
+            </p>
+            <h3 className="text-2xl font-bold mb-2">{primary.name}</h3>
+            <p className="text-sm leading-relaxed opacity-85">{primary.description}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary essence — shown if strong enough */}
+      {secondary && result.secondary && (
+        <div className={cn('rounded-xl overflow-hidden border', `bg-gradient-to-br ${secondary.gradient}`)}>
+          <div className="grid grid-cols-[100px_1fr] min-h-[130px]">
+            <div className="p-3 flex items-center justify-center opacity-90">
+              {ILLUSTRATIONS[result.secondary]}
+            </div>
+            <div className={cn('p-4 flex flex-col justify-center', secondary.textColor)}>
+              <p className="text-xs font-semibold uppercase tracking-wider opacity-70 mb-1">
+                With a secondary touch of
+              </p>
+              <h3 className="text-xl font-bold mb-1">{secondary.name}</h3>
+              <p className="text-sm opacity-75">{secondary.tagline}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Style guide pills */}
+      <div className="bg-secondary/40 rounded-xl p-5 space-y-4">
+        <h4 className="font-semibold text-sm">Your style blueprint</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Your best silhouettes
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {primary.styleGuide.silhouettes.map(s => (
+                <span key={s} className="text-xs bg-background border rounded-full px-2.5 py-1">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Your best fabrics
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {primary.styleGuide.fabrics.map(f => (
+                <span key={f} className="text-xs bg-background border rounded-full px-2.5 py-1">
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Style icons
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {primary.styleGuide.celebrities.map(c => (
+                <span key={c} className="text-xs bg-primary/10 text-primary border border-primary/20 rounded-full px-2.5 py-1">
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              Avoid
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {primary.styleGuide.avoid.slice(0, 3).map(a => (
+                <span key={a} className="text-xs bg-destructive/10 text-destructive border border-destructive/20 rounded-full px-2.5 py-1">
+                  {a}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={onRetake} className="flex items-center gap-2">
+          <RefreshCcw className="w-4 h-4" />
+          Retake quiz
+        </Button>
+        <Button onClick={() => onContinue(result)} className="flex-1">
+          See my full style profile
+          <ArrowRight className="ml-2 w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Main Quiz Component ────────────────────────────────────────────────────
 
 interface EssenceQuizProps {
-  existingEssence?: StyleEssence | null
+  onComplete: (result: EssenceResult) => void
+  onSkip?: () => void
 }
 
-export function EssenceQuiz({ existingEssence }: EssenceQuizProps) {
-  const router = useRouter()
-  const [step, setStep] = useState<'intro' | 'quiz' | 'result'>('intro')
+export function EssenceQuiz({ onComplete, onSkip }: EssenceQuizProps) {
   const [currentQ, setCurrentQ] = useState(0)
-  const [answers, setAnswers] = useState<number[]>([])
-  const [selected, setSelected] = useState<number | null>(null)
-  const [result, setResult] = useState<StyleEssence | null>(existingEssence ?? null)
-  const [isSaving, setIsSaving] = useState(false)
+  const [answers, setAnswers] = useState<Record<number, string>>({})
+  const [result, setResult] = useState<EssenceResult | null>(null)
+  const [animating, setAnimating] = useState(false)
 
-  const question = QUESTIONS[currentQ]
-  const progress = (currentQ / QUESTIONS.length) * 100
+  const question = QUIZ_QUESTIONS[currentQ]
+  const isLast = currentQ === QUIZ_QUESTIONS.length - 1
+  const selectedId = answers[question.id]
+  const progress = ((currentQ + (selectedId ? 1 : 0)) / QUIZ_QUESTIONS.length) * 100
 
-  const handleNext = async () => {
-    if (selected === null) return
-    const newAnswers = [...answers, selected]
+  function selectOption(optionId: string) {
+    setAnswers(prev => ({ ...prev, [question.id]: optionId }))
+  }
 
-    if (currentQ < QUESTIONS.length - 1) {
-      setAnswers(newAnswers)
-      setSelected(null)
+  function goNext() {
+    if (!selectedId || animating) return
+    if (isLast) {
+      const finalAnswers = { ...answers, [question.id]: selectedId }
+      setAnswers(finalAnswers)
+      setResult(calculateEssence(finalAnswers))
+      return
+    }
+    setAnimating(true)
+    setTimeout(() => {
       setCurrentQ(q => q + 1)
-    } else {
-      const essence = calculateEssence(newAnswers)
-      setResult(essence)
-      setStep('result')
-      setIsSaving(true)
-      await fetch('/api/essence', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ essence }),
-      })
-      setIsSaving(false)
-      router.refresh()
-    }
+      setAnimating(false)
+    }, 200)
   }
 
-  const handleBack = () => {
-    if (currentQ === 0) {
-      setStep('intro')
-    } else {
-      setAnswers(a => a.slice(0, -1))
-      setSelected(answers[currentQ - 1] ?? null)
+  function goBack() {
+    if (currentQ === 0 || animating) return
+    setAnimating(true)
+    setTimeout(() => {
       setCurrentQ(q => q - 1)
-    }
+      setAnimating(false)
+    }, 200)
   }
 
-  const startQuiz = () => {
-    setStep('quiz')
+  function retake() {
+    setAnswers({})
     setCurrentQ(0)
-    setAnswers([])
-    setSelected(null)
     setResult(null)
   }
 
-  // ── INTRO ──────────────────────────────────────────────────────────
-  if (step === 'intro') {
+  if (result) {
     return (
-      <div className="max-w-2xl mx-auto space-y-8 text-center">
-        <div>
-          <p className="text-6xl mb-4">🧬</p>
-          <h1 className="text-3xl font-bold tracking-tight mb-3">Discover your Style Essence</h1>
-          <p className="text-muted-foreground text-lg">
-            The 7 style essences go beyond colour — they reveal the silhouettes, textures and vibes that are naturally aligned with your physical features and personality.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-left">
-          {(Object.entries(ESSENCE_INFO) as [StyleEssence, typeof ESSENCE_INFO[StyleEssence]][]).map(([key, info]) => (
-            <div key={key} className="flex items-center gap-3 p-3 rounded-lg border border-border/50">
-              <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${info.gradient} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                {info.name[0]}
-              </div>
-              <div>
-                <p className="font-medium text-sm">{info.name}</p>
-                <p className="text-xs text-muted-foreground">{info.tagline.split(' · ')[0]}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {existingEssence && result && (
-          <Card className={`border-0 bg-gradient-to-r ${ESSENCE_INFO[result].gradient} text-white`}>
-            <CardContent className="p-4">
-              <p className="text-sm opacity-80 mb-1">Your current essence</p>
-              <p className="text-xl font-bold">{ESSENCE_INFO[result].name}</p>
-              <p className="text-sm opacity-80">{ESSENCE_INFO[result].tagline}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        <Button size="lg" onClick={startQuiz} className="gap-2">
-          {existingEssence ? 'Retake the quiz' : 'Start the quiz'} →
-        </Button>
-        <p className="text-sm text-muted-foreground">5 questions · takes about 1 minute</p>
-      </div>
+      <EssenceResults
+        result={result}
+        onRetake={retake}
+        onContinue={onComplete}
+      />
     )
   }
-
-  // ── RESULT ─────────────────────────────────────────────────────────
-  if (step === 'result' && result) {
-    const info = ESSENCE_INFO[result]
-    return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className={`rounded-2xl bg-gradient-to-br ${info.gradient} p-8 text-white text-center`}>
-          <p className="text-5xl mb-4">{info.emoji}</p>
-          <p className="text-sm uppercase tracking-widest opacity-80 mb-1">Your Style Essence</p>
-          <h1 className="text-4xl font-bold mb-2">{info.name}</h1>
-          <p className="opacity-90">{info.tagline}</p>
-        </div>
-
-        <Card className="border-border/50">
-          <CardContent className="p-6 space-y-4">
-            <p className="text-muted-foreground leading-relaxed">{info.description}</p>
-            <div>
-              <p className="text-sm font-medium mb-2">Your style keywords</p>
-              <div className="flex flex-wrap gap-2">
-                {info.keywords.map(k => (
-                  <span key={k} className="px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-sm">{k}</span>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {isSaving && (
-          <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" /> Saving your essence...
-          </p>
-        )}
-
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={startQuiz} className="flex-1">Retake quiz</Button>
-          <Button onClick={() => router.push('/dashboard/wardrobe')} className="flex-1">Go to wardrobe →</Button>
-        </div>
-      </div>
-    )
-  }
-
-  // ── QUIZ ───────────────────────────────────────────────────────────
-  const cols = question.options.length <= 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Progress */}
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>Question {currentQ + 1} of {QUESTIONS.length}</span>
-          <span>{Math.round(progress)}%</span>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Style Essence
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {currentQ + 1} of {QUIZ_QUESTIONS.length}
+            </span>
+          </div>
+          {/* Progress bar */}
+          <div className="w-48 h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
-        <div className="h-2 bg-secondary rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
+        {onSkip && (
+          <button
+            onClick={onSkip}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip for now
+          </button>
+        )}
       </div>
 
       {/* Question */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-1">{question.question}</h2>
-        {question.subtitle && <p className="text-muted-foreground">{question.subtitle}</p>}
-      </div>
+      <div
+        className={cn(
+          'transition-opacity duration-200',
+          animating ? 'opacity-0' : 'opacity-100'
+        )}
+      >
+        <div className="mb-1">
+          <h2 className="text-xl font-bold tracking-tight">{question.question}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{question.hint}</p>
+        </div>
 
-      {/* Options with images */}
-      <div className={`grid ${cols} gap-3`}>
-        {question.options.map((option, i) => (
-          <button
-            key={i}
-            onClick={() => setSelected(i)}
-            className={cn(
-              'text-left rounded-xl border-2 overflow-hidden transition-all duration-150 group',
-              selected === i
-                ? 'border-primary shadow-md shadow-primary/20'
-                : 'border-border hover:border-primary/40'
-            )}
-          >
-            {/* Image */}
-            <div className="relative w-full aspect-[4/3] overflow-hidden bg-secondary">
-              <Image
-                src={option.image}
-                alt={option.label}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 640px) 50vw, 33vw"
-              />
-              {selected === i && (
-                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                    <Check className="w-4 h-4 text-primary-foreground" />
+        {/* Options — 2×2 grid */}
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          {question.options.map(option => {
+            const isSelected = selectedId === option.id
+
+            return (
+              <button
+                key={option.id}
+                onClick={() => selectOption(option.id)}
+                className={cn(
+                  'relative rounded-2xl overflow-hidden text-left transition-all duration-200',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                  isSelected
+                    ? 'ring-3 ring-primary shadow-lg scale-[1.02]'
+                    : 'hover:scale-[1.01] hover:shadow-md ring-1 ring-border',
+                )}
+                aria-pressed={isSelected}
+              >
+                {/* Illustration area */}
+                <div className={cn('h-40 sm:h-48 w-full', CARD_BG[option.illustration])}>
+                  <div className="w-full h-full p-3">
+                    {ILLUSTRATIONS[option.illustration]}
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Text */}
-            <div className="p-3">
-              <p className="font-medium text-sm mb-0.5">{option.label}</p>
-              <p className="text-xs text-muted-foreground leading-snug">{option.description}</p>
-            </div>
-          </button>
-        ))}
+                {/* Label area */}
+                <div className={cn('p-3 pb-3.5', CARD_BG[option.illustration])}>
+                  <div className={cn('font-semibold text-sm leading-tight', CARD_TEXT[option.illustration])}>
+                    {option.label}
+                  </div>
+                  <div className={cn('text-xs mt-0.5 opacity-70 leading-tight', CARD_TEXT[option.illustration])}>
+                    {option.sublabel}
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {option.keywords.map(k => (
+                      <span
+                        key={k}
+                        className={cn(
+                          'text-[10px] px-1.5 py-0.5 rounded-full font-medium',
+                          CARD_KEYWORD_BG[option.illustration]
+                        )}
+                      >
+                        {k}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Selected checkmark */}
+                {isSelected && (
+                  <div className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-md">
+                    <Check className="w-3.5 h-3.5 text-primary-foreground" strokeWidth={3} />
+                  </div>
+                )}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex gap-3">
-        <Button variant="outline" onClick={handleBack} className="gap-1">
-          <ChevronLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between pt-1">
+        <Button
+          variant="ghost"
+          onClick={goBack}
+          disabled={currentQ === 0}
+          className="flex items-center gap-1.5"
+        >
+          <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
-        <Button onClick={handleNext} disabled={selected === null} className="flex-1 gap-1">
-          {currentQ === QUESTIONS.length - 1 ? 'See my essence' : 'Next'}
-          <ChevronRight className="h-4 w-4" />
+
+        <Button
+          onClick={goNext}
+          disabled={!selectedId}
+          className="flex items-center gap-1.5 px-6"
+        >
+          {isLast ? (
+            <>
+              <Sparkles className="w-4 h-4" />
+              See my essence
+            </>
+          ) : (
+            <>
+              Next
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </Button>
       </div>
     </div>
