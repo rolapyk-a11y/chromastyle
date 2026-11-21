@@ -111,12 +111,14 @@ export type HeightBand = 'short' | 'average' | 'tall'
 export type ShoulderBuild = 'narrow' | 'average' | 'broad'
 export type BodyProportion = 'long-torso' | 'balanced' | 'long-legs'
 export type BuildType = 'slim' | 'average' | 'athletic' | 'fuller'
+export type HipWidth = 'narrow' | 'average' | 'wide'
 
 export interface BodyProfile {
   height: HeightBand
   shoulders: ShoulderBuild
   proportion: BodyProportion
   build: BuildType
+  hips?: HipWidth            // optional: older saved profiles don't have it
   created_at: string
 }
 

@@ -42,6 +42,7 @@ export function BodyProfileQuiz({ onComplete, onSkip }: BodyProfileQuizProps) {
         shoulders: finalAnswers.shoulders as BodyProfile['shoulders'],
         proportion: finalAnswers.proportion as BodyProfile['proportion'],
         build: finalAnswers.build as BodyProfile['build'],
+        hips: finalAnswers.hips as BodyProfile['hips'],
         created_at: new Date().toISOString(),
       }
       setResult(profile)
@@ -71,18 +72,18 @@ export function BodyProfileQuiz({ onComplete, onSkip }: BodyProfileQuizProps) {
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium">
             <Ruler className="w-4 h-4 text-primary" />
-            Your fit profile
+            Din pasformsprofil
           </div>
           <h2 className="text-2xl font-bold tracking-tight capitalize">{bodyProfileSummary(result)}</h2>
           <p className="text-muted-foreground text-sm">
-            We&apos;ll now favour the cuts that flatter your proportions — in outfit
-            scoring and product suggestions.
+            Appen prioriterer nu de snit, der klæder dine proportioner – i outfits og
+            produktforslag.
           </p>
         </div>
 
         <div className="bg-secondary/40 rounded-xl p-5 space-y-3">
           <h4 className="font-semibold text-sm flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" /> Your fit rules
+            <Sparkles className="w-4 h-4 text-primary" /> Dine pasformsregler
           </h4>
           <ul className="space-y-2">
             {tips.map((tip, i) => (
@@ -96,10 +97,10 @@ export function BodyProfileQuiz({ onComplete, onSkip }: BodyProfileQuizProps) {
 
         <div className="flex gap-3">
           <Button variant="outline" onClick={retake} className="flex items-center gap-2">
-            <RefreshCcw className="w-4 h-4" /> Retake
+            <RefreshCcw className="w-4 h-4" /> Tag igen
           </Button>
           <Button onClick={() => onComplete(result)} className="flex-1">
-            Use my fit profile
+            Brug min profil
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
@@ -115,10 +116,10 @@ export function BodyProfileQuiz({ onComplete, onSkip }: BodyProfileQuizProps) {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Fit profile
+              Pasformsprofil
             </span>
             <span className="text-xs text-muted-foreground">
-              {currentQ + 1} of {BODY_QUESTIONS.length}
+              {currentQ + 1} af {BODY_QUESTIONS.length}
             </span>
           </div>
           <div className="w-48 h-1.5 bg-secondary rounded-full overflow-hidden">
@@ -133,7 +134,7 @@ export function BodyProfileQuiz({ onComplete, onSkip }: BodyProfileQuizProps) {
             onClick={onSkip}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Skip for now
+            Spring over
           </button>
         )}
       </div>
@@ -178,10 +179,10 @@ export function BodyProfileQuiz({ onComplete, onSkip }: BodyProfileQuizProps) {
       {/* Navigation */}
       <div className="flex items-center justify-between pt-1">
         <Button variant="ghost" onClick={goBack} disabled={currentQ === 0} className="flex items-center gap-1.5">
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-4 h-4" /> Tilbage
         </Button>
         <Button onClick={goNext} disabled={!selected} className="flex items-center gap-1.5 px-6">
-          {isLast ? (<><Sparkles className="w-4 h-4" /> See my fit profile</>) : (<>Next <ArrowRight className="w-4 h-4" /></>)}
+          {isLast ? (<><Sparkles className="w-4 h-4" /> Se min profil</>) : (<>Næste <ArrowRight className="w-4 h-4" /></>)}
         </Button>
       </div>
     </div>

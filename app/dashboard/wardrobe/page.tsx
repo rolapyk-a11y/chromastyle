@@ -76,6 +76,7 @@ export default async function WardrobePage() {
       {/* If no Supabase analysis yet, sync from localStorage then refresh */}
       {!colorAnalysis && <LocalAnalysisSync />}
       <WardrobeClient
+        signedIn={!!user}
         colorAnalysis={colorAnalysis}
         clothingItems={merged}
         savedItemIds={savedItemIds}

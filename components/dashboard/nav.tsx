@@ -33,13 +33,13 @@ interface DashboardNavProps {
 }
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: Sparkles },
-  { href: '/analyze', label: 'Analyze', icon: Camera },
-  { href: '/colour-check', label: 'Colour Check', icon: ScanLine },
-  { href: '/dashboard/closet', label: 'Closet', icon: DoorClosed },
+  { href: '/dashboard', label: 'Oversigt', icon: Sparkles },
+  { href: '/analyze', label: 'Analyse', icon: Camera },
+  { href: '/colour-check', label: 'Farvetjek', icon: ScanLine },
+  { href: '/dashboard/closet', label: 'Mit skab', icon: DoorClosed },
   { href: '/dashboard/outfits', label: 'Outfits', icon: Layers },
-  { href: '/dashboard/wardrobe', label: 'Wardrobe', icon: Shirt },
-  { href: '/dashboard/saved', label: 'Saved', icon: Heart },
+  { href: '/dashboard/wardrobe', label: 'Shop', icon: Shirt },
+  { href: '/dashboard/saved', label: 'Gemt', icon: Heart },
   { href: '/dashboard/trends', label: 'Trends', icon: TrendingUp },
 ]
 
@@ -74,13 +74,13 @@ export function DashboardNav({ user }: DashboardNavProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive 
-                      ? 'bg-primary/10 text-primary' 
+                    'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors',
+                    isActive
+                      ? 'bg-primary/10 text-primary'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                   )}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <item.icon className="w-4 h-4 shrink-0" />
                   {item.label}
                 </Link>
               )
@@ -117,7 +117,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/profile" className="flex items-center gap-2 cursor-pointer">
                     <UserIcon className="w-4 h-4" />
-                    Profile
+                    Profil
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -126,7 +126,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                   className="text-destructive focus:text-destructive cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sign out
+                  Log ud
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

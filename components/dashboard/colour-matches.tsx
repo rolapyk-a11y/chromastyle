@@ -16,26 +16,26 @@ import { PRODUCT_CATALOG, catalogIsEmpty, type CatalogProduct } from '@/lib/prod
 import { matchProducts, type ProductMatch } from '@/lib/colorMatch'
 
 const FABRIC_LABEL: Record<string, string> = {
-  'linen': 'Linen',
-  'light-cotton': 'Light cotton',
-  'cotton': 'Cotton',
+  'linen': 'Hør',
+  'light-cotton': 'Let bomuld',
+  'cotton': 'Bomuld',
   'denim': 'Denim',
-  'knit': 'Knit',
+  'knit': 'Strik',
   'fleece': 'Fleece',
-  'wool': 'Wool',
+  'wool': 'Uld',
 }
 
 // Filter chips, shown in this order when present in the catalog.
 const GARMENT_TYPE_LABELS: Record<GarmentType, string> = {
-  shirt:     'Shirts',
+  shirt:     'Skjorter',
   tshirt:    'T-shirts',
-  sweater:   'Sweaters',
-  trousers:  'Trousers',
+  sweater:   'Strik',
+  trousers:  'Bukser',
   shorts:    'Shorts',
-  jacket:    'Jackets',
-  shoes:     'Shoes',
-  socks:     'Socks',
-  accessory: 'Accessories',
+  jacket:    'Jakker',
+  shoes:     'Sko',
+  socks:     'Strømper',
+  accessory: 'Tilbehør',
 }
 const GARMENT_TYPE_ORDER: GarmentType[] = [
   'shirt', 'tshirt', 'sweater', 'trousers', 'shorts', 'jacket', 'shoes', 'socks', 'accessory',
@@ -65,19 +65,45 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
     return GARMENT_TYPE_ORDER.filter(t => present.has(t))
   }, [])
 
+  // One entry per product: feeds often list the same item once per size or colour code
+  const uniqueCatalog = useMemo(() => {
+    const seen = new Set<string>()
+    return PRODUCT_CATALOG.filter(p => {
+      if (/\b(women|woman|womens|dame|kvinde|girls?|kids?|børn|junior)\b/i.test(p.name)) return false
+      const key = `${p.brand ?? ''}|${p.name}|${p.colorHex}`.toLowerCase()
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }, [])
+
   const filteredCatalog = useMemo(
     () => typeFilter === 'all'
-      ? PRODUCT_CATALOG
-      : PRODUCT_CATALOG.filter(p => p.garmentType === typeFilter),
-    [typeFilter],
+      ? uniqueCatalog
+      : uniqueCatalog.filter(p => p.garmentType === typeFilter),
+    [typeFilter, uniqueCatalog],
   )
 
   const matchesByColour = useMemo(() => {
     if (catalogIsEmpty()) return []
-    return palette
+    const groups = palette
       .map(hex => ({
         hex,
-        matches: matchProducts(hex, filteredCatalog, 25, 8, season, bodyProfile),
+        matches: matchProducts(hex, filteredCatalog, 25, 16, season, bodyProfile),
+      }))
+    // Show each product once, under the palette colour it matches best
+    const bestFor = new Map<string, { hex: string; pct: number }>()
+    for (const g of groups) for (const m of g.matches) {
+      const k = `${m.product.brand ?? ''}|${m.product.name}`.toLowerCase()
+      const cur = bestFor.get(k)
+      if (!cur || m.matchPercent > cur.pct) bestFor.set(k, { hex: g.hex, pct: m.matchPercent })
+    }
+    return groups
+      .map(g => ({
+        hex: g.hex,
+        matches: g.matches
+          .filter(m => bestFor.get(`${m.product.brand ?? ''}|${m.product.name}`.toLowerCase())?.hex === g.hex)
+          .slice(0, 8),
       }))
       .sort((a, b) => (b.matches[0]?.matchPercent ?? 0) - (a.matches[0]?.matchPercent ?? 0))
   }, [palette, season, bodyProfile, filteredCatalog])
@@ -87,7 +113,7 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
       <Card className="border-dashed border-border/60">
         <CardContent className="p-6 space-y-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-2 text-foreground font-medium">
-            <Info className="w-4 h-4" /> No product catalog yet
+            <Info className="w-4 h-4" /> Intet produktkatalog endnu
           </div>
           <p>
             The colour-matching engine is ready, but there are no products to match against.
@@ -109,7 +135,7 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Palette className="w-4 h-4" />
-        <span>Real products matched to your exact palette colours, closest first.</span>
+        <span>Rigtige produkter i dine farver, sorteret efter farve og pasform. Snit, der ikke klæder din krop, er sorteret fra.</span>
       </div>
 
       {/* ── Garment-type filter chips ── */}
@@ -123,7 +149,7 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
                 : 'border-border/60 text-muted-foreground hover:border-border'
             }`}
           >
-            All
+            Alle
           </button>
           {availableTypes.map(t => (
             <button
@@ -154,12 +180,12 @@ export function ColourMatches({ colorAnalysis, bodyProfile, onAddToInventory }: 
             <div className="w-5 h-5 rounded-md border border-border/40" style={{ backgroundColor: hex }} />
             <span className="text-sm font-medium">{hex}</span>
             <span className="text-xs text-muted-foreground">
-              {matches.length} match{matches.length !== 1 ? 'es' : ''}
+              {matches.length} {matches.length !== 1 ? 'fund' : 'fund'}
             </span>
           </div>
 
           {matches.length === 0 ? (
-            <p className="text-xs text-muted-foreground pl-7">No close products in the catalog yet.</p>
+            <p className="text-xs text-muted-foreground pl-7">Ingen produkter tæt på denne farve endnu.</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {matches.map(m => (
@@ -203,7 +229,7 @@ function ProductMatchCard({
           <span
             className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full border-2 border-background shadow"
             style={{ backgroundColor: product.colorHex }}
-            title={`Actual colour ${product.colorHex}`}
+            title={`Farve ${product.colorHex}`}
           />
         </div>
       </a>
@@ -225,9 +251,9 @@ function ProductMatchCard({
             {fitsBody && (
               <span
                 className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400"
-                title={fitReason || 'Suits your proportions'}
+                title={fitReason || 'Passer til dine proportioner'}
               >
-                ✓ Suits your shape
+                ✓ Klæder din krop
               </span>
             )}
           </div>
@@ -242,7 +268,7 @@ function ProductMatchCard({
                 : 'border-border/60 hover:border-primary hover:text-primary'
             }`}
           >
-            {added ? <><Check className="w-2.5 h-2.5" /> Added</> : <><Plus className="w-2.5 h-2.5" /> Add to inventory</>}
+            {added ? <><Check className="w-2.5 h-2.5" /> I skabet</> : <><Plus className="w-2.5 h-2.5" /> Jeg har den</>}
           </button>
           <a
             href={product.product_url}
@@ -250,7 +276,7 @@ function ProductMatchCard({
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1 text-[10px] px-1.5 py-1 rounded border border-border/60 hover:border-primary hover:text-primary transition-colors"
           >
-            <ExternalLink className="w-2.5 h-2.5" /> View
+            <ExternalLink className="w-2.5 h-2.5" /> Se
           </a>
         </div>
       </div>

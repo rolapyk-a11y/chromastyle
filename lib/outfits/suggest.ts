@@ -68,7 +68,7 @@ Sådan arbejder du:
 - Noterne på tøjet er hans egne regler. De er ufravigelige (fx en jakke der kun er til sport, eller farver der ikke må kombineres).
 - Tyk sweatshirt, half-zip eller strik bæres altid med en t-shirt under.
 - Hans farvetype bestemmer, hvad der sidder tæt på ansigtet: lyse, varme, dæmpede farver ved ansigtet, mørkere farver længere nede. Hold kontrasten lav til middel og temperaturen varm.
-- Krop: brede hofter, korte ben og en tæt overkrop. Forlæng benene (bukser og sko i samme lyshed, ingen opslag), struktur foroven, intet der tilføjer volumen på hofterne.
+- Krop: brede hofter, korte ben og en tæt overkrop, ca. 1,75 m. Bukser i lige eller relaxed-straight snit, der falder lige fra hoften, mellemhøj talje, intet eller lille knæk og ingen opslag. Ikke slim/skinny og ikke helt vide/baggy ben. Bukser og sko i samme lyshed forlænger benene. Struktur ved skuldrene (krave, overshirt, half-zip), relaxed men ikke oversized foroven, og front-tuck af t-shirten når det passer.
 - Hans godkendte outfits viser hans smag. Byg videre på den, men gentag dem ikke.
 - Skriv på dansk, kort og konkret, til ham som "du".
 - Brug butikstøj kun hvis det løfter outfittet tydeligt.`

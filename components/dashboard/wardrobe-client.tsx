@@ -1,14 +1,17 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ColorAnalysis, ClothingItem, Season, SEASON_INFO } from '@/lib/types'
-import { getStyleGuide } from '@/lib/seasonStyle'
+import { ColorAnalysis, ClothingItem, Season, SEASON_INFO, type BodyProfile } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ClothingCard } from './clothing-card'
 import { TryOnModal } from './try-on-modal'
 import { MyWardrobe } from './my-wardrobe'
+import { ColourMatches } from './colour-matches'
+import { PersonalStyleGuide } from './personal-style-guide'
+import { addWardrobeItem, loadWardrobe } from '@/lib/closet/wardrobe-store'
+import type { CatalogProduct } from '@/lib/productCatalog'
 import {
   Search,
   Filter,
@@ -28,13 +31,15 @@ import {
 } from '@/components/ui/select'
 import Link from 'next/link'
 
-type MainTab = 'shop' | 'my-wardrobe'
+type MainTab = 'colours' | 'shop' | 'my-wardrobe'
 
 interface WardrobeClientProps {
   colorAnalysis: ColorAnalysis | undefined
   clothingItems: ClothingItem[]
   savedItemIds: string[]
   initialMainTab?: MainTab
+  /** Signed-in users keep their closet under Mit skab; guests use the browser wardrobe here. */
+  signedIn?: boolean
 }
 
 type FilterBrand = 'all' | 'H&M' | 'Zara' | 'Toj Eksperten'
@@ -72,9 +77,31 @@ export function WardrobeClient({
   colorAnalysis,
   clothingItems,
   savedItemIds: initialSavedIds,
-  initialMainTab = 'shop'
+  initialMainTab = 'colours',
+  signedIn = false,
 }: WardrobeClientProps) {
-  const [mainTab, setMainTab] = useState<MainTab>(initialMainTab)
+  const [mainTab, setMainTab] = useState<MainTab>(signedIn && initialMainTab === 'my-wardrobe' ? 'colours' : initialMainTab)
+  const [bodyProfile, setBodyProfile] = useState<BodyProfile | undefined>()
+  const [ownedMsg, setOwnedMsg] = useState<string | null>(null)
+
+  async function addOwned(p: CatalogProduct) {
+    try {
+      await loadWardrobe()
+      await addWardrobeItem({
+        id: `item-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        name: p.name,
+        category: p.category,
+        color_hex: p.colorHex,
+        color_name: p.colorName ?? p.colorHex,
+        brand: p.brand,
+        image_url: p.image_url,
+        created_at: new Date().toISOString(),
+      })
+      setOwnedMsg(signedIn ? `${p.name} er lagt i Mit skab.` : `${p.name} er lagt i dit skab i denne browser.`)
+    } catch (e) {
+      setOwnedMsg(e instanceof Error ? e.message : 'Kunne ikke gemme')
+    }
+  }
   const [searchQuery, setSearchQuery] = useState('')
   const [brandFilter, setBrandFilter] = useState<FilterBrand>('all')
   const [categoryFilter, setCategoryFilter] = useState<FilterCategory>('all')
@@ -195,11 +222,11 @@ export function WardrobeClient({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Wardrobe</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Shop</h1>
           <p className="text-muted-foreground mt-1">
             {colorAnalysis
-              ? `Showing clothes that match your ${colorAnalysis.sub_season?.replace('-', ' ')} palette`
-              : 'Browse clothing from our partner stores'
+              ? 'Tøj i dine farver og en pasform, der klæder dig'
+              : 'Tøj fra vores partnerbutikker'
             }
           </p>
         </div>
@@ -211,76 +238,54 @@ export function WardrobeClient({
         )}
       </div>
 
-      {/* Style Guide - fit & fabric recommendations */}
-      {colorAnalysis?.sub_season && (() => {
-        const guide = getStyleGuide(colorAnalysis.sub_season)
-        return (
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardContent className="p-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <h2 className="font-semibold text-sm">Your Style Guide - {colorAnalysis.sub_season.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="space-y-2">
-                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fits</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {guide.fits.map(f => (
-                      <span key={f} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">{f}</span>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{guide.fitAdvice}</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Best Fabrics</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {guide.fabrics.map(f => (
-                      <span key={f} className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 text-xs font-medium">{f}</span>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{guide.fabricAdvice}</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-medium text-xs uppercase tracking-wide text-muted-foreground">Avoid</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {guide.avoid.map(f => (
-                      <span key={f} className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-medium">{f}</span>
-                    ))}
-                  </div>
-                  <div className="mt-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
-                    <p className="text-xs font-medium text-primary mb-0.5">Go-to outfit formula</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{guide.outfitFormula}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )
-      })()}
+      {!signedIn && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="p-4 flex flex-wrap items-center gap-3 text-sm">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <p className="flex-1 min-w-[12rem]">
+              Du er ikke logget ind. Det, du lægger i skabet her, gemmes kun i denne browser.
+              Log ind for at se dit skab og dine outfits på alle dine enheder.
+            </p>
+            <Button asChild size="sm"><Link href="/auth/login">Log ind</Link></Button>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Main tabs: Shop / My Wardrobe */}
-      <div className="flex gap-1 border-b border-border">
-        <button
-          onClick={() => setMainTab('shop')}
-          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            mainTab === 'shop'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Palette className="w-4 h-4" /> Shop
-        </button>
-        <button
-          onClick={() => setMainTab('my-wardrobe')}
-          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            mainTab === 'my-wardrobe'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Shirt className="w-4 h-4" /> My Wardrobe &amp; Outfits
-        </button>
+      <PersonalStyleGuide colorAnalysis={colorAnalysis} onBodyProfile={setBodyProfile} />
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-border overflow-x-auto">
+        {([
+          ...(!signedIn ? [{ id: 'my-wardrobe' as const, label: 'Mit skab', icon: Shirt }] : []),
+          { id: 'colours' as const, label: 'I dine farver', icon: Palette },
+          { id: 'shop' as const, label: 'Alle produkter', icon: Search },
+        ]).map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setMainTab(id)}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              mainTab === id
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Icon className="w-4 h-4" /> {label}
+          </button>
+        ))}
       </div>
+
+      {signedIn && (
+        <p className="text-sm text-muted-foreground">
+          Dit eget tøj ligger under <Link href="/dashboard/closet" className="underline">Mit skab</Link>, og dine outfits under{' '}
+          <Link href="/dashboard/outfits" className="underline">Outfits</Link>.
+        </p>
+      )}
+
+      {ownedMsg && <p className="text-sm text-muted-foreground">{ownedMsg}</p>}
+
+      {mainTab === 'colours' && (
+        <ColourMatches colorAnalysis={colorAnalysis} bodyProfile={bodyProfile} onAddToInventory={addOwned} />
+      )}
 
       {mainTab === 'my-wardrobe' && (
         <MyWardrobe colorAnalysis={colorAnalysis} />
@@ -295,11 +300,11 @@ export function WardrobeClient({
             <AlertCircle className="w-5 h-5 text-primary shrink-0" />
             <div className="flex-1">
               <p className="text-sm">
-                Get personalized recommendations by completing your color analysis first.
+                Lav din farveanalyse først, så bliver anbefalingerne personlige.
               </p>
             </div>
             <Button asChild size="sm">
-              <Link href="/dashboard/analyze">Analyze Now</Link>
+              <Link href="/dashboard/analyze">Lav analyse</Link>
             </Button>
           </CardContent>
         </Card>
@@ -312,7 +317,7 @@ export function WardrobeClient({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, brand, or style..."
+              placeholder="Søg på navn, mærke eller stil..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -328,7 +333,7 @@ export function WardrobeClient({
                 className="gap-2"
               >
                 <Palette className="h-4 w-4" />
-                <span className="hidden sm:inline">My Colors</span>
+                <span className="hidden sm:inline">Mine farver</span>
               </Button>
             )}
             <Button
@@ -337,7 +342,7 @@ export function WardrobeClient({
               className="gap-2"
             >
               <SlidersHorizontal className="h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
+              <span className="hidden sm:inline">Filtre</span>
             </Button>
           </div>
         </div>
@@ -348,13 +353,13 @@ export function WardrobeClient({
             <CardContent className="p-4">
               <div className="flex flex-wrap gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Brand</label>
+                  <label className="text-sm font-medium">Mærke</label>
                   <Select value={brandFilter} onValueChange={(v) => setBrandFilter(v as FilterBrand)}>
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Brands</SelectItem>
+                      <SelectItem value="all">Alle mærker</SelectItem>
                       <SelectItem value="H&M">H&M</SelectItem>
                       <SelectItem value="Zara">Zara</SelectItem>
                       <SelectItem value="Toj Eksperten">Toj Eksperten</SelectItem>
@@ -363,32 +368,32 @@ export function WardrobeClient({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Category</label>
+                  <label className="text-sm font-medium">Kategori</label>
                   <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as FilterCategory)}>
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="tops">Tops</SelectItem>
-                      <SelectItem value="shirts">Shirts</SelectItem>
-                      <SelectItem value="outerwear">Outerwear</SelectItem>
-                      <SelectItem value="pants">Pants</SelectItem>
+                      <SelectItem value="all">Alle kategorier</SelectItem>
+                      <SelectItem value="tops">Overdele</SelectItem>
+                      <SelectItem value="shirts">Skjorter</SelectItem>
+                      <SelectItem value="outerwear">Overtøj</SelectItem>
+                      <SelectItem value="pants">Bukser</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Sort By</label>
+                  <label className="text-sm font-medium">Sortér efter</label>
                   <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="recommended">Recommended</SelectItem>
+                      <SelectItem value="recommended">Anbefalet</SelectItem>
                       <SelectItem value="price-low">Price: Low to High</SelectItem>
                       <SelectItem value="price-high">Price: High to Low</SelectItem>
-                      <SelectItem value="trending">Trending</SelectItem>
+                      <SelectItem value="trending">Populært</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -424,7 +429,7 @@ export function WardrobeClient({
         {showOnlyMatching && colorAnalysis && (
           <div className="flex items-center gap-2 text-sm">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground">Showing items that match your palette</span>
+            <span className="text-muted-foreground">Viser tøj, der passer til dine farver</span>
           </div>
         )}
       </div>
@@ -448,7 +453,7 @@ export function WardrobeClient({
         <Card className="border-border/50">
           <CardContent className="p-12 text-center">
             <Filter className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No items found</h3>
+            <h3 className="text-lg font-medium mb-2">Ingen produkter fundet</h3>
             <p className="text-muted-foreground">
               Try adjusting your filters or search query
             </p>
