@@ -14,7 +14,7 @@
 
 import type { FabricWeight, GarmentCut, ItemCategory, Season, BodyProfile } from './types'
 import { fabricSeasonPenalty } from './styleGuide'
-import { cutFitsBody } from './bodyGuide'
+import { cutFitsBody, inferCutFromName, nameMentionsCut } from './bodyGuide'
 
 export interface Lab {
   L: number
@@ -78,6 +78,7 @@ export function matchPercent(dE: number): number {
 
 export interface ColouredProduct {
   colorHex: string
+  name?: string
   fabric?: FabricWeight
   cut?: GarmentCut
   category?: ItemCategory
@@ -125,17 +126,21 @@ export function matchProducts<T extends ColouredProduct>(
       // Apply body-fit delta when body profile + cut + category are all known
       let fitDelta = 0
       let fitReason: string | undefined
-      if (bodyProfile && product.cut && product.category) {
-        const fit = cutFitsBody(product.cut, product.category, bodyProfile)
+      // Fall back to the cut named in the product title ("SLHSLIM", "Relaxed Fit", ...)
+      const cut = product.cut ?? (product.name && nameMentionsCut(product.name) ? inferCutFromName(product.name) : undefined)
+      if (bodyProfile && cut && product.category) {
+        const fit = cutFitsBody(cut, product.category, bodyProfile)
         fitDelta = fit.delta
         fitReason = fit.reason || undefined
       }
 
       const combined = Math.max(0, Math.min(100, colourPct - fabricPenalty + fitDelta))
 
-      return { product, deltaE: dE, matchPercent: combined, colourPercent: colourPct, fitReason }
+      return { product, deltaE: dE, matchPercent: combined, colourPercent: colourPct, fitReason, fitDelta }
     })
-    .filter(m => m.deltaE <= maxDeltaE)
+    // Drop clear fit mismatches (e.g. slim trousers for wide hips), not just rank them lower
+    .filter(m => m.deltaE <= maxDeltaE && m.fitDelta > -8)
+    .map(({ fitDelta: _fitDelta, ...m }) => m)
     .sort((a, b) => b.matchPercent - a.matchPercent)
     .slice(0, topN)
 }

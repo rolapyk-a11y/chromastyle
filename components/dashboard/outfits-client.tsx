@@ -13,6 +13,7 @@ import {
 import { sortPieces } from '@/lib/outfits/pieces'
 import { checkOutfit, type Check } from '@/lib/outfits/rules'
 import { Button } from '@/components/ui/button'
+import { CompleteOutfit } from './complete-outfit'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -34,6 +35,7 @@ import {
   Pencil,
   Plus,
   Shirt,
+  ShoppingBag,
   Sparkles,
   Trash2,
   X,
@@ -71,7 +73,9 @@ function asArray(v: unknown): string[] {
   return Array.isArray(v) ? (v as string[]) : []
 }
 
-export function OutfitsClient({ colorAnalysis, closet, shop, initialOutfits, setupMissing }: OutfitsClientProps) {
+export function OutfitsClient({ colorAnalysis, closet, shop: initialShop, initialOutfits, setupMissing }: OutfitsClientProps) {
+  const [shop, setShop] = useState(initialShop)
+  const [completeFor, setCompleteFor] = useState<{ pieces: Piece[]; missing?: string | null } | null>(null)
   const [outfits, setOutfits] = useState(initialOutfits)
   const [draft, setDraft] = useState<Draft | null>(initialOutfits.length ? null : { ...EMPTY })
   const [source, setSource] = useState<'closet' | 'shop'>('closet')
@@ -285,6 +289,9 @@ export function OutfitsClient({ colorAnalysis, closet, shop, initialOutfits, set
                         Tilpas
                       </Button>
                     </div>
+                    <Button size="sm" variant="ghost" className="gap-1.5" onClick={() => setCompleteFor({ pieces: s.pieces, missing: s.missing })}>
+                      <ShoppingBag className="w-4 h-4" /> {s.missing ? `Find ${s.missing.toLowerCase()}` : 'Fuldend fra butikker'}
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -427,6 +434,11 @@ export function OutfitsClient({ colorAnalysis, closet, shop, initialOutfits, set
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Gem outfit
               </Button>
+              {selected.length > 0 && (
+                <Button variant="outline" className="gap-2" onClick={() => setCompleteFor({ pieces: selected })}>
+                  <ShoppingBag className="w-4 h-4" /> Fuldend fra butikker
+                </Button>
+              )}
             </div>
           </div>
         </Card>
@@ -466,6 +478,9 @@ export function OutfitsClient({ colorAnalysis, closet, shop, initialOutfits, set
                         </div>
                       </div>
                       <div className="flex shrink-0">
+                        <Button variant="ghost" size="icon" onClick={() => setCompleteFor({ pieces: o.pieces })} aria-label={`Fuldend ${o.name} fra butikker`} title="Fuldend fra butikker">
+                          <ShoppingBag className="w-4 h-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" onClick={() => edit(o)} aria-label={`Redigér ${o.name}`}>
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -492,6 +507,18 @@ export function OutfitsClient({ colorAnalysis, closet, shop, initialOutfits, set
           </div>
         </>
       )}
+      <CompleteOutfit
+        pieces={completeFor?.pieces ?? null}
+        missing={completeFor?.missing}
+        onClose={() => setCompleteFor(null)}
+        onSaved={(piece) => setShop((prev) => (prev.some((p) => p.key === piece.key) ? prev : [piece, ...prev]))}
+        onUseInBuilder={(keys) => {
+          setCompleteFor(null)
+          setError(null)
+          setDraft({ name: '', occasion: 'everyday', approved: false, keys })
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }}
+      />
     </div>
   )
 }

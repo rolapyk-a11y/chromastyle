@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import seasonReferences from '@/lib/agents/research-output/season-references.json'
 import type { SubSeason, ClothingItem } from '@/lib/types'
 
-const SERPAPI_URL = 'https://serpapi.com/search'
+// Google Shopping via serper.dev (the SERPER_API_KEY belongs to serper.dev, not serpapi.com)
+const SERPER_URL = 'https://google.serper.dev/shopping'
 const SEARCH_CATEGORIES = ['shirt', 'trousers', 'jacket']
 const TOP_COLOURS = 3
 const CACHE_DAYS = 30
@@ -16,31 +17,26 @@ interface SerpResult {
 }
 
 async function serpSearch(query: string, apiKey: string): Promise<SerpResult[]> {
-  const params = new URLSearchParams({
-    engine: 'google_shopping',
-    q: query,
-    api_key: apiKey,
-    gl: 'gb',
-    num: '6',
-  })
   try {
-    const res = await fetch(`${SERPAPI_URL}?${params}`, { cache: 'no-store' })
+    const res = await fetch(SERPER_URL, {
+      method: 'POST',
+      headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: query, gl: 'dk', hl: 'da' }),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(20_000),
+    })
     if (!res.ok) {
-      console.error(`[fetchProducts] SerpAPI ${res.status} for "${query}"`)
+      console.error(`[fetchProducts] Serper ${res.status} for "${query}"`)
       return []
     }
-    const data = await res.json()
-    if (data.error) {
-      console.error(`[fetchProducts] SerpAPI error for "${query}":`, data.error)
-      return []
-    }
-    const results = data.shopping_results ?? []
-    if (results.length === 0) console.warn(`[fetchProducts] 0 results for "${query}"`)
-    else {
-      const sample = results[0]
-      console.log(`[fetchProducts] sample fields for "${query}":`, Object.keys(sample).filter(k => ['title','product_link','thumbnail','price'].includes(k)))
-    }
-    return results
+    const data = (await res.json()) as { shopping?: Record<string, unknown>[] }
+    return (data.shopping ?? []).map((r) => ({
+      title: String(r.title ?? ''),
+      source: String(r.source ?? ''),
+      product_link: String(r.link ?? ''),
+      thumbnail: String(r.imageUrl ?? ''),
+      price: String(r.price ?? ''),
+    }))
   } catch (e) {
     console.error(`[fetchProducts] fetch error for "${query}":`, e)
     return []
@@ -83,7 +79,7 @@ export async function fetchProductsForSeason(subSeason: SubSeason): Promise<Clot
 
   for (const colour of topColours) {
     for (const category of SEARCH_CATEGORIES) {
-      const results = await serpSearch(`${colour.name} ${category} men`, apiKey)
+      const results = await serpSearch(`herre ${colour.name} ${category}`, apiKey)
       for (const r of results.slice(0, 3)) {
         if (!r.thumbnail || !r.product_link) continue
         raw.push({
@@ -132,8 +128,8 @@ function mapToClothingItems(raw: object[]): ClothingItem[] {
     brand: p.brand ?? '',
     category: p.category,
     subcategory: p.colour_name,
-    price: parseFloat(p.price?.replace(/[^0-9.]/g, '') ?? '0') || 0,
-    currency: 'GBP',
+    price: parseFloat(p.price?.replace(/[^0-9,]/g, '').replace(',', '.') ?? '0') || 0,
+    currency: 'DKK',
     image_url: p.image_url,
     product_url: p.product_url,
     colors: [p.colour_hex],
